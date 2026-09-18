@@ -52,6 +52,20 @@ function Invoke-Native {
   try { & $Command } finally { $ErrorActionPreference = $prev }
 }
 
+# 生成 version.json（入口页用它显示「线上是哪一版」）
+function New-VersionFile {
+  param([string]$Commit, [string]$PublishedAt, [string]$TenantAt, [string]$MerchantAt)
+  $version = [pscustomobject]@{
+    publishedAt      = $PublishedAt
+    commit           = $Commit
+    tenantSourceAt   = $TenantAt
+    merchantSourceAt = $MerchantAt
+    site             = $SiteUrl
+  }
+  $p = Join-Path $RepoRoot 'version.json'
+  [System.IO.File]::WriteAllText($p, ($version | ConvertTo-Json -Depth 3), (New-Object System.Text.UTF8Encoding($false)))
+}
+
 Write-Host ''
 Write-Host '食联网数智餐饮平台 · 原型一键发布' -ForegroundColor White
 Write-Host "发布仓库：$RepoRoot" -ForegroundColor DarkGray
@@ -95,10 +109,8 @@ try {
     Write-Ok "已同步 -> $dst"
   }
 
-  Write-Step '3/5 生成线上版本信息'
-  $now    = Get-Date -Format 'yyyy-MM-dd HH:mm'
-  $commit = (Invoke-Native { git rev-parse --short HEAD 2>$null } | Select-Object -First 1)
-  if (-not $commit) { $commit = 'initial' }
+  Write-Step '3/5 统计本次发布信息'
+  $now = Get-Date -Format 'yyyy-MM-dd HH:mm'
   $tenantAt = '-'; $merchantAt = '-'
   foreach ($key in $Sources.Keys) {
     $latest = Get-ChildItem $Sources[$key].path -Recurse -File -ErrorAction SilentlyContinue |
@@ -107,16 +119,8 @@ try {
     if ($latest) { $v = $latest.LastWriteTime.ToString('yyyy-MM-dd HH:mm') }
     if ($key -eq 'tenant') { $tenantAt = $v } else { $merchantAt = $v }
   }
-  $version = [pscustomobject]@{
-    publishedAt      = $now
-    commit           = $commit
-    tenantSourceAt   = $tenantAt
-    merchantSourceAt = $merchantAt
-    site             = $SiteUrl
-  }
-  $verPath = Join-Path $RepoRoot 'version.json'
-  [System.IO.File]::WriteAllText($verPath, ($version | ConvertTo-Json -Depth 3), (New-Object System.Text.UTF8Encoding($false)))
-  Write-Ok "version.json：$now / $commit"
+  Write-Ok "发布时刻：$now"
+  Write-Ok "原型最后修改：租户端 $tenantAt / 商户端 $merchantAt"
 
   Write-Step '4/5 提交并推送到 GitHub'
   Invoke-Native { git add -A } | Out-Null
@@ -133,6 +137,15 @@ try {
   Invoke-Native { git commit -m $commitMessage --quiet } | Out-Null
   if ($LASTEXITCODE -ne 0) { Write-Err '提交失败。'; exit 1 }
   Write-Ok "已提交：$commitMessage"
+
+  # 把本次提交号写进 version.json（入口页会显示），并入本次提交一起发布
+  $newCommit = (Invoke-Native { git rev-parse --short HEAD 2>$null } | Select-Object -First 1)
+  New-VersionFile -Commit "$newCommit" -PublishedAt $now -TenantAt $tenantAt -MerchantAt $merchantAt
+  Invoke-Native { git add version.json } | Out-Null
+  Invoke-Native { git commit --amend --no-edit --quiet } | Out-Null
+  if ($LASTEXITCODE -eq 0) { Write-Ok "version.json 已写入本次提交号：$newCommit" }
+  else { Write-Note 'version.json 未能并入本次提交，不影响发布' }
+
   $branch = $Branch
   Invoke-Native { git push origin $branch } | Out-Null
   if ($LASTEXITCODE -ne 0) {
@@ -172,6 +185,18 @@ try {
     }
   } else {
     Write-Note '未安装 GitHub CLI，跳过部署状态检查（约 30 秒后刷新线上地址即可）'
+  }
+
+  # 可选：线上资源自检（需要本机有 node，缺省自动跳过）
+  if (Get-Command node -ErrorAction SilentlyContinue) {
+    $verifyScript = Join-Path $RepoRoot 'verify-live.mjs'
+    if (Test-Path $verifyScript) {
+      Write-Host ''
+      Write-Host '  正在自检线上资源…' -ForegroundColor DarkGray
+      $vout = @(Invoke-Native { node $verifyScript 2>$null })
+      $summary = @($vout | Where-Object { "$_".Trim() }) | Select-Object -Last 1
+      if ($summary) { Write-Ok "自检：$("$summary".Trim())" }
+    }
   }
 
   Write-Host ''
