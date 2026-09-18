@@ -1,0 +1,18 @@
+.device-ingredient-section{background:#fff;border:1px solid #e3e8f1;border-radius:10px;margin-bottom:18px;overflow:hidden}
+.device-ingredient-head{width:100%;display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border:0;background:#fff;text-align:left;cursor:pointer}
+.device-ingredient-head h3{margin:0;color:#17233a;font-size:16px}
+.device-ingredient-head h3 span{margin-left:6px;color:#3475ed;font-size:12px;font-weight:500}
+.device-ingredient-head p{margin:5px 0 0;color:#8794a8;font-size:12px}
+.device-ingredient-head em{color:#3475ed;font-style:normal;font-size:13px}
+.device-ingredient-section.expanded .device-ingredient-head{border-bottom:1px solid #edf0f5}
+.device-ingredient-toolbar{display:flex;justify-content:flex-end;padding:12px 14px 0}
+.device-ingredient-list{padding:14px;display:flex;flex-direction:column;gap:12px}
+.device-ingredient-card{position:relative;background:#f8fafe;border:1px solid #e7ebf3;border-radius:9px;padding:14px}
+.ingredient-remove{position:absolute;right:12px;top:10px;border:0;background:transparent;color:#df5454;cursor:pointer}
+.device-ingredient-grid{display:grid;grid-template-columns:repeat(4,minmax(120px,1fr));gap:12px;padding-top:18px}
+.device-ingredient-grid label{color:#68758a;font-size:12px}
+.device-ingredient-grid input,.device-ingredient-grid select{width:100%;box-sizing:border-box;margin-top:6px;border:1px solid #dfe5ef;border-radius:7px;padding:8px 9px;background:#fff;color:#27334a}
+@media(max-width:1000px){.device-ingredient-grid{grid-template-columns:repeat(2,1fr)}}
+
+
+

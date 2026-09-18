@@ -1,0 +1,2 @@
+.content:has(.product-reference-frame){padding:0;overflow:hidden;max-width:none}
+.product-reference-frame{display:block;width:100%;height:calc(100vh - 68px);min-height:760px;margin:0;border:0;background:#f5f7fb}

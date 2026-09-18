@@ -1,0 +1,1 @@
+.device-bulk-mode-bar{display:flex;align-items:center;gap:10px}.device-bulk-mode-bar .spacer{flex:1}.device-bulk-mode-bar span{color:#6f7d92;font-size:11px}.device-bulk-mode-bar .mode-name{color:#285fc2;font-weight:600}.device-recipe-check:disabled,#checkAllDeviceRecipes:disabled{cursor:not-allowed;opacity:.38}

@@ -1,0 +1,9 @@
+# 系统与编辑器临时文件（不会发布到线上）
+Thumbs.db
+Desktop.ini
+.DS_Store
+*.tmp
+*.log
+
+# 本地临时目录
+_local/

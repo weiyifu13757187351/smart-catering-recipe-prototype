@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>数智餐饮商户管理平台｜租户端</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="formats.css" />
+  <link rel="stylesheet" href="editor.css" />
+  <link rel="stylesheet" href="editor-v2.css" />
+  <link rel="stylesheet" href="merchant-ops.css" />
+  <link rel="stylesheet" href="roles.css" />
+  <link rel="stylesheet" href="roles-v2.css" />
+  <link rel="stylesheet" href="level-attributes.css" />
+  <link rel="stylesheet" href="merchant-credit.css" />
+  <link rel="stylesheet" href="dishes.css" />
+  <link rel="stylesheet" href="dishes-detail.css" />
+  <link rel="stylesheet" href="dish-version.css" />
+  <link rel="stylesheet" href="dish-authorization.css" />
+  <link rel="stylesheet" href="dish-authorization-tree.css" />
+  <link rel="stylesheet" href="device-recipes.css" />
+  <link rel="stylesheet" href="dish-library-v2.css" />
+  <link rel="stylesheet" href="tenant-device-center.css?v=20260911" />
+  <link rel="stylesheet" href="tenant-device-dictionary.css?v=20260911" />
+  <link rel="stylesheet" href="tenant-device-ingredients.css?v=20260911" />
+  <link rel="stylesheet" href="tenant-device-tabs.css?v=20260911" />
+  <link rel="stylesheet" href="tenant-device-compat.css?v=20260911-2" />
+  <link rel="stylesheet" href="tenant-recipe-authorization-v1.css?v=20260913" />
+  <link rel="stylesheet" href="tenant-recipe-authorization-v1-fix.css?v=20260913" />
+  <link rel="stylesheet" href="tenant-recipe-auth-cleanup.css?v=20260913" />
+  <link rel="stylesheet" href="tenant-device-bulk-modes.css?v=20260913" />
+  <link rel="stylesheet" href="tenant-product-center.css?v=20260911" />
+  <link rel="stylesheet" href="product-reference-override.css?v=20260911-4" />
+  <link rel="stylesheet" href="unified-recipe-v1.css?v=20260914-8" />
+  <link rel="stylesheet" href="unified-recipe-list-v2.css?v=20260914-4" />
+  <link rel="stylesheet" href="unified-recipe-editor-v2.css?v=20260914-5" />
+</head>
+<body>
+  <section id="loginView" class="login-view">
+    <div class="login-art">
+      <div class="brand brand-light"><span class="brand-mark">食</span><span>数智餐饮商户管理平台</span></div>
+      <div class="hero-copy">
+        <span class="eyebrow">RESTAURANT CLOUD</span>
+        <h1>让每一家门店，<br>都在同一套标准下高效经营</h1>
+        <p>面向餐饮企业的一体化数智管理平台，统一商户、供应商、菜谱、采购与权限管理。</p>
+      </div>
+      <div class="orb orb-a"></div><div class="orb orb-b"></div><div class="grid-lines"></div>
+    </div>
+    <div class="login-panel">
+      <div class="login-box">
+        <div class="mobile-brand"><span class="brand-mark">食</span> 数智餐饮商户管理平台（租户端）</div>
+        <p class="hello">欢迎回来</p><h2>登录租户管理平台</h2><p class="muted">请输入您的企业账号和密码</p>
+        <form id="loginForm">
+          <label>企业账号</label><div class="input-wrap"><span>◎</span><input id="username" value="admin" placeholder="请输入企业账号" /></div>
+          <label>登录密码</label><div class="input-wrap"><span>◇</span><input id="password" type="password" value="123456" placeholder="请输入登录密码" /><button type="button" class="eye" id="togglePwd">查看</button></div>
+          <div class="login-options"><label class="check"><input type="checkbox" checked /> 记住账号</label><a href="#">忘记密码？</a></div>
+          <button class="primary login-btn" type="submit">登录系统 <span>→</span></button>
+        </form>
+        <div class="demo-tip">演示账号：admin　密码：123456</div>
+        <p class="copyright">© 2026 食联网 · 服务热线 400-888-2026</p>
+      </div>
+    </div>
+  </section>
+
+  <div id="appView" class="app hidden">
+    <aside class="sidebar">
+      <div class="brand"><span class="brand-mark">食</span><span>数智餐饮商户管理平台</span></div>
+      <div class="tenant-chip"><div class="tenant-logo">味</div><div><b>味来餐饮集团</b><span>连锁总部版</span></div><button>⌄</button></div>
+      <nav id="nav">
+        <p>工作台</p><button class="active" data-page="dashboard"><span>▦</span>经营总览</button>
+        <p>组织经营</p><button data-page="merchants"><span>▤</span>商户管理<em>128</em></button><button data-page="suppliers"><span>♧</span>供应商管理</button><button data-page="formats"><span>◈</span>业态管理</button>
+        <p>商品中心</p><button data-page="standardIngredients"><span>▦</span>标准食材</button><button data-page="tenantProducts"><span>◇</span>运营商品</button><button data-page="tenantSkus"><span>▣</span>SKU中心</button><button data-page="productPublish"><span>✓</span>发布记录</button><button data-page="brandLibrary"><span>◆</span>品牌库</button><button data-page="productCategories"><span>▦</span>分类库</button><button data-page="productAuthorization"><span>⊞</span>商品授权</button>
+        <p>菜谱中心</p><button data-page="standardRecipes"><span>◉</span>菜谱管理</button><button data-page="dishAuthorization"><span>⊞</span>菜谱授权</button><p>商品供应链</p><button data-page="ingredients"><span>◒</span>食材中心</button><button data-page="purchase"><span>⇄</span>采购管理<em class="warn">6</em></button>
+        <p>系统管控</p><button data-page="permissions"><span>⊞</span>角色与权限</button>
+      </nav>
+      <div class="sidebar-help"><span>?</span><div><b>需要帮助？</b><small>查看使用指南</small></div><span>›</span></div>
+    </aside>
+    <main class="main">
+      <header><div class="breadcrumb" id="breadcrumb">首页 / <b>经营总览</b></div><div class="header-actions"><button class="icon-btn">⌕</button><button class="icon-btn bell">♢<i></i></button><div class="avatar">陈</div><div class="user"><b>陈晓宇</b><span>超级管理员</span></div><button id="logoutBtn" class="chevron">⌄</button></div></header>
+      <div id="content" class="content"></div>
+    </main>
+  </div>
+
+  <div id="modal" class="modal hidden"><div class="modal-card"><div class="modal-head"><div><h3>新建商户</h3><p>创建后可继续配置业态、功能范围及有效期</p></div><button id="closeModal">×</button></div><form id="merchantForm" class="form-grid"><label class="full credit-query">统一社会信用代码 <i>*</i><div><input id="creditQuery" required maxlength="18" placeholder="请输入18位统一社会信用代码" /><button type="button" id="queryCredit" class="primary">查询商户</button></div><small>查询企业登记信息后，可自动带入商户名称等基础资料</small></label><label>商户名称<input id="createMerchantName" required placeholder="请输入商户名称" /></label><label>商户账号<input required placeholder="请输入商户登录账号（手机号码）" /></label><label>商户编码<input placeholder="不填则自动生成" /></label><label>业态模板<select><option value="K12_EDU">K12 教育业态</option></select></label><label>联系人<input id="createContact" placeholder="请输入联系人" /></label><label>联系电话<input placeholder="请输入手机号" /></label><label>服务有效期<input type="date" value="2027-08-04" /></label><label class="full">商户地址<input id="createAddress" placeholder="请输入省市区及详细地址" /></label><div class="form-actions full"><button type="button" class="ghost" id="cancelModal">取消</button><button class="primary">确认创建</button></div></form></div></div>
+  <div id="merchantOpsModal" class="modal hidden"><div class="modal-card"><div class="modal-head"><div><h3 id="merchantOpsTitle">商户详情</h3><p id="merchantOpsDesc">查看商户基本信息及服务配置</p></div><button class="merchant-ops-close">×</button></div><div id="merchantOpsBody"></div></div></div>
+  <div id="formatModal" class="modal hidden"><div class="modal-card format-editor-card"><div class="modal-head"><div><h3 id="formatModalTitle">新建业态模板</h3><p>设置模板基本信息及商户组织层级</p></div><button class="format-close">×</button></div><div id="formatEditorBody"></div></div></div>
+  <div id="levelModal" class="modal hidden"><div class="modal-card level-editor-card"><div class="modal-head"><div><h3>配置组织层级</h3><p>设置层级显示名称、备注及组织图标</p></div><button class="level-close">×</button></div><form id="levelForm" class="single-form"><label>层级名称<input id="levelName" required /></label><label>层级备注<textarea id="levelNote" rows="4"></textarea></label><label>组织图标 <small>仅支持上传 1 张图片</small><div class="icon-upload"><input id="levelIcon" type="file" accept="image/*" /><div id="iconPreview"><span>＋</span><b>上传图标</b><small>PNG、JPG，建议 1:1</small></div></div></label><div class="level-attributes"><div class="attribute-head"><div><b>层级属性</b><span>创建该层级组织时需要维护的基础信息</span></div><em id="attributeCount">0 项</em></div><div class="attribute-note">以下属性由平台预设，仅供查看，不支持在租户端修改。</div><div id="attributeList" class="attribute-list"></div></div><div class="form-actions"><button type="button" class="ghost level-close">取消</button><button class="primary">保存配置</button></div></form></div></div>
+  <div id="roleModal" class="modal hidden"><div class="modal-card role-editor-card"><div class="modal-head"><div><h3>创建商户角色</h3><p>设置角色的功能权限及功能内数据字段权限</p></div><button class="role-close">×</button></div><form id="roleForm" class="role-form"><div class="role-basic"><label>角色名称 <i>*</i><input id="roleName" required placeholder="如：校区管理员" /></label><label>角色说明<textarea rows="3" placeholder="请输入角色职责说明"></textarea></label></div><div class="permission-section"><h4>功能权限</h4><p>勾选该角色在商户端可使用的功能</p><div class="permission-tree"><label><input type="checkbox" checked /> 工作台</label><div><label><input type="checkbox" checked /> 组织管理</label><label><input type="checkbox" checked /> 成员管理</label></div><div><label><input type="checkbox" checked /> 菜谱管理</label><label><input type="checkbox" /> 价格管理</label></div><div><label><input type="checkbox" checked /> 采购管理</label><label><input type="checkbox" /> 采购审核</label><label><input type="checkbox" /> 供应商查看</label></div><div><label><input type="checkbox" /> 库存管理</label><label><input type="checkbox" /> 库存盘点</label></div><label><input type="checkbox" /> 经营报表</label></div></div><div class="permission-section"><h4>数据权限</h4><p>按功能设置具体数据字段的可见方式；未获得功能权限时，对应数据权限不生效</p><div class="field-permissions"><div class="field-head"><b>功能</b><b>数据字段</b><b>可见方式</b></div><div class="field-row"><b>成员管理</b><span>姓名</span><select><option>完整可见</option><option>脱敏显示</option><option>隐藏</option></select><span>手机号码</span><select><option>脱敏显示</option><option>完整可见</option><option>隐藏</option></select><span>证件号码</span><select><option>隐藏</option><option>脱敏显示</option><option>完整可见</option></select></div><div class="field-row"><b>供应商查看</b><span>联系人</span><select><option>完整可见</option><option>脱敏显示</option><option>隐藏</option></select><span>联系电话</span><select><option>脱敏显示</option><option>完整可见</option><option>隐藏</option></select><span>银行账户</span><select><option>隐藏</option><option>脱敏显示</option><option>完整可见</option></select></div><div class="field-row"><b>采购管理</b><span>采购金额</span><select><option>完整可见</option><option>隐藏</option></select><span>成本单价</span><select><option>隐藏</option><option>完整可见</option></select><span>毛利数据</span><select><option>隐藏</option><option>完整可见</option></select></div></div></div><div class="editor-footer"><button type="button" class="ghost role-close">取消</button><button class="primary">创建角色</button></div></form></div></div>
+  <div id="assignRoleModal" class="modal hidden"><div class="modal-card assign-card"><div class="modal-head"><div><h3>分配商户角色</h3><p>选择商户并赋予已创建的角色</p></div><button class="assign-close">×</button></div><form id="assignRoleForm" class="single-form"><label>选择商户<select required><option>杭州市校园餐饮管理中心</option><option>西湖区学校后勤服务中心</option><option>南京未来教育服务中心</option></select></label><label>选择角色<select required><option>商户管理员</option><option>校区管理员</option><option>采购专员</option><option>数据查看员</option></select></label><div class="assignment-preview"><b>权限预览</b><span>功能权限：组织、成员、菜谱、采购</span><span>数据权限：姓名完整可见，手机号脱敏，证件号隐藏</span></div><div class="form-actions"><button type="button" class="ghost assign-close">取消</button><button class="primary">确认分配</button></div></form></div></div>
+  <div id="toast" class="toast">操作成功</div>
+  <script src="app.js"></script>
+  <script src="dishes.js"></script>
+  <script src="dishes-detail.js"></script>
+  <script src="dish-version.js"></script>
+  <script src="dish-authorization.js"></script>
+  <script src="device-recipes.js"></script>
+  <script src="dish-library-v2.js"></script>
+  <script src="tenant-device-dictionary.js?v=20260914-3"></script>
+  <script src="tenant-device-center.js?v=20260911"></script>
+  <script src="recipe-center-hubs.js?v=20260911"></script>
+  <script src="tenant-product-center.js?v=20260911"></script>
+  <script src="product-reference-override.js?v=20260917-4"></script>
+  <script src="tenant-recipe-authorization-v1.js?v=20260913-9"></script>
+  <script src="unified-recipe-v1.js?v=20260914-11"></script>
+  <script src="unified-recipe-editor-v2.js?v=20260915-1"></script>
+  <script src="unified-recipe-list-v2.js?v=20260914-5"></script>
+<script src="./annotation-kit/host-view-adapter.js"></script>
+<!-- vpa:assets:start -->
+<link rel="stylesheet" href="./annotation-kit/runtime.css">
+<script src="./annotation-kit/annotation.bundle.inline.js"></script>
+<script src="./annotation-kit/runtime.js"></script>
+<!-- vpa:assets:end -->
+<script src="_anno-verify.js"></script>
+</body>
+</html>

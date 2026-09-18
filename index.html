@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>食联网数智餐饮平台 · 原型演示</title>
+<style>
+  :root {
+    --blue: #2d7dff; --deep: #123b83; --ink: #24324b; --muted: #7c8da6;
+    --line: #e6eefb; --card: #ffffff;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh; padding: 56px 22px 70px;
+    font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif; color: var(--ink);
+    background: radial-gradient(1100px 520px at 12% -10%, #e8f2ff 0%, rgba(232,242,255,0) 60%),
+                radial-gradient(900px 460px at 96% 4%, #eef1ff 0%, rgba(238,241,255,0) 62%),
+                linear-gradient(160deg, #f7faff 0%, #fbfdff 55%, #f2f7ff 100%);
+  }
+  .wrap { width: min(1020px, 100%); margin: 0 auto; }
+  .brand { display: flex; align-items: center; gap: 13px; }
+  .logo {
+    width: 44px; height: 44px; display: grid; place-items: center; border-radius: 13px; color: #fff; font-size: 22px;
+    background: linear-gradient(135deg, #3a90ff, #2457da); box-shadow: 0 10px 20px rgba(36, 87, 218, .26);
+  }
+  h1 { margin: 0; font-size: 25px; letter-spacing: .6px; color: #17458f; }
+  .sub { margin: 7px 0 0; font-size: 14px; letter-spacing: .4px; color: #7d97c2; }
+  .bar {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px;
+    margin: 26px 0 24px; padding: 13px 18px; border: 1px solid var(--line); border-radius: 12px;
+    background: rgba(255, 255, 255, .78); font-size: 13px; color: #61789b;
+  }
+  .pill {
+    display: inline-flex; align-items: center; gap: 7px; padding: 4px 12px; border-radius: 999px;
+    background: #eaf3ff; color: #2364cf; font-weight: 700; font-size: 12.5px;
+  }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: #2ecc71; box-shadow: 0 0 0 3px rgba(46, 204, 113, .18); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
+  .card {
+    display: flex; flex-direction: column; padding: 26px 26px 22px; border: 1px solid var(--line); border-radius: 16px;
+    background: var(--card); box-shadow: 0 14px 34px rgba(44, 92, 173, .09); transition: .22s;
+  }
+  .card:hover { transform: translateY(-3px); box-shadow: 0 20px 42px rgba(44, 92, 173, .16); border-color: #d3e4ff; }
+  .card h2 { margin: 16px 0 6px; font-size: 20px; color: #1c3f7d; letter-spacing: .5px; }
+  .tag {
+    align-self: flex-start; padding: 4px 11px; border-radius: 8px; font-size: 12px; font-weight: 700;
+    background: #eef6ff; color: #2f6fd0; letter-spacing: .5px;
+  }
+  .card p.desc { margin: 0 0 14px; font-size: 13.5px; line-height: 1.85; color: #6c7f99; }
+  ul { margin: 0 0 18px; padding-left: 18px; font-size: 13.5px; line-height: 1.95; color: #55688a; }
+  ul li::marker { color: #9dc0f2; }
+  .meta { margin-top: auto; font-size: 12.5px; color: #93a4bd; }
+  .go {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; height: 46px;
+    margin: 16px 0 12px; border-radius: 10px; color: #fff; font-weight: 700; font-size: 15px; letter-spacing: 2px;
+    text-decoration: none; background: linear-gradient(90deg, #3185ff, #2468ec); box-shadow: 0 10px 20px rgba(38, 104, 236, .22);
+  }
+  .go:hover { filter: brightness(1.05); }
+  .tip {
+    margin: 26px 0 0; padding: 15px 18px; border: 1px dashed #cfe0f8; border-radius: 12px;
+    background: rgba(255, 255, 255, .6); font-size: 13px; line-height: 1.9; color: #6b7f9c;
+  }
+  .tip b { color: #2d5ea8; }
+  footer { margin-top: 22px; font-size: 12.5px; color: #93a4bd; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">
+    <div class="logo">🍲</div>
+    <div>
+      <h1>食联网数智餐饮平台 · 原型演示</h1>
+      <p class="sub">统一菜谱管理方案 —— 租户端 + 商户端</p>
+    </div>
+  </div>
+
+  <div class="bar">
+    <span class="pill"><span class="dot"></span>线上最新版</span>
+    <span>版本时间：<b id="verTime">读取中…</b></span>
+    <span>提交：<code id="verCommit">—</code></span>
+    <span>本页网址固定不变，原型更新后刷新即可</span>
+  </div>
+
+  <div class="grid">
+    <section class="card">
+      <span class="tag">租户端 · 平台运营</span>
+      <h2>统一菜谱管理中心</h2>
+      <p class="desc">面向平台/租户运营：在菜谱制作步骤中配置人工处理或多型号设备加工方案，并完成菜谱授权下发。</p>
+      <ul>
+        <li>菜谱管理：菜谱库、分类管理、菜谱标签与字典</li>
+        <li>新建 / 编辑：基础信息、用料明细、加工步骤（人工 + 设备）</li>
+        <li>菜谱授权：新建授权三步向导、授权详情、下发记录</li>
+        <li>租户设备中心：设备字典、配料、兼容与批量模式</li>
+      </ul>
+      <a class="go" href="tenant/index.html">进入租户端 →</a>
+      <div class="meta">演示账号：admin &nbsp;/&nbsp; 密码：123456 &nbsp;·&nbsp; 源码更新：<span id="verTenant">—</span></div>
+    </section>
+
+    <section class="card">
+      <span class="tag">商户端 · 门店使用</span>
+      <h2>商户统一菜谱</h2>
+      <p class="desc">面向商户门店：接收租户授权菜谱并结合自建菜谱、设备菜谱与餐次计划开展经营。</p>
+      <ul>
+        <li>登录 / 找回密码、商户选择</li>
+        <li>组织及人员：组织档案、成员维护、角色与管理员设置</li>
+        <li>按组织维护统一菜谱：租户授权同步 + 自建菜谱</li>
+        <li>设备菜谱编辑、设备列表与状态、餐次计划</li>
+      </ul>
+      <a class="go" href="merchant/index.html">进入商户端 →</a>
+      <div class="meta">登录页选择商户后进入演示 &nbsp;·&nbsp; 源码更新：<span id="verMerchant">—</span></div>
+    </section>
+  </div>
+
+  <div class="tip">
+    <b>使用提示：</b>页面内已启用业务标注 —— 点击<b>角标 / 右侧抽屉</b>可查看该模块对应的 PRD 规则说明；
+    演示数据为前端模拟，刷新后恢复初始状态。<br />
+    若看不到本次改动，请按 <b>Ctrl + F5</b>（Mac：Cmd + Shift + R）强制刷新，或稍等 30 秒后重试。
+  </div>
+
+  <footer>
+    本页为原型演示环境，非生产系统。发布流程见仓库根目录 <code>使用说明.md</code>。
+  </footer>
+</div>
+
+<script>
+  fetch('version.json?t=' + Date.now(), { cache: 'no-store' })
+    .then(function (r) { if (!r.ok) throw new Error(r.status); return r.text(); })
+    .then(function (t) { return JSON.parse(t.replace(/^\uFEFF/, '')); })
+    .then(function (v) {
+      var set = function (id, val) { var el = document.getElementById(id); if (el && val) el.textContent = val; };
+      set('verTime', v.publishedAt);
+      set('verCommit', v.commit);
+      set('verTenant', v.tenantSourceAt);
+      set('verMerchant', v.merchantSourceAt);
+    })
+    .catch(function () {
+      var el = document.getElementById('verTime');
+      if (el) el.textContent = '未知（version.json 未读取到）';
+    });
+</script>
+</body>
+</html>

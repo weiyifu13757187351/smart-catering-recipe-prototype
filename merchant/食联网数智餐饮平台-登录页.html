@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>食联网数智餐饮平台 - 用户登录</title>
+  <style>
+    :root { --blue:#2678ff; --deep:#123b83; --ink:#243b61; --muted:#8495ad; --line:#e6edf7; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; display:grid; place-items:center; font-family:"Microsoft YaHei","PingFang SC",Arial,sans-serif; color:var(--ink); background:linear-gradient(145deg,#f4f8ff 0%,#fafcff 52%,#eef5ff 100%); }
+    .login-shell { width:min(1120px,calc(100vw - 44px)); min-height:660px; display:grid; grid-template-columns:42% 58%; overflow:hidden; border:1px solid #edf2f9; border-radius:18px; background:#fff; box-shadow:0 22px 60px rgba(44,92,173,.15); }
+    .brand-panel { position:relative; overflow:hidden; padding:58px 54px; background:linear-gradient(160deg,#eff7ff 0%,#eaf3ff 52%,#dcecff 100%); }
+    .brand-panel::before,.brand-panel::after { content:""; position:absolute; border-radius:50%; background:rgba(52,132,255,.08); }
+    .brand-panel::before { width:390px; height:390px; right:-165px; top:-125px; }
+    .brand-panel::after { width:440px; height:440px; left:-225px; bottom:-255px; }
+    .brand { position:relative; z-index:1; display:flex; align-items:center; gap:12px; color:var(--deep); font-size:22px; font-weight:700; letter-spacing:.3px; }
+    .brand-icon { width:37px; height:37px; display:grid; place-items:center; border-radius:12px; color:white; background:linear-gradient(135deg,#2d89ff,#2457da); box-shadow:0 8px 17px rgba(36,87,218,.26); }
+    .brand-icon svg { width:24px; height:24px; }
+    .brand-copy { position:relative; z-index:1; margin-top:57px; }
+    .brand-copy h1 { margin:0; font-size:29px; letter-spacing:1.5px; color:#1c5cc9; }
+    .brand-copy p { margin:12px 0 0; font-size:15px; letter-spacing:.45px; color:#7b9ed3; }
+    .scene { position:absolute; z-index:1; width:370px; left:36px; bottom:38px; }
+    .login-panel { padding:74px 82px; background:#fff; }
+    .topline { display:flex; align-items:flex-start; }
+    .topline h2 { margin:0; font-size:25px; letter-spacing:.8px; color:#283b59; }
+    .topline p { margin:8px 0 0; color:#a0acbb; font-size:13px; letter-spacing:1.3px; }
+    form { margin-top:64px; }
+    .field { position:relative; margin-bottom:20px; }
+    .field input { width:100%; height:54px; padding:0 48px 0 17px; outline:0; border:1px solid var(--line); border-radius:7px; color:var(--ink); background:#fff; font-size:15px; transition:.2s; }
+    .field input:focus { border-color:#75a7ff; box-shadow:0 0 0 3px rgba(38,120,255,.09); }
+    .field svg { position:absolute; width:20px; height:20px; right:16px; top:17px; stroke:#aebacc; fill:none; stroke-width:1.8; }
+    .verify { display:grid; grid-template-columns:1fr 132px; gap:12px; }
+    .code { height:54px; display:grid; place-items:center; border:1px solid var(--line); border-radius:7px; background:#f8fbff; color:#284469; font-family:Georgia,serif; font-size:22px; letter-spacing:4px; transform:skew(-5deg); }
+    button { width:100%; height:54px; margin-top:4px; border:0; border-radius:7px; color:#fff; font:700 17px "Microsoft YaHei",sans-serif; letter-spacing:8px; text-indent:8px; cursor:pointer; background:linear-gradient(90deg,#3185ff,#2468ec); box-shadow:0 9px 18px rgba(38,104,236,.22); }
+    .form-footer { display:flex; justify-content:space-between; align-items:center; margin-top:22px; color:#7e8ea4; font-size:13px; }
+    label { display:flex; align-items:center; gap:7px; cursor:pointer; }
+    input[type="checkbox"] { width:15px; height:15px; margin:0; accent-color:var(--blue); }
+    .form-footer a { color:#347dff; text-decoration:none; }
+    .form-view[hidden] { display:none; }
+    .recovery-intro { margin:11px 0 0; color:#8b9ab0; font-size:14px; }
+    .stepper { display:flex; align-items:center; gap:8px; margin:34px 0 28px; color:#9ba9bb; font-size:12px; }
+    .stepper span { display:inline-grid; place-items:center; width:21px; height:21px; border-radius:50%; color:#fff; background:#c5cfdb; font-size:11px; }
+    .stepper .active { background:var(--blue); }
+    .stepper i { width:54px; height:1px; background:#dfe7f1; }
+    .phone-card { display:flex; align-items:center; justify-content:space-between; height:57px; margin-bottom:20px; padding:0 16px; border:1px solid var(--line); border-radius:7px; background:#f9fbfe; color:#40516a; font-size:15px; }
+    .phone-card strong { color:#1f3e70; font-size:17px; letter-spacing:1.2px; }
+    .send-code { height:54px; min-width:116px; border:1px solid #a9c7ff; border-radius:7px; color:#2875f4; background:#f7fbff; font:14px "Microsoft YaHei",sans-serif; letter-spacing:0; text-indent:0; box-shadow:none; }
+    .send-code:disabled { color:#94a3b8; border-color:#d9e2ed; background:#f5f7fa; cursor:not-allowed; }
+    .back-link { display:inline-block; margin-top:22px; color:#7e8ea4; font-size:13px; text-decoration:none; }
+    .back-link:hover,.form-footer a:hover { color:#1f68e6; }
+    .field-note { display:none; margin:-11px 0 14px; color:#e05252; font-size:12px; }
+    .field-note.show { display:block; }
+    .toast { position:fixed; left:50%; top:50%; z-index:10; min-width:220px; padding:15px 22px; border-radius:9px; color:#fff; text-align:center; font-size:14px; background:rgba(26,43,71,.9); box-shadow:0 10px 26px rgba(13,34,67,.24); transform:translate(-50%,-50%); opacity:0; pointer-events:none; transition:opacity .2s; }
+    .toast.show { opacity:1; }
+    .merchant-mask { position:fixed; z-index:20; inset:0; display:none; place-items:center; padding:20px; background:rgba(22,40,68,.38); }
+    .merchant-mask.show { display:grid; }
+    .merchant-modal { width:min(460px,100%); padding:26px; border-radius:12px; background:#fff; box-shadow:0 20px 54px rgba(18,45,86,.24); }
+    .merchant-modal h3 { margin:0; color:#283b59; font-size:20px; }
+    .merchant-modal>p { margin:9px 0 20px; color:#8b9ab0; font-size:13px; }
+    .merchant-list { display:grid; gap:10px; }
+    .merchant-option { display:flex; align-items:center; gap:12px; padding:14px 15px; border:1px solid #e2e9f3; border-radius:8px; cursor:pointer; transition:.2s; }
+    .merchant-option:hover { border-color:#94baff; background:#f7faff; }
+    .merchant-option:has(input:checked) { border-color:#4b8cff; background:#edf5ff; box-shadow:0 0 0 2px rgba(38,120,255,.08); }
+    .merchant-option input { width:15px; height:15px; margin:0; accent-color:var(--blue); }
+    .merchant-option strong { display:block; color:#344b6b; font-size:15px; }
+    .merchant-option span { display:block; margin-top:4px; color:#95a3b5; font-size:12px; }
+    .merchant-error { display:none; margin:10px 0 0!important; color:#e05252!important; font-size:12px!important; }
+    .merchant-error.show { display:block; }
+    .merchant-actions { display:flex; justify-content:flex-end; gap:10px; margin-top:22px; }
+    .merchant-actions button { width:auto; min-width:88px; height:40px; margin:0; letter-spacing:0; text-indent:0; font-size:14px; box-shadow:none; }
+    .merchant-actions .cancel { color:#60738b; background:#f0f4f8; }
+    .selected-merchant { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; padding:12px 15px; border:1px solid #dce8f8; border-radius:7px; color:#536982; background:#f7faff; font-size:13px; }
+    .selected-merchant strong { color:#236fe9; }
+    @media (max-width:780px) { .login-shell{grid-template-columns:1fr;max-width:520px}.brand-panel{min-height:270px;padding:32px}.brand-copy{margin-top:34px}.scene{display:none}.login-panel{padding:42px 34px}form{margin-top:38px} }
+  </style>
+</head>
+<body>
+  <main class="login-shell">
+    <section class="brand-panel" aria-label="食联网数智餐饮平台品牌介绍">
+      <div class="brand"><span class="brand-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M6 4v7a3 3 0 0 0 6 0V4M6 8h6M15 4v16M15 4c2 0 3 2 3 5v2c0 2-1 3-3 3" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg></span>数智餐饮经营管理平台</div>
+      <div class="brand-copy"><h1>连接食安 · 智慧运营</h1><p>Intelligent Catering Operations Platform</p></div>
+      <svg class="scene" viewBox="0 0 390 300" aria-hidden="true">
+        <ellipse cx="190" cy="255" rx="155" ry="28" fill="#bad9ff" opacity=".55"/>
+        <path d="M50 220c18-56 72-89 135-82 50 5 96 38 122 92H50z" fill="#c9e2ff"/>
+        <rect x="113" y="82" width="155" height="118" rx="13" transform="rotate(7 190 141)" fill="#1f5da8"/>
+        <rect x="122" y="91" width="137" height="97" rx="8" transform="rotate(7 190 141)" fill="#fafdff"/>
+        <rect x="139" y="108" width="101" height="13" rx="6" transform="rotate(7 190 141)" fill="#dcecff"/>
+        <rect x="139" y="132" width="72" height="10" rx="5" transform="rotate(7 190 141)" fill="#e8f1ff"/>
+        <circle cx="227" cy="157" r="13" fill="#2d86ff"/>
+        <path d="M202 174l40 5-18 27-39-8z" fill="#2870d6" opacity=".8"/>
+        <circle cx="181" cy="135" r="18" fill="#ffb08a"/>
+        <path d="M163 158c7-17 31-17 39 1l11 31-43-5z" fill="#ff7448"/>
+        <path d="M174 187l-16 41M198 188l22 35" stroke="#2f5d9e" stroke-width="11" stroke-linecap="round"/>
+        <path d="M196 164l41-21" stroke="#ffb08a" stroke-width="7" stroke-linecap="round"/>
+        <g fill="#3588ff"><circle cx="79" cy="103" r="6"/><circle cx="288" cy="65" r="6"/><circle cx="321" cy="185" r="5"/></g>
+        <g stroke="#75aeff" stroke-width="2" stroke-dasharray="5 5"><path d="M84 106l66 25M285 68l-48 52M318 183l-72-13"/></g>
+      </svg>
+    </section>
+    <section class="login-panel">
+      <div id="loginView" class="form-view">
+        <div class="topline"><div><h2>用户登录</h2><p>USER LOGIN</p></div></div>
+        <form>
+          <div class="field"><input aria-label="用户名" placeholder="请输入用户名"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.2"/><path d="M5 20c.7-3.2 3-5 7-5s6.3 1.8 7 5"/></svg></div>
+          <div class="field"><input aria-label="密码" type="password" placeholder="请输入密码"><svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v2"/></svg></div>
+          <div class="verify"><div class="field"><input aria-label="图形验证码" placeholder="请输入验证码"></div><div class="code">K7M8</div></div>
+          <button id="loginButton" type="button">登 录</button>
+          <div class="form-footer"><label><input type="checkbox" checked>记住密码</label><a id="forgotLink" href="#recovery">忘记登录密码？</a></div>
+        </form>
+      </div>
+      <div id="recoveryView" class="form-view" hidden>
+        <div class="topline"><div><h2>找回登录密码</h2><p>RESET PASSWORD</p></div></div>
+        <p class="recovery-intro">请使用已绑定的手机号完成身份验证</p>
+        <div class="stepper"><span class="active">1</span>手机验证<i></i><span id="step2">2</span>设置新密码</div>
+        <form id="recoveryForm">
+          <div id="verifyStep">
+            <div class="phone-card"><span>已绑定手机号</span><strong>138****8888</strong></div>
+            <div class="verify"><div class="field"><input id="smsCode" inputmode="numeric" maxlength="4" aria-label="短信验证码" placeholder="请输入短信验证码"></div><button id="sendCode" class="send-code" type="button">发送验证码</button></div>
+            <p id="codeHint" class="field-note">请输入任意 4 位数字验证码</p>
+            <button id="verifyCode" type="button">验 证</button>
+          </div>
+          <div id="passwordStep" hidden>
+            <div class="selected-merchant"><span>当前选择商户</span><strong id="recoveryMerchant">请选择商户</strong></div>
+            <div class="field"><input id="newPassword" type="password" aria-label="新密码" placeholder="请输入新密码"><svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v2"/></svg></div>
+            <div class="field"><input id="confirmPassword" type="password" aria-label="确认新密码" placeholder="请再次输入新密码"><svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v2"/></svg></div>
+            <p id="passwordHint" class="field-note">两次输入的密码不一致</p>
+            <button id="confirmChange" type="button">确认修改</button>
+          </div>
+          <a id="backLogin" class="back-link" href="#login">← 返回登录</a>
+        </form>
+      </div>
+    </section>
+  </main>
+  <div id="merchantMask" class="merchant-mask">
+    <div class="merchant-modal">
+      <h3 id="merchantTitle">选择登录商户</h3>
+      <p>该账号关联多个商户，请选择本次操作的商户</p>
+      <div class="merchant-list">
+        <label class="merchant-option"><input type="radio" name="merchant" value="第一实验学校"><span><strong>第一实验学校</strong><span>教育餐饮 · 市教育局</span></span></label>
+        <label class="merchant-option"><input type="radio" name="merchant" value="阳光职工餐厅"><span><strong>阳光职工餐厅</strong><span>企事业餐饮 · 阳光集团</span></span></label>
+        <label class="merchant-option"><input type="radio" name="merchant" value="城市学院餐饮中心"><span><strong>城市学院餐饮中心</strong><span>高校餐饮 · 城市学院</span></span></label>
+      </div>
+      <p id="merchantError" class="merchant-error">请选择一个商户</p>
+      <div class="merchant-actions"><button id="cancelMerchant" class="cancel" type="button">取消</button><button id="confirmMerchant" type="button">确定</button></div>
+    </div>
+  </div>
+  <div id="toast" class="toast">登录密码修改成功</div>
+  <script>
+    const loginView = document.getElementById('loginView');
+    const recoveryView = document.getElementById('recoveryView');
+    const verifyStep = document.getElementById('verifyStep');
+    const passwordStep = document.getElementById('passwordStep');
+    const toast = document.getElementById('toast');
+    const merchantMask = document.getElementById('merchantMask');
+    let merchantAction = 'login';
+    let recoveryMerchant = '';
+    const openMerchant = action => { merchantAction = action; document.getElementById('merchantTitle').textContent = action === 'login' ? '选择登录商户' : '选择修改密码商户'; document.querySelectorAll('input[name="merchant"]').forEach(input => input.checked = action === 'reset' && input.value === recoveryMerchant); document.getElementById('merchantError').classList.remove('show'); merchantMask.classList.add('show'); };
+    const showLogin = () => { loginView.hidden = false; recoveryView.hidden = true; };
+    const showRecovery = () => { loginView.hidden = true; recoveryView.hidden = false; };
+    document.getElementById('forgotLink').addEventListener('click', event => { event.preventDefault(); recoveryMerchant = ''; document.getElementById('recoveryMerchant').textContent = '请选择商户'; verifyStep.hidden = false; passwordStep.hidden = true; document.getElementById('step2').classList.remove('active'); showRecovery(); });
+    document.getElementById('loginButton').addEventListener('click', () => openMerchant('login'));
+    document.getElementById('cancelMerchant').addEventListener('click', () => merchantMask.classList.remove('show'));
+    document.getElementById('confirmMerchant').addEventListener('click', () => { const selected = document.querySelector('input[name="merchant"]:checked'); document.getElementById('merchantError').classList.toggle('show', !selected); if (!selected) return; if (merchantAction === 'login') { sessionStorage.setItem('selectedMerchant', selected.value); window.location.href = './食联网数智餐饮平台-组织及人员.html'; return; } recoveryMerchant = selected.value; document.getElementById('recoveryMerchant').textContent = selected.value; merchantMask.classList.remove('show'); verifyStep.hidden = true; passwordStep.hidden = false; document.getElementById('step2').classList.add('active'); });
+    document.getElementById('recoveryMerchant').addEventListener('click', () => openMerchant('reset'));
+    document.getElementById('backLogin').addEventListener('click', event => { event.preventDefault(); showLogin(); });
+    document.getElementById('sendCode').addEventListener('click', event => {
+      const button = event.currentTarget; button.disabled = true; button.textContent = '已发送（60s）';
+      setTimeout(() => { button.disabled = false; button.textContent = '重新发送'; }, 3000);
+    });
+    document.getElementById('verifyCode').addEventListener('click', () => {
+      const valid = /^\d{4}$/.test(document.getElementById('smsCode').value);
+      document.getElementById('codeHint').classList.toggle('show', !valid);
+      if (!valid) return;
+      openMerchant('reset');
+    });
+    document.getElementById('confirmChange').addEventListener('click', () => {
+      const first = document.getElementById('newPassword').value;
+      const second = document.getElementById('confirmPassword').value;
+      const valid = recoveryMerchant && first.length > 0 && first === second;
+      document.getElementById('passwordHint').classList.toggle('show', !valid);
+      if (!valid) return;
+      toast.classList.add('show');
+      setTimeout(() => { toast.classList.remove('show'); showLogin(); }, 1300);
+    });
+  </script>
+</body>
+</html>

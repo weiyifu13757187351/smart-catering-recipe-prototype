@@ -1,0 +1,524 @@
+{
+  "version": 1,
+  "title": "商户端菜谱中心 · 菜谱管理业务标注",
+  "scope": "merchant-recipe-management",
+  "sourceBase": "..",
+  "output": "../annotation-kit/annotation.bundle.json",
+  "coverage": "coverage.md",
+  "runtime": {
+    "zIndexBase": 2147480000,
+    "initialMode": "annotate",
+    "layout": "drawer",
+    "drawerWidth": 480,
+    "hideToolbarWhenEmpty": true,
+    "viewScopeLabels": {
+      "recipe-hub": "菜谱管理工作台",
+      "recipe-list": "菜谱库",
+      "recipe-sync": "同步租户授权菜谱",
+      "recipe-editor-basic": "新建与编辑菜谱 / 基础信息",
+      "recipe-editor-ingredients": "新建与编辑菜谱 / 用料明细",
+      "recipe-editor-process": "新建与编辑菜谱 / 加工步骤",
+      "recipe-detail-current": "菜谱详情 / 当前版本",
+      "recipe-detail-latest": "菜谱详情 / 最新授权版本",
+      "recipe-categories": "菜谱分类"
+    }
+  },
+  "mermaid": {
+    "enabled": false,
+    "src": "",
+    "options": {}
+  },
+  "sourceRequirements": [
+    {"id": "REQ-01-SOURCE", "source": "../商户端菜谱管理PRD.md#3. 数据来源", "page": "菜谱库"},
+    {"id": "REQ-02-ORG-SCOPE", "source": "../商户端菜谱管理PRD.md#2. 角色与数据范围", "page": "菜谱库"},
+    {"id": "REQ-03-HUB", "source": "../商户端菜谱管理PRD.md#4. 入口与页面结构", "page": "菜谱管理工作台"},
+    {"id": "REQ-04-LIST-FIELD", "source": "../商户端菜谱管理PRD.md#5.3 列表字段", "page": "菜谱库"},
+    {"id": "REQ-05-LIST-FILTER", "source": "../商户端菜谱管理PRD.md#5.4 筛选项（默认可见）", "page": "菜谱库"},
+    {"id": "REQ-06-LIST-MORE-FILTER", "source": "../商户端菜谱管理PRD.md#5.5 更多筛选", "page": "菜谱库"},
+    {"id": "REQ-07-LIST-ACTION", "source": "../商户端菜谱管理PRD.md#5.6 行操作", "page": "菜谱库"},
+    {"id": "REQ-08-LIST-BUTTON", "source": "../商户端菜谱管理PRD.md#5.1 页面结构", "page": "菜谱库"},
+    {"id": "REQ-09-SYNC-ENTRY", "source": "../商户端菜谱管理PRD.md#6.1 入口与数量气泡", "page": "同步租户授权菜谱"},
+    {"id": "REQ-10-SYNC-COND", "source": "../商户端菜谱管理PRD.md#6.2 可同步条件", "page": "同步租户授权菜谱"},
+    {"id": "REQ-11-SYNC-DRAWER", "source": "../商户端菜谱管理PRD.md#6.3 同步抽屉", "page": "同步租户授权菜谱"},
+    {"id": "REQ-12-SYNC-RESULT", "source": "../商户端菜谱管理PRD.md#6.4 同步结果", "page": "同步租户授权菜谱"},
+    {"id": "REQ-13-SYNC-FAIL", "source": "../商户端菜谱管理PRD.md#6.5 同步失败与部分成功", "page": "同步租户授权菜谱"},
+    {"id": "REQ-14-EDITOR", "source": "../商户端菜谱管理PRD.md#7. 新建与编辑菜谱", "page": "新建与编辑菜谱"},
+    {"id": "REQ-15-EDITOR-BASIC", "source": "../商户端菜谱管理PRD.md#7.5 基础信息字段", "page": "新建与编辑菜谱"},
+    {"id": "REQ-16-EDITOR-INGREDIENT", "source": "../商户端菜谱管理PRD.md#7.6 用料明细", "page": "新建与编辑菜谱"},
+    {"id": "REQ-17-EDITOR-PROCESS", "source": "../商户端菜谱管理PRD.md#7.7 加工步骤", "page": "新建与编辑菜谱"},
+    {"id": "REQ-18-EDITOR-SUBMIT", "source": "../商户端菜谱管理PRD.md#7.8 提交", "page": "新建与编辑菜谱"},
+    {"id": "REQ-19-DETAIL", "source": "../商户端菜谱管理PRD.md#8.1 详情结构", "page": "菜谱详情"},
+    {"id": "REQ-20-VERSION-SWITCH", "source": "../商户端菜谱管理PRD.md#8.2 版本切换", "page": "菜谱详情"},
+    {"id": "REQ-21-VERSION-UPDATE", "source": "../商户端菜谱管理PRD.md#8.3 更新到此版本", "page": "菜谱详情"},
+    {"id": "REQ-22-CATEGORY", "source": "../商户端菜谱管理PRD.md#9. 菜谱分类（只读）", "page": "菜谱分类"},
+    {"id": "REQ-23-CATEGORY-IMPACT", "source": "../商户端菜谱管理PRD.md#9.4 分类失效对商户端的影响", "page": "菜谱分类"},
+    {"id": "REQ-24-STATUS", "source": "../商户端菜谱管理PRD.md#10.1 自建菜谱状态", "page": "状态与权限"},
+    {"id": "REQ-25-PERM", "source": "../商户端菜谱管理PRD.md#10.2 组织菜谱操作权限", "page": "状态与权限"},
+    {"id": "REQ-26-TENANT-IMPACT", "source": "../商户端菜谱管理PRD.md#10.4 租户侧变化对商户端的影响", "page": "状态与权限"},
+    {"id": "REQ-27-EXCEPTION", "source": "../商户端菜谱管理PRD.md#11. 异常与边界场景", "page": "异常与边界"},
+    {"id": "REQ-28-DATA-SOURCE", "source": "../商户端菜谱管理PRD.md#3.2 原型演示数据来源", "page": "数据来源"}
+  ],
+  "annotations": [
+    {
+      "id": "hub-rules",
+      "type": "page-global",
+      "page": "*",
+      "viewScope": ["recipe-hub"],
+      "moduleName": "本页规则",
+      "markdownFile": "annotations/merchant-recipe-management.md",
+      "blockId": "hub-rules",
+      "sourceRefs": ["REQ-03-HUB", "REQ-02-ORG-SCOPE"]
+    },
+    {
+      "id": "hub-library-entry",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["recipe-hub"],
+      "moduleName": "菜谱库入口",
+      "target": {"selector": ".um-hub-grid > .um-hub-entry:nth-of-type(1)"},
+      "markdownFile": "annotations/merchant-recipe-management.md",
+      "blockId": "hub-library-entry",
+      "sourceRefs": ["REQ-03-HUB"]
+    },
+    {
+      "id": "hub-category-entry",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["recipe-hub"],
+      "moduleName": "菜谱分类入口",
+      "target": {"selector": ".um-hub-grid > .um-hub-entry:nth-of-type(2)"},
+      "markdownFile": "annotations/merchant-recipe-management.md",
+      "blockId": "hub-category-entry",
+      "sourceRefs": ["REQ-22-CATEGORY"]
+    },
+
+    {
+      "id": "list-rules",
+      "type": "page-global",
+      "page": "*",
+      "viewScope": ["recipe-list"],
+      "moduleName": "本页规则",
+      "markdownFile": "annotations/merchant-recipe-management.md",
+      "blockId": "list-rules",
+      "sourceRefs": ["REQ-04-LIST-FIELD", "REQ-08-LIST-BUTTON", "REQ-02-ORG-SCOPE", "REQ-01-SOURCE", "REQ-26-TENANT-IMPACT", "REQ-28-DATA-SOURCE"]
+    },
+    {
+      "id": "list-org-note",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["recipe-list"],
+      "moduleName": "当前组织范围",
+      "target": {"selector": ".um-org-note"},
+      "markdownFile": "annotations/merchant-recipe-management.md",
+      "blockId": "list-org-note",
+      "sourceRefs": ["REQ-02-ORG-SCOPE"]
+    },
+    {
+      "id": "list-sync-button",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["recipe-list"],
+      "moduleName": "同步菜谱入口",
+      "target": {"selector": "#umSync"},
+      "markdownFile": "annotations/merchant-recipe-management.md",
+      "blockId": "list-sync-button",
+      "sourceRefs": ["REQ-09-SYNC-ENTRY"]
+    },
+    {
+      "id": "list-create-button",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["recipe-list"],
+      "moduleName": "新建菜谱",
+      "target": {"selector": "#umCreate"},
+      "markdownFile": "annotations/merchant-recipe-management.md",
+      "blockId": "list-create-button",
+      "sourceRefs": ["REQ-14-EDITOR"]
+    },
+    {
+      "id": "list-filters",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["recipe-list"],
+      "moduleName": "筛选项",
+      "target": {"selector": ".um-filters"},
+      "markdownFile": "annotations/merchant-recipe-management.md",
+      "blockId": "list-filters",
+      "sourceRefs": ["REQ-05-LIST-FILTER"]
+    },
+    {
+      "id": "list-more-filters",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["recipe-list"],
+      "moduleName": "更多筛选",
+      "target": {"selector": "#umMore"},
+      "markdownFile": "annotations/merchant-recipe-management.md",
+      "blockId": "list-more-filters",
+      "sourceRefs": ["REQ-06-LIST-MORE-FILTER"]
+    },
+    {
+      "id": "list-reset",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["recipe-list"],
+      "moduleName": "重置筛选",
+      "target": {"selector": "#umReset"},
+      "markdownFile": "annotations/merchant-recipe-management.md",
+      "blockId": "list-reset",
+      "sourceRefs": ["REQ-05-LIST-FILTER"]
+    },
+    {
+      "id": "list-source-col",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["recipe-list"],
+      "moduleName": "来源列",
+      "target": {"selector": ".um-table thead th:nth-child(3)"},
+      "markdownFile": "annotations/merchant-recipe-management.md",
+      "blockId": "list-source-col",
+      "sourceRefs": ["REQ-01-SOURCE"]
+    },
+    {
+      "id": "list-process-col",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["recipe-list"],
+      "moduleName": "加工方式列",
+      "target": {"selector": ".um-table thead th:nth-child(4)"},
+      "markdownFile": "annotations/merchant-recipe-management.md",
+      "blockId": "list-process-col",
+      "sourceRefs": ["REQ-04-LIST-FIELD"]
+    },
+    {
+      "id": "list-tags-col",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["recipe-list"],
+      "moduleName": "菜谱标签列",
+      "target": {"selector": ".um-table thead th:nth-child(7)"},
+      "markdownFile": "annotations/merchant-recipe-management.md",
+      "blockId": "list-tags-col",
+      "sourceRefs": ["REQ-04-LIST-FIELD"]
+    },
+    {
+      "id": "list-version-col",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["recipe-list"],
+      "moduleName": "版本 / 状态列",
+      "target": {"selector": ".um-table thead th:nth-child(8)"},
+      "markdownFile": "annotations/merchant-recipe-management.md",
+      "blockId": "list-version-col",
+      "sourceRefs": ["REQ-24-STATUS", "REQ-20-VERSION-SWITCH"]
+    },
+    {
+      "id": "list-update-col",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["recipe-list"],
+      "moduleName": "更新信息列",
+      "target": {"selector": ".um-table thead th:nth-child(9)"},
+      "markdownFile": "annotations/merchant-recipe-management.md",
+      "blockId": "list-update-col",
+      "sourceRefs": ["REQ-04-LIST-FIELD"]
+    },
+    {
+      "id": "list-action-col",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["recipe-list"],
+      "moduleName": "操作列",
+      "target": {"selector": ".um-table thead th:nth-child(10)"},
+      "markdownFile": "annotations/merchant-recipe-management.md",
+      "blockId": "list-action-col",
+      "sourceRefs": ["REQ-07-LIST-ACTION", "REQ-25-PERM"]
+    },
+    {
+      "id": "list-rows",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["recipe-list"],
+      "moduleName": "菜谱行与同名区分",
+      "target": {"selector": "#umRows"},
+      "markdownFile": "annotations/merchant-recipe-management.md",
+      "blockId": "list-rows",
+      "sourceRefs": ["REQ-04-LIST-FIELD", "REQ-27-EXCEPTION"]
+    },
+
+    {
+      "id": "sync-rules",
+      "type": "page-global",
+      "page": "*",
+      "viewScope": ["recipe-sync"],
+      "moduleName": "本页规则",
+      "markdownFile": "annotations/merchant-recipe-management.md",
+      "blockId": "sync-rules",
+      "sourceRefs": ["REQ-11-SYNC-DRAWER", "REQ-10-SYNC-COND"]
+    },
+    {
+      "id": "sync-category-tree",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["recipe-sync"],
+      "moduleName": "分类树",
+      "target": {"selector": ".um-category-side"},
+      "markdownFile": "annotations/merchant-recipe-management.md",
+      "blockId": "sync-category-tree",
+      "sourceRefs": ["REQ-11-SYNC-DRAWER"]
+    },
+    {
+      "id": "sync-tools",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["recipe-sync"],
+      "moduleName": "同步筛选工具",
+      "target": {"selector": ".um-sync-tools"},
+      "markdownFile": "annotations/merchant-recipe-management.md",
+      "blockId": "sync-tools",
+      "sourceRefs": ["REQ-11-SYNC-DRAWER"]
+    },
+    {
+      "id": "sync-summary",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["recipe-sync"],
+      "moduleName": "已选数量",
+      "target": {"selector": ".um-select-summary"},
+      "markdownFile": "annotations/merchant-recipe-management.md",
+      "blockId": "sync-summary",
+      "sourceRefs": ["REQ-11-SYNC-DRAWER"]
+    },
+    {
+      "id": "sync-rows",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["recipe-sync"],
+      "moduleName": "可同步菜谱列表",
+      "target": {"selector": "#umSyncRows"},
+      "markdownFile": "annotations/merchant-recipe-management.md",
+      "blockId": "sync-rows",
+      "sourceRefs": ["REQ-10-SYNC-COND", "REQ-23-CATEGORY-IMPACT"]
+    },
+    {
+      "id": "sync-confirm",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["recipe-sync"],
+      "moduleName": "确认同步",
+      "target": {"selector": "#umSyncConfirm"},
+      "markdownFile": "annotations/merchant-recipe-management.md",
+      "blockId": "sync-confirm",
+      "sourceRefs": ["REQ-12-SYNC-RESULT", "REQ-13-SYNC-FAIL"]
+    },
+    {
+      "id": "sync-cancel",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["recipe-sync"],
+      "moduleName": "取消同步",
+      "target": {"selector": "#umSyncCancel"},
+      "markdownFile": "annotations/merchant-recipe-management.md",
+      "blockId": "sync-cancel",
+      "sourceRefs": ["REQ-11-SYNC-DRAWER"]
+    },
+
+    {
+      "id": "editor-basic-rules",
+      "type": "page-global",
+      "page": "*",
+      "viewScope": ["recipe-editor-basic"],
+      "moduleName": "本页规则",
+      "markdownFile": "annotations/merchant-recipe-management.md",
+      "blockId": "editor-basic-rules",
+      "sourceRefs": ["REQ-14-EDITOR"]
+    },
+    {
+      "id": "editor-basic-fields",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["recipe-editor-basic"],
+      "moduleName": "基础信息字段",
+      "target": {"selector": "#umDrawerBody"},
+      "markdownFile": "annotations/merchant-recipe-management.md",
+      "blockId": "editor-basic-fields",
+      "sourceRefs": ["REQ-15-EDITOR-BASIC"]
+    },
+    {
+      "id": "editor-category-field",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["recipe-editor-basic"],
+      "moduleName": "菜谱分类选择",
+      "target": {"selector": "#umtCat1"},
+      "markdownFile": "annotations/merchant-recipe-management.md",
+      "blockId": "editor-category-field",
+      "sourceRefs": ["REQ-15-EDITOR-BASIC", "REQ-23-CATEGORY-IMPACT"]
+    },
+    {
+      "id": "editor-footer",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["recipe-editor-basic"],
+      "moduleName": "保存草稿与提交",
+      "target": {"selector": "#umtSubmit"},
+      "markdownFile": "annotations/merchant-recipe-management.md",
+      "blockId": "editor-footer",
+      "sourceRefs": ["REQ-18-EDITOR-SUBMIT", "REQ-24-STATUS"]
+    },
+
+    {
+      "id": "editor-ingredients-rules",
+      "type": "page-global",
+      "page": "*",
+      "viewScope": ["recipe-editor-ingredients"],
+      "moduleName": "本页规则",
+      "markdownFile": "annotations/merchant-recipe-management.md",
+      "blockId": "editor-ingredients-rules",
+      "sourceRefs": ["REQ-16-EDITOR-INGREDIENT"]
+    },
+    {
+      "id": "editor-ingredients-fields",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["recipe-editor-ingredients"],
+      "moduleName": "用料明细字段",
+      "target": {"selector": "#umDrawerBody"},
+      "markdownFile": "annotations/merchant-recipe-management.md",
+      "blockId": "editor-ingredients-fields",
+      "sourceRefs": ["REQ-16-EDITOR-INGREDIENT"]
+    },
+
+    {
+      "id": "editor-process-rules",
+      "type": "page-global",
+      "page": "*",
+      "viewScope": ["recipe-editor-process"],
+      "moduleName": "本页规则",
+      "markdownFile": "annotations/merchant-recipe-management.md",
+      "blockId": "editor-process-rules",
+      "sourceRefs": ["REQ-17-EDITOR-PROCESS"]
+    },
+    {
+      "id": "editor-process-modes",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["recipe-editor-process"],
+      "moduleName": "加工方式切换",
+      "target": {"selector": "#umDrawerBody"},
+      "markdownFile": "annotations/merchant-recipe-management.md",
+      "blockId": "editor-process-modes",
+      "sourceRefs": ["REQ-17-EDITOR-PROCESS"]
+    },
+
+    {
+      "id": "detail-current-rules",
+      "type": "page-global",
+      "page": "*",
+      "viewScope": ["recipe-detail-current"],
+      "moduleName": "本页规则",
+      "markdownFile": "annotations/merchant-recipe-management.md",
+      "blockId": "detail-current-rules",
+      "sourceRefs": ["REQ-19-DETAIL"]
+    },
+    {
+      "id": "detail-version-switch",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["recipe-detail-current"],
+      "moduleName": "版本切换",
+      "target": {"selector": "[data-umt-version=\"latest\"]"},
+      "markdownFile": "annotations/merchant-recipe-management.md",
+      "blockId": "detail-version-switch",
+      "sourceRefs": ["REQ-20-VERSION-SWITCH"]
+    },
+    {
+      "id": "detail-current-tabs",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["recipe-detail-current"],
+      "moduleName": "当前版本可查看范围",
+      "target": {"selector": "[data-umt-detail-tab=\"nutrition\"]"},
+      "markdownFile": "annotations/merchant-recipe-management.md",
+      "blockId": "detail-current-tabs",
+      "sourceRefs": ["REQ-19-DETAIL"]
+    },
+
+    {
+      "id": "detail-latest-rules",
+      "type": "page-global",
+      "page": "*",
+      "viewScope": ["recipe-detail-latest"],
+      "moduleName": "本页规则",
+      "markdownFile": "annotations/merchant-recipe-management.md",
+      "blockId": "detail-latest-rules",
+      "sourceRefs": ["REQ-21-VERSION-UPDATE"]
+    },
+    {
+      "id": "detail-update-action",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["recipe-detail-latest"],
+      "moduleName": "更新到此版本",
+      "target": {"selector": "#umtUpdateVersion"},
+      "markdownFile": "annotations/merchant-recipe-management.md",
+      "blockId": "detail-update-action",
+      "sourceRefs": ["REQ-21-VERSION-UPDATE"]
+    },
+    {
+      "id": "detail-latest-tabs",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["recipe-detail-latest"],
+      "moduleName": "最新授权版本可查看范围",
+      "target": {"selector": "[data-umt-detail-tab=\"process\"]"},
+      "markdownFile": "annotations/merchant-recipe-management.md",
+      "blockId": "detail-latest-tabs",
+      "sourceRefs": ["REQ-19-DETAIL"]
+    },
+
+    {
+      "id": "categories-rules",
+      "type": "page-global",
+      "page": "*",
+      "viewScope": ["recipe-categories"],
+      "moduleName": "本页规则",
+      "markdownFile": "annotations/merchant-recipe-management.md",
+      "blockId": "categories-rules",
+      "sourceRefs": ["REQ-22-CATEGORY"]
+    },
+    {
+      "id": "categories-readonly-note",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["recipe-categories"],
+      "moduleName": "只读声明",
+      "target": {"selector": ".um-readonly-note"},
+      "markdownFile": "annotations/merchant-recipe-management.md",
+      "blockId": "categories-readonly-note",
+      "sourceRefs": ["REQ-22-CATEGORY"]
+    },
+    {
+      "id": "categories-tree",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["recipe-categories"],
+      "moduleName": "分类结构树",
+      "target": {"selector": ".um-category-tree"},
+      "markdownFile": "annotations/merchant-recipe-management.md",
+      "blockId": "categories-tree",
+      "sourceRefs": ["REQ-22-CATEGORY"]
+    },
+    {
+      "id": "categories-table",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["recipe-categories"],
+      "moduleName": "分类明细表",
+      "target": {"selector": ".um-category-main"},
+      "markdownFile": "annotations/merchant-recipe-management.md",
+      "blockId": "categories-table",
+      "sourceRefs": ["REQ-23-CATEGORY-IMPACT"]
+    }
+  ]
+}

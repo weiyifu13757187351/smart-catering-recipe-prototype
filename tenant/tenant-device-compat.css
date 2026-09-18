@@ -1,0 +1,36 @@
+/* 设备菜谱迁移兼容层：补齐运营端公共组件样式，并隔离租户端同名规则。 */
+.recipe-center-page button:disabled,.recipe-modal-mask button:disabled{cursor:not-allowed;opacity:.42}
+.recipe-center-page .secondary,.recipe-modal-mask .secondary,.device-operation-drawer-mask .secondary{border:1px solid #d9e0e9;border-radius:7px;background:#fff;color:#4b5870;padding:9px 14px;cursor:pointer}
+.recipe-center-page .secondary:hover,.recipe-modal-mask .secondary:hover,.device-operation-drawer-mask .secondary:hover{border-color:#9fb1d0;color:#2f63d9}
+.recipe-center-page .link,.recipe-modal-mask .link{border:0;background:transparent;color:#346fe8;padding:3px 5px;margin:0 3px 0 0;cursor:pointer;white-space:nowrap}
+.recipe-center-page .link:hover,.recipe-modal-mask .link:hover{color:#164fc9}
+.recipe-center-page .link.danger,.recipe-center-page .danger-link,.recipe-modal-mask .danger-link{color:#e65353}
+.recipe-center-page .link.archive{color:#9a6a16}
+.recipe-center-page .badge,.recipe-modal-mask .badge{display:inline-block;border-radius:4px;padding:3px 7px;font-size:11px;line-height:1.4;white-space:nowrap;background:#eef1f5;color:#667186}
+.recipe-center-page .badge.green,.recipe-modal-mask .badge.green{background:#e8f7ef;color:#15905c}
+.recipe-center-page .badge.gray,.recipe-modal-mask .badge.gray{background:#eef1f5;color:#7a8596}
+
+.recipe-center-page .filters .search{position:relative;width:260px;min-width:220px;height:40px;padding:0;border:1px solid #dfe4ed;border-radius:8px;background:#fff;display:flex;align-items:center}
+.recipe-center-page .filters .search>span{position:absolute;left:11px;top:50%;transform:translateY(-50%);z-index:1;color:#8b97aa;pointer-events:none}
+.recipe-center-page .filters .search input{width:100%;height:100%;border:0!important;border-radius:8px!important;outline:0;background:transparent;padding:0 12px 0 31px!important;color:#27334a}
+.recipe-center-page .filters .search:focus-within{border-color:#6f8ff3;box-shadow:0 0 0 3px #4f6df512}
+.recipe-center-page .device-basic-filters>select{height:40px}
+
+.recipe-center-page .device-recipe-table th,.recipe-center-page .device-recipe-table td{vertical-align:middle}
+.recipe-center-page .device-recipe-table th{white-space:nowrap;line-height:1.35}
+.recipe-center-page .device-recipe-table th:nth-last-child(4),
+.recipe-center-page .device-recipe-table td:nth-last-child(4){min-width:74px;text-align:center}
+.recipe-center-page .device-recipe-table th:last-child,
+.recipe-center-page .device-recipe-table td:last-child{min-width:176px;white-space:nowrap}
+.recipe-center-page .recipe-status{display:inline-flex;align-items:center;justify-content:center;min-width:58px;padding:4px 9px;border-radius:12px;line-height:1.25;white-space:nowrap;background:#fff2df;color:#d98213}
+.recipe-center-page .recipe-status.archived{background:#e8f8f3;color:#14966f}
+.recipe-center-page .recipe-status.off{background:#eef1f5;color:#7b8799}
+.recipe-center-page .device-tags span,.recipe-center-page .device-count,.recipe-center-page .device-step-count{white-space:nowrap}
+
+.dictionary-page .dictionary-content{overflow:hidden}
+.dictionary-page table th:last-child,.dictionary-page table td:last-child{min-width:190px;white-space:nowrap}
+.dictionary-page .dictionary-filters input,.dictionary-page .dictionary-filters select{height:38px;border:1px solid #dfe5ef;border-radius:7px;background:#fff;padding:0 10px;outline:none}
+.dictionary-page .dictionary-filters input:focus,.dictionary-page .dictionary-filters select:focus{border-color:#6f8ff3;box-shadow:0 0 0 3px #4f6df512}
+
+.recipe-modal-mask .recipe-modal-foot button,.device-operation-drawer-foot button{min-width:78px}
+.recipe-extension-toast,.dictionary-toast{z-index:220!important;opacity:1!important;pointer-events:none!important;transform:translate(-50%,0)!important;background:#26334c!important;color:#fff!important;box-shadow:0 8px 24px #10182e38}
