@@ -204,6 +204,7 @@ try {
   Write-Host "  $SiteUrl" -ForegroundColor White
   Write-Host '提示：若别人仍看到旧内容，让其按 Ctrl + F5 强制刷新。' -ForegroundColor DarkGray
   Write-Host ''
+  exit 0
 }
 finally {
   Pop-Location
