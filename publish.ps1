@@ -53,11 +53,12 @@ function Invoke-Native {
 }
 
 # 生成 version.json（入口页用它显示「线上是哪一版」）
+# 说明：publishLabel 与本次 git 提交说明完全一致，可在 git log / Actions 里一一对应。
 function New-VersionFile {
-  param([string]$Commit, [string]$PublishedAt, [string]$TenantAt, [string]$MerchantAt)
+  param([string]$Label, [string]$PublishedAt, [string]$TenantAt, [string]$MerchantAt)
   $version = [pscustomobject]@{
     publishedAt      = $PublishedAt
-    commit           = $Commit
+    publishLabel     = $Label
     tenantSourceAt   = $TenantAt
     merchantSourceAt = $MerchantAt
     site             = $SiteUrl
@@ -134,17 +135,15 @@ try {
   Write-Host "  本次变更文件数：$($staged.Count)" -ForegroundColor DarkGray
   if (-not $Message) { $Message = "更新原型 $now" }
   $commitMessage = $Message
+
+  # 先把版本信息写进去，再和原型改动一起提交（保证线上入口页显示的版本与本次提交一致）
+  New-VersionFile -Label $commitMessage -PublishedAt $now -TenantAt $tenantAt -MerchantAt $merchantAt
+  Invoke-Native { git add version.json } | Out-Null
+  Write-Ok "version.json：$commitMessage"
+
   Invoke-Native { git commit -m $commitMessage --quiet } | Out-Null
   if ($LASTEXITCODE -ne 0) { Write-Err '提交失败。'; exit 1 }
   Write-Ok "已提交：$commitMessage"
-
-  # 把本次提交号写进 version.json（入口页会显示），并入本次提交一起发布
-  $newCommit = (Invoke-Native { git rev-parse --short HEAD 2>$null } | Select-Object -First 1)
-  New-VersionFile -Commit "$newCommit" -PublishedAt $now -TenantAt $tenantAt -MerchantAt $merchantAt
-  Invoke-Native { git add version.json } | Out-Null
-  Invoke-Native { git commit --amend --no-edit --quiet } | Out-Null
-  if ($LASTEXITCODE -eq 0) { Write-Ok "version.json 已写入本次提交号：$newCommit" }
-  else { Write-Note 'version.json 未能并入本次提交，不影响发布' }
 
   $branch = $Branch
   Invoke-Native { git push origin $branch } | Out-Null
