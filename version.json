@@ -1,7 +1,23 @@
 {
-    "publishedAt":  "2026-09-18 16:36",
-    "publishLabel":  "更新原型 2026-09-18 16:36",
+    "publishedAt":  "2026-09-18 18:15",
+    "publishLabel":  "更新原型 2026-09-18 18:15",
     "tenantSourceAt":  "2026-09-18 15:25",
     "merchantSourceAt":  "2026-09-18 16:06",
+    "changes":  {
+                    "tenant":  {
+                                   "modules":  [
+
+                                               ],
+                                   "moreCount":  0,
+                                   "fileCount":  0
+                               },
+                    "merchant":  {
+                                     "modules":  [
+
+                                                 ],
+                                     "moreCount":  0,
+                                     "fileCount":  0
+                                 }
+                },
     "site":  "https://weiyifu13757187351.github.io/smart-catering-recipe-prototype/"
 }

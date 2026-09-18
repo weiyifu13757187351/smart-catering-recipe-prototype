@@ -56,6 +56,18 @@
     text-decoration: none; background: linear-gradient(90deg, #3185ff, #2468ec); box-shadow: 0 10px 20px rgba(38, 104, 236, .22);
   }
   .go:hover { filter: brightness(1.05); }
+  .update {
+    margin: 22px 0 0; padding: 17px 22px 15px; border: 1px solid var(--line); border-left: 4px solid #2d7dff;
+    border-radius: 12px; background: #fff; box-shadow: 0 10px 26px rgba(44, 92, 173, .07);
+  }
+  .update-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px; margin-bottom: 9px; }
+  .update-head b { font-size: 15px; letter-spacing: .5px; color: #1c3f7d; }
+  .update-head span { font-size: 12.5px; color: #93a4bd; }
+  .update-row { display: flex; gap: 10px; font-size: 13.5px; line-height: 1.95; color: #55688a; }
+  .update-row + .update-row { margin-top: 3px; }
+  .update-row em { flex: none; width: 62px; font-style: normal; font-weight: 700; color: #2f6fd0; }
+  .update-row.none, .update-row.none em { color: #aab7c9; }
+  .update-row b { color: #2d5ea8; }
   .tip {
     margin: 26px 0 0; padding: 15px 18px; border: 1px dashed #cfe0f8; border-radius: 12px;
     background: rgba(255, 255, 255, .6); font-size: 13px; line-height: 1.9; color: #6b7f9c;
@@ -84,13 +96,7 @@
     <section class="card">
       <span class="tag">租户端 · 平台运营</span>
       <h2>统一菜谱管理中心</h2>
-      <p class="desc">面向平台/租户运营：在菜谱制作步骤中配置人工处理或多型号设备加工方案，并完成菜谱授权下发。</p>
-      <ul>
-        <li>菜谱管理：菜谱库、分类管理、菜谱标签与字典</li>
-        <li>新建 / 编辑：基础信息、用料明细、加工步骤（人工 + 设备）</li>
-        <li>菜谱授权：新建授权三步向导、授权详情、下发记录</li>
-        <li>租户设备中心：设备字典、配料、兼容与批量模式</li>
-      </ul>
+      <p class="desc">面向平台 / 租户运营的统一菜谱管理、授权下发与设备菜谱配置。</p>
       <a class="go" href="tenant/index.html">进入租户端 →</a>
       <div class="meta">演示账号：admin &nbsp;/&nbsp; 密码：123456 &nbsp;·&nbsp; 源码更新：<span id="verTenant">—</span></div>
     </section>
@@ -98,16 +104,18 @@
     <section class="card">
       <span class="tag">商户端 · 门店使用</span>
       <h2>商户统一菜谱</h2>
-      <p class="desc">面向商户门店：接收租户授权菜谱并结合自建菜谱、设备菜谱与餐次计划开展经营。</p>
-      <ul>
-        <li>登录 / 找回密码、商户选择</li>
-        <li>组织及人员：组织档案、成员维护、角色与管理员设置</li>
-        <li>按组织维护统一菜谱：租户授权同步 + 自建菜谱</li>
-        <li>设备菜谱编辑、设备列表与状态、餐次计划</li>
-      </ul>
+      <p class="desc">面向商户门店：接收租户授权菜谱，结合自建菜谱与设备菜谱开展经营。</p>
       <a class="go" href="merchant/index.html">进入商户端 →</a>
       <div class="meta">登录页选择商户后进入演示 &nbsp;·&nbsp; 源码更新：<span id="verMerchant">—</span></div>
     </section>
+  </div>
+
+  <div class="update" id="updateBox" hidden>
+    <div class="update-head">
+      <b>本次更新</b>
+      <span id="updateAt"></span>
+    </div>
+    <div id="updateRows"></div>
   </div>
 
   <div class="tip">
@@ -122,6 +130,37 @@
 </div>
 
 <script>
+  // 渲染「本次更新」：数据来自发布脚本生成的 version.json，无需手工维护
+  function renderUpdate(v) {
+    var box = document.getElementById('updateBox');
+    var rows = document.getElementById('updateRows');
+    if (!box || !rows) return;
+    var ch = v && v.changes;
+    if (!ch) return;                                  // 旧版 version.json 没有该字段就不显示
+
+    var esc = function (s) {
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    };
+    var row = function (name, side) {
+      var mods = (side && side.modules) || [];
+      var n = (side && side.fileCount) || 0;
+      if (!n) return '<div class="update-row none"><em>' + name + '</em><span>本次无改动</span></div>';
+      var text = esc(mods.join('、'));
+      if (side.moreCount) text += '，另有 <b>' + Number(side.moreCount) + '</b> 个模块';
+      return '<div class="update-row"><em>' + name + '</em><span>' + text +
+             '（<b>' + Number(n) + '</b> 个文件）</span></div>';
+    };
+
+    var total = ((ch.tenant && ch.tenant.fileCount) || 0) + ((ch.merchant && ch.merchant.fileCount) || 0);
+    rows.innerHTML = (total === 0)
+      ? '<div class="update-row none"><em>原型</em><span>本次未改动原型内容（仅更新了入口页或发布脚本）</span></div>'
+      : row('租户端', ch.tenant) + row('商户端', ch.merchant);
+
+    var at = document.getElementById('updateAt');
+    if (at && v.publishedAt) at.textContent = v.publishedAt;
+    box.hidden = false;
+  }
+
   fetch('version.json?t=' + Date.now(), { cache: 'no-store' })
     .then(function (r) { if (!r.ok) throw new Error(r.status); return r.text(); })
     .then(function (t) { return JSON.parse(t.replace(/^\uFEFF/, '')); })
@@ -130,6 +169,7 @@
       set('verTime', v.publishedAt);
       set('verTenant', v.tenantSourceAt);
       set('verMerchant', v.merchantSourceAt);
+      renderUpdate(v);
     })
     .catch(function () {
       var el = document.getElementById('verTime');

@@ -52,20 +52,42 @@ function Invoke-Native {
   try { & $Command } finally { $ErrorActionPreference = $prev }
 }
 
-# 生成 version.json（入口页用它显示「线上是哪一版」）
+# 生成 version.json（入口页用它显示「线上是哪一版」+「本次更新」小结）
 # 说明：publishLabel 与本次 git 提交说明完全一致，可在 git log / Actions 里一一对应。
 function New-VersionFile {
-  param([string]$Label, [string]$PublishedAt, [string]$TenantAt, [string]$MerchantAt)
+  param(
+    [string]$Label,
+    [string]$PublishedAt,
+    [string]$TenantAt,
+    [string]$MerchantAt,
+    $TenantChanges,
+    $MerchantChanges
+  )
   $version = [pscustomobject]@{
     publishedAt      = $PublishedAt
     publishLabel     = $Label
     tenantSourceAt   = $TenantAt
     merchantSourceAt = $MerchantAt
+    changes          = [pscustomobject]@{
+      tenant   = [pscustomobject]@{
+        modules   = @($TenantChanges.modules)
+        moreCount = $TenantChanges.moreCount
+        fileCount = $TenantChanges.fileCount
+      }
+      merchant = [pscustomobject]@{
+        modules   = @($MerchantChanges.modules)
+        moreCount = $MerchantChanges.moreCount
+        fileCount = $MerchantChanges.fileCount
+      }
+    }
     site             = $SiteUrl
   }
   $p = Join-Path $RepoRoot 'version.json'
-  [System.IO.File]::WriteAllText($p, ($version | ConvertTo-Json -Depth 3), (New-Object System.Text.UTF8Encoding($false)))
+  [System.IO.File]::WriteAllText($p, ($version | ConvertTo-Json -Depth 6), (New-Object System.Text.UTF8Encoding($false)))
 }
+
+# 载入「改动文件 → 中文模块名」映射表（同目录 module-map.ps1，维护规则改那个文件）
+. (Join-Path $RepoRoot 'module-map.ps1')
 
 Write-Host ''
 Write-Host '食联网数智餐饮平台 · 原型一键发布' -ForegroundColor White
@@ -136,10 +158,26 @@ try {
   if (-not $Message) { $Message = "更新原型 $now" }
   $commitMessage = $Message
 
+  # 归纳本次改动（入口页的「本次更新」用）
+  $siteFiles     = @($staged | Where-Object { $_ -notmatch '^version\.json$' })
+  $tenantFiles   = @($siteFiles | Where-Object { $_ -match '^tenant/'   } | ForEach-Object { $_ -replace '^tenant/', '' })
+  $merchantFiles = @($siteFiles | Where-Object { $_ -match '^merchant/' } | ForEach-Object { $_ -replace '^merchant/', '' })
+  $sumTenant     = Get-ChangeSummary -Files $tenantFiles
+  $sumMerchant   = Get-ChangeSummary -Files $merchantFiles
+
   # 先把版本信息写进去，再和原型改动一起提交（保证线上入口页显示的版本与本次提交一致）
-  New-VersionFile -Label $commitMessage -PublishedAt $now -TenantAt $tenantAt -MerchantAt $merchantAt
+  New-VersionFile -Label $commitMessage -PublishedAt $now -TenantAt $tenantAt -MerchantAt $merchantAt `
+                  -TenantChanges $sumTenant -MerchantChanges $sumMerchant
   Invoke-Native { git add version.json } | Out-Null
   Write-Ok "version.json：$commitMessage"
+  foreach ($pair in @(@('租户端', $sumTenant), @('商户端', $sumMerchant))) {
+    if ($pair[1].fileCount -eq 0) { Write-Host "    本次更新（$($pair[0])）：无改动" -ForegroundColor DarkGray }
+    else {
+      $more = ''
+      if ($pair[1].moreCount -gt 0) { $more = "，另有 $($pair[1].moreCount) 个模块" }
+      Write-Host "    本次更新（$($pair[0])）：$($pair[1].modules -join '、')$more（$($pair[1].fileCount) 个文件）" -ForegroundColor DarkGray
+    }
+  }
 
   Invoke-Native { git commit -m $commitMessage --quiet } | Out-Null
   if ($LASTEXITCODE -ne 0) { Write-Err '提交失败。'; exit 1 }
