@@ -1,22 +1,22 @@
 {
-    "publishedAt":  "2026-09-18 18:15",
-    "publishLabel":  "更新原型 2026-09-18 18:15",
-    "tenantSourceAt":  "2026-09-18 15:25",
-    "merchantSourceAt":  "2026-09-18 16:06",
+    "publishedAt":  "2026-09-20 09:45",
+    "publishLabel":  "业务标注：确认租户端/商户端待确认项并重新编译",
+    "tenantSourceAt":  "2026-09-20 09:44",
+    "merchantSourceAt":  "2026-09-20 09:44",
     "changes":  {
                     "tenant":  {
                                    "modules":  [
-
+                                                   "业务标注"
                                                ],
                                    "moreCount":  0,
-                                   "fileCount":  0
+                                   "fileCount":  3
                                },
                     "merchant":  {
                                      "modules":  [
-
+                                                     "业务标注"
                                                  ],
                                      "moreCount":  0,
-                                     "fileCount":  0
+                                     "fileCount":  3
                                  }
                 },
     "site":  "https://weiyifu13757187351.github.io/smart-catering-recipe-prototype/"
