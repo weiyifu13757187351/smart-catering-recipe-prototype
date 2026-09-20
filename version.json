@@ -1,8 +1,8 @@
 {
-    "publishedAt":  "2026-09-20 09:45",
-    "publishLabel":  "业务标注：确认租户端/商户端待确认项并重新编译",
-    "tenantSourceAt":  "2026-09-20 09:44",
-    "merchantSourceAt":  "2026-09-20 09:44",
+    "publishedAt":  "2026-09-20 10:04",
+    "publishLabel":  "业务标注：确认菜谱分类动态生成、版本接收覆盖、营养刷新等待确认项",
+    "tenantSourceAt":  "2026-09-20 10:03",
+    "merchantSourceAt":  "2026-09-20 10:03",
     "changes":  {
                     "tenant":  {
                                    "modules":  [
