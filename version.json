@@ -1,8 +1,8 @@
 {
-    "publishedAt":  "2026-09-20 10:04",
-    "publishLabel":  "业务标注：确认菜谱分类动态生成、版本接收覆盖、营养刷新等待确认项",
-    "tenantSourceAt":  "2026-09-20 10:03",
-    "merchantSourceAt":  "2026-09-20 10:03",
+    "publishedAt":  "2026-09-20 10:07",
+    "publishLabel":  "业务标注：确认时间区间口径与列表展示口径，待确认项清零",
+    "tenantSourceAt":  "2026-09-20 10:07",
+    "merchantSourceAt":  "2026-09-20 10:07",
     "changes":  {
                     "tenant":  {
                                    "modules":  [
@@ -13,10 +13,10 @@
                                },
                     "merchant":  {
                                      "modules":  [
-                                                     "业务标注"
+
                                                  ],
                                      "moreCount":  0,
-                                     "fileCount":  3
+                                     "fileCount":  0
                                  }
                 },
     "site":  "https://weiyifu13757187351.github.io/smart-catering-recipe-prototype/"
