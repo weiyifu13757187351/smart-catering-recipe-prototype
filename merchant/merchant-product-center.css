@@ -1,0 +1,155 @@
+/* 商户端「商品中心」样式补充
+   通用卡片 / 头部 / 筛选 / 表格 / 抽屉 / 标签 / 提示条 / toast 复用 merchant-unified-recipe-v1.css 的 um-* 类，
+   本文件只补充商品中心特有的部分，避免与菜谱模块的视觉产生差异。 */
+
+/* 必填标记：与标签文字同处一行，避免 um-edit-grid 的 grid 布局把它挤成独立行 */
+.pc-req{color:#e75b5b;font-style:normal}
+.pc-hint{color:#93a2b3;font-size:12px}
+.pc-sub{display:block;margin-top:4px;color:#93a2b3;font-size:12px}
+
+/* 居中弹窗（新建商品第一步：加工形态 + 关联标准食材） */
+.pc-modal-mask.show{display:flex;align-items:center;justify-content:center;padding:24px}
+.pc-modal{display:flex;flex-direction:column;width:min(860px,94vw);max-height:90vh;border-radius:12px;background:#fff;box-shadow:0 20px 50px rgba(16,39,66,.22)}
+.pc-modal-head{display:flex;padding:20px 24px;border-bottom:1px solid #e8edf4}
+.pc-modal-head h2{margin:0;color:#193b62;font-size:19px}
+.pc-modal-head p{margin:6px 0 0;color:#8696aa;font-size:13px}
+.pc-modal-body{overflow:auto;flex:1;padding:20px 24px}
+.pc-modal-foot{display:flex;align-items:center;gap:10px;padding:14px 24px;border-top:1px solid #e8edf4}
+.pc-modal-step{margin:0 0 12px;color:#294967;font-size:15px}
+.pc-modal-step:not(:first-child){margin-top:24px;padding-top:18px;border-top:1px solid #eef2f7}
+.pc-picked{margin-left:6px;color:#2879f5;font-size:12px;font-style:normal}
+.pc-modal-hint{margin:-6px 0 10px;color:#93a2b3;font-size:12px}
+.pc-shape-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.pc-shape-card{padding:14px 16px;border:1px solid #e1e8f1;border-radius:8px;text-align:left;color:#4d6480;background:#fff;cursor:pointer}
+.pc-shape-card:hover{border-color:#a9c9fd}
+.pc-shape-card.active{border-color:#2879f5;background:#f2f7ff}
+.pc-shape-card b{display:block;color:#294965;font-size:14px}
+.pc-shape-card.active b{color:#1f6fe8}
+.pc-shape-card small{display:block;margin-top:5px;color:#93a2b3;font-size:12px}
+.pc-ing-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pc-ing-card{display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid #e6ecf4;border-radius:8px;text-align:left;background:#fff;cursor:pointer}
+.pc-ing-card:hover:not([disabled]){border-color:#a9c9fd}
+.pc-ing-card.active{border-color:#2879f5;background:#f2f7ff}
+.pc-ing-card[disabled]{opacity:.5;cursor:not-allowed}
+.pc-ing-card>i{display:grid;place-items:center;width:34px;height:34px;border-radius:9px;color:#fff;background:#4caf50;font-size:10px;font-style:normal}
+.pc-ing-card>span{flex:1;min-width:0}
+.pc-ing-card b{display:block;color:#294965;font-size:14px}
+.pc-ing-card small{display:block;margin-top:3px;color:#95a3b3;font-size:11px;overflow:hidden;text-overflow:ellipsis}
+.pc-ing-card>em{color:#2879f5;font-style:normal}
+
+/* 三步向导 */
+.pc-steps{display:flex;align-items:center;justify-content:center;gap:10px;margin:-4px 0 18px;padding-bottom:16px;border-bottom:1px solid #eef2f7}
+.pc-step{display:flex;align-items:center;gap:8px;color:#8496a9;font-size:14px}
+.pc-step>i{display:grid;place-items:center;width:22px;height:22px;border:1px solid #cfdbe8;border-radius:50%;font-size:12px;font-style:normal}
+.pc-step.active{color:#2879f5}
+.pc-step.active>i{border-color:#2879f5;color:#fff;background:#2879f5}
+.pc-step.done{color:#4f718f}
+.pc-step.done>i{border-color:#2879f5;color:#fff;background:#2879f5}
+.pc-step-line{width:90px;height:1px;background:#dbe4ef}
+.pc-source-banner{display:flex;align-items:center;gap:12px;margin-bottom:16px;padding:14px 16px;border:1px solid #e2e9f2;border-radius:8px;background:#f8fbff}
+.pc-source-banner>i{display:grid;place-items:center;width:36px;height:36px;border-radius:9px;color:#fff;background:#4caf50;font-size:14px;font-style:normal}
+.pc-source-banner>div{flex:1;min-width:0}
+.pc-source-banner b{display:block;color:#294965;font-size:14px}
+.pc-source-banner small{display:block;margin-top:4px;color:#8b9cae;font-size:12px}
+.pc-section-hint{margin-left:6px;color:#9fadbd;font-size:12px;font-style:normal;font-weight:400}
+.pc-cascade{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.pc-cascade select{box-sizing:border-box;width:100%;padding:9px;border:1px solid #dce5ef;border-radius:5px;color:#3f5872;background:#fff}
+.pc-cascade select:disabled{color:#a9b6c4;background:#f7f9fc}
+.pc-upload{display:grid;place-items:center;gap:4px;padding:22px;border:1px dashed #cfdbe8;border-radius:8px;color:#8b9cae;background:#fafbfd;cursor:pointer;text-align:center}
+.pc-upload b{color:#2879f5;font-size:20px}
+.pc-upload small{color:#a3b0be;font-size:12px}
+.pc-section-head{display:flex;align-items:flex-start;gap:12px;margin-bottom:14px}
+.pc-section-head h3{margin:0}
+.pc-section-head p{margin:6px 0 0;color:#8696aa;font-size:12px}
+.pc-section-head button{margin-left:auto}
+.pc-metric-row{display:flex;align-items:center;gap:18px;margin-bottom:12px;padding:10px 14px;border-radius:8px;color:#60758c;background:#f7f9fc;font-size:13px}
+.pc-metric-row b{color:#294965;font-size:15px}
+.pc-metric-row em{margin-left:auto;color:#9fadbd;font-size:12px;font-style:normal}
+.pc-confirm-head{display:flex;align-items:center;gap:12px}
+.pc-confirm-head>i{display:grid;place-items:center;width:40px;height:40px;border-radius:10px;color:#2879f5;background:#eaf3ff;font-size:18px;font-style:normal}
+.pc-confirm-head>div{flex:1}
+.pc-confirm-head h3{margin:0;color:#294967}
+.pc-confirm-head p{margin:6px 0 0;color:#8696aa;font-size:12px}
+.pc-version-chip{padding:5px 11px;border-radius:12px;color:#c47a10;background:#fff3e0;font-size:12px}
+.pc-metric-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0 20px}
+.pc-metric-cards>div{padding:13px 15px;border:1px solid #e6ecf4;border-radius:8px}
+.pc-metric-cards span{display:block;color:#8292a5;font-size:12px}
+.pc-metric-cards b{display:block;margin-top:6px;color:#294965;font-size:17px}
+.pc-change-title{margin:0 0 12px;color:#294967;font-size:14px}
+.pc-change-card{margin-bottom:14px;border:1px solid #e6ecf4;border-radius:8px;overflow:hidden}
+.pc-change-card>header{display:flex;align-items:center;gap:10px;padding:12px 15px;background:#f8fafd}
+.pc-change-card>header>i{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;color:#2879f5;background:#eaf3ff;font-size:12px;font-style:normal}
+.pc-change-card>header b{display:block;color:#294965;font-size:13px}
+.pc-change-card>header small{display:block;margin-top:3px;color:#95a3b3;font-size:11px}
+.pc-diff-row{display:grid;grid-template-columns:1.1fr 1fr 26px 1fr;gap:10px;align-items:center;padding:12px 15px;border-top:1px solid #eef2f7;font-size:13px}
+.pc-diff-row>i{color:#b3bfcc;font-style:normal;text-align:center}
+.pc-diff-name{color:#60758c}
+.pc-diff-old{color:#9fadbd;text-decoration:line-through}
+.pc-diff-new{color:#15855e}
+.pc-diff-row.is-add .pc-diff-new{color:#15855e}
+.pc-added-row{margin:10px 15px;padding:11px 13px;border-radius:6px;color:#15855e;background:#eefaf3;font-size:13px}
+.pc-sku-diff{padding:12px 15px;border-top:1px solid #eef2f7}
+.pc-sku-diff>b{display:block;margin-bottom:4px;color:#294965;font-size:13px}
+.pc-sku-diff .pc-diff-row{padding:10px 0;border-top:1px dashed #eef2f7}
+.pc-change-empty{padding:22px;border-top:1px solid #eef2f7;color:#b3bfcc;text-align:center;font-size:13px}
+.pc-record-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin-bottom:16px;padding:16px;border:1px solid #e6ecf4;border-radius:8px}
+.pc-date-range{display:flex;align-items:center;gap:8px;color:#53677f;font-size:13px}
+.pc-date-range input{box-sizing:border-box;height:38px;padding:0 11px;border:1px solid #dce5ef;border-radius:6px;color:#53677f;background:#fff}
+
+/* 页签（新建/编辑商品：基础信息 / SKU配置） */
+.pc-tabs{display:flex;gap:6px;margin-bottom:16px;border-bottom:1px solid #e7edf5}
+.pc-tabs button{padding:10px 16px;border:0;border-bottom:2px solid transparent;color:#7b8ca1;background:none;cursor:pointer;font-size:14px}
+.pc-tabs button.active{color:#2879f5;border-bottom-color:#2879f5;font-weight:600}
+
+/* 加工形态选择卡 */
+.pc-choice{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.pc-choice button{padding:13px;border:1px solid #e1e8f1;border-radius:6px;text-align:left;color:#4d6480;background:#fff;cursor:pointer}
+.pc-choice button:hover{border-color:#a9c9fd}
+.pc-choice button.active{border-color:#2879f5;color:#1f6fe8;background:#f2f7ff}
+.pc-choice b{display:block;font-size:14px}
+.pc-choice small{display:block;margin-top:5px;color:#93a2b3;font-size:12px}
+
+/* 只读字段（关联标准食材 / 分类 / 品牌） */
+.pc-locked-field{display:grid;gap:6px}
+.pc-locked-field>span{color:#8292a5;font-size:12px}
+.pc-locked-value{display:flex;align-items:center;gap:8px;min-height:38px;padding:0 11px;border:1px dashed #d7e0ea;border-radius:6px;color:#8496a9;background:#fafbfd;font-size:13px}
+.pc-locked-value.has-value{color:#354f6b;border-style:solid;background:#fff}
+.pc-locked-value em{margin-left:auto;color:#2879f5;font-size:12px;font-style:normal;cursor:pointer}
+.pc-locked-value em.plain{color:#8496a9;cursor:default}
+.pc-readonly-tag{display:inline-flex;padding:3px 8px;border-radius:10px;color:#7b6ad0;background:#f0ecff;font-size:11px;white-space:nowrap}
+.pc-ing-chips{display:flex;flex-wrap:wrap;gap:6px}
+.pc-ing-chip{padding:4px 9px;border-radius:12px;color:#2479cf;background:#e8f4ff;font-size:12px}
+
+/* 同步抽屉：按商品分组的 SKU 行 */
+.pc-sync-group{margin:14px 0 0;padding:9px 12px;border-radius:6px;color:#385571;background:#f2f7fd;font-size:13px;font-weight:600}
+.pc-sync-group small{margin-left:8px;color:#8b9cae;font-weight:400}
+.pc-sync-row{display:grid;grid-template-columns:30px 1.6fr 1fr 1.1fr 124px 92px;gap:10px;align-items:center;padding:12px;border-bottom:1px solid #edf1f6;color:#526980;font-size:12px}
+.pc-sync-row>div{min-width:0}
+.pc-sync-row.head{color:#71849b;background:#f7f9fc}
+.pc-sync-row strong{display:block;color:#294965;font-size:13px;overflow:hidden;text-overflow:ellipsis}
+.pc-sync-row small{display:block;margin-top:4px;color:#95a3b3;overflow:hidden;text-overflow:ellipsis}
+.pc-sync-row .um-status,.pc-sync-row .um-tag{white-space:nowrap}
+.pc-sync-row.is-synced{opacity:.5}
+.pc-sync-row input[type=checkbox]{width:15px;height:15px;margin:0;accent-color:#2879f5}
+.pc-sync-empty{padding:56px;text-align:center;color:#94a3b5}
+
+/* 只读标准食材选择器 */
+.pc-ing-list{max-height:380px;overflow:auto;border:1px solid #e6ecf4;border-radius:8px}
+.pc-ing-row{display:grid;grid-template-columns:1.4fr 1fr 1fr 92px;gap:10px;align-items:center;padding:11px 13px;border-bottom:1px solid #eef2f7;color:#526980;font-size:13px;cursor:pointer}
+.pc-ing-row:hover{background:#f6faff}
+.pc-ing-row.head{color:#71849b;background:#f7f9fc;font-size:12px;cursor:default}
+.pc-ing-row.head:hover{background:#f7f9fc}
+.pc-ing-row strong{display:block;color:#294965}
+.pc-ing-row small{display:block;margin-top:3px;color:#95a3b3}
+
+/* 商品下的 SKU 清单（编辑 / 详情） */
+.pc-sku-lines{border:1px solid #e6ecf4;border-radius:8px;overflow:hidden}
+.pc-sku-line{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr 92px;gap:10px;align-items:center;padding:11px 13px;border-bottom:1px solid #eef2f7;color:#526980;font-size:13px}
+.pc-sku-line.head{color:#71849b;background:#f7f9fc;font-size:12px}
+.pc-sku-line:last-child{border-bottom:0}
+.pc-sku-line .um-ops{justify-content:flex-end}
+
+@media (max-width:1100px){
+  .pc-choice{grid-template-columns:1fr}
+  .pc-sync-row,.pc-ing-row,.pc-sku-line{grid-template-columns:1fr}
+}

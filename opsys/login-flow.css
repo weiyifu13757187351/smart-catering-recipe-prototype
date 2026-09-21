@@ -1,0 +1,192 @@
+/* 登录流程覆盖层：承载「退出 → 登录校验 → 首次登录改密提醒 → 修改密码」的原型交互。
+   这部分不属于运营端业务页面，仅在原型中演示登录侧规则。 */
+
+#loginFlow {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  overflow: auto;
+  background: #f6f8fc;
+  color: #253149;
+  font: 14px/1.6 "PingFang SC", "Microsoft YaHei", system-ui, -apple-system, sans-serif;
+}
+
+#loginFlow[hidden] { display: none; }
+#loginFlow * { box-sizing: border-box; }
+
+#loginFlow .primary,
+#loginFlow .ghost {
+  border-radius: 6px;
+  height: 40px;
+  padding: 0 18px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+#loginFlow .primary {
+  border: 1px solid #3472df;
+  color: #fff;
+  background: #3472df;
+  box-shadow: 0 4px 10px #2f6bff29;
+}
+
+#loginFlow .primary:hover { background: #2a63c8; }
+
+#loginFlow .ghost {
+  border: 0;
+  color: #7b8799;
+  background: transparent;
+}
+
+#loginFlow .ghost:hover { color: #46536a; }
+
+/* 登录区 */
+#loginFlow .login-shell {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  min-height: 100vh;
+}
+
+#loginFlow .brand-panel {
+  background: linear-gradient(150deg, #1c2c4c 0%, #17233c 55%, #12203a 100%);
+  color: #fff;
+  padding: 46px 52px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+#loginFlow .brand-logo { display: flex; align-items: center; gap: 13px; }
+
+#loginFlow .brand-logo > span {
+  width: 42px; height: 42px; border-radius: 11px; background: #3472df;
+  display: grid; place-items: center; font-size: 20px; font-weight: 700;
+}
+
+#loginFlow .brand-logo b { display: block; font-size: 16px; }
+#loginFlow .brand-logo small { color: #9db0d0; font-size: 12px; }
+#loginFlow .brand-copy h1 { margin: 0 0 14px; font-size: 30px; letter-spacing: 1px; }
+#loginFlow .brand-copy p { margin: 0; max-width: 430px; color: #a9bada; line-height: 1.9; }
+#loginFlow .brand-foot { color: #7f92b4; font-size: 12px; }
+
+#loginFlow .login-panel { display: flex; align-items: center; justify-content: center; padding: 40px 32px; }
+#loginFlow .login-card { width: 100%; max-width: 390px; }
+#loginFlow .login-card h2 { margin: 0 0 6px; font-size: 22px; color: #17233c; }
+#loginFlow .panel-sub { margin: 0 0 26px; color: #7d899d; font-size: 13px; }
+
+#loginFlow .field {
+  display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px;
+  color: #667388; font-size: 13px;
+}
+
+#loginFlow .field input {
+  height: 42px; padding: 0 12px; color: #23304a; background: #fff;
+  border: 1px solid #dbe1eb; border-radius: 7px; outline: none;
+  font: inherit;
+}
+
+#loginFlow .field input:focus { border-color: #8bb0f2; box-shadow: 0 0 0 3px #3472df1f; }
+#loginFlow .login-card .primary { width: 100%; height: 44px; font-size: 15px; }
+#loginFlow .form-error { min-height: 20px; margin: 0 0 10px; color: #e05252; font-size: 12px; }
+
+#loginFlow .demo-switch {
+  margin-top: 26px; padding: 14px 16px; border: 1px dashed #c9d5e8;
+  border-radius: 9px; background: #fbfcfe;
+}
+
+#loginFlow .demo-switch b { display: block; margin-bottom: 9px; color: #46536a; font-size: 12px; letter-spacing: .5px; }
+
+#loginFlow .demo-account {
+  width: 100%; display: flex; align-items: center; gap: 9px; text-align: left;
+  padding: 8px 10px; margin-bottom: 6px; border: 1px solid #e3e9f3; border-radius: 7px;
+  background: #fff; color: #46536a; font: inherit; font-size: 12.5px; cursor: pointer;
+}
+
+#loginFlow .demo-account:hover { border-color: #b9cff5; background: #f5f8ff; }
+#loginFlow .demo-account span { font-weight: 600; color: #2c3a55; }
+#loginFlow .demo-account em { font-style: normal; color: #7d899d; font-family: ui-monospace, monospace; }
+#loginFlow .demo-account small { margin-left: auto; color: #8a96a8; }
+#loginFlow .demo-account.off small { color: #d14b4b; }
+#loginFlow .demo-tip { margin: 8px 0 0; color: #9aa5b6; font-size: 12px; line-height: 1.7; }
+
+/* 弹窗 */
+#loginFlow .mask {
+  position: fixed; inset: 0; z-index: 20; background: #17233c73;
+  display: grid; place-items: center; padding: 24px;
+}
+
+#loginFlow .mask[hidden] { display: none; }
+
+#loginFlow .modal {
+  position: relative; width: 440px; max-width: 100%;
+  background: #fff; border-radius: 12px; padding: 26px;
+  box-shadow: 0 18px 50px #17233c40; text-align: center;
+}
+
+#loginFlow .modal-close {
+  position: absolute; top: 12px; right: 14px; width: 30px; height: 30px;
+  border: 0; border-radius: 7px; background: transparent; color: #9aa5b6;
+  font: inherit; font-size: 19px; line-height: 1; cursor: pointer;
+}
+
+#loginFlow .modal-close:hover { background: #f0f4f8; color: #66738a; }
+
+#loginFlow .modal-icon {
+  width: 50px; height: 50px; margin: 0 auto 14px; border-radius: 50%;
+  background: #eaf2ff; color: #3472df; display: grid; place-items: center;
+  font-size: 23px; font-weight: 700;
+}
+
+#loginFlow .modal h3 { margin: 0 0 10px; color: #17233c; font-size: 17px; }
+#loginFlow .modal > p { margin: 0 0 6px; color: #69768a; line-height: 1.75; }
+
+#loginFlow .modal code {
+  padding: 2px 7px; border-radius: 5px; background: #f4f7fc;
+  border: 1px solid #dbe4f2; color: #18376f; font-family: ui-monospace, monospace;
+}
+
+#loginFlow .modal-actions { display: flex; justify-content: center; gap: 10px; margin-top: 20px; }
+#loginFlow .modal .field { text-align: left; margin-top: 16px; }
+#loginFlow .modal-actions .ghost { background: #f0f4f8; color: #60738b; }
+
+@media (max-width: 860px) {
+  #loginFlow .login-shell { grid-template-columns: 1fr; }
+  #loginFlow .brand-panel { padding: 32px 30px; min-height: 220px; }
+  #loginFlow .brand-copy h1 { font-size: 24px; }
+  #loginFlow .brand-copy p { display: none; }
+}
+
+/* 右上角当前账号菜单（退出入口） */
+.account-picker { position: relative; display: flex; align-items: center; }
+
+.account-trigger {
+  display: flex; align-items: center; gap: 9px;
+  padding: 5px 8px; border: 0; border-radius: 8px;
+  background: transparent; color: inherit; font: inherit; cursor: pointer;
+}
+
+.account-trigger:hover { background: #f0f4f8; }
+.account-trigger .avatar { flex: none; }
+.account-picker .account-caret { color: #9aa5b6; font-size: 12px; }
+
+.account-menu {
+  position: absolute; top: calc(100% + 10px); right: 0; z-index: 150;
+  width: 232px; padding: 8px; border: 1px solid #e4e9f1; border-radius: 10px;
+  background: #fff; box-shadow: 0 14px 34px #17233c26;
+}
+
+.account-menu[hidden] { display: none; }
+
+.account-menu-head { padding: 9px 10px 11px; border-bottom: 1px solid #eef1f6; }
+.account-menu-head b { display: block; color: #17233c; font-size: 14px; }
+.account-menu-head small { color: #8a96a8; font-size: 12px; }
+
+.account-menu-item {
+  width: 100%; margin-top: 6px; padding: 9px 10px;
+  border: 0; border-radius: 7px; background: transparent;
+  color: #d14b4b; font: inherit; font-size: 13px; text-align: left; cursor: pointer;
+}
+
+.account-menu-item:hover { background: #fdecec; }
+.account-menu-tip { margin: 8px 4px 2px; color: #9aa5b6; font-size: 11.5px; line-height: 1.7; }

@@ -1,0 +1,161 @@
+.permission-tree {
+  border: 1px solid #e1e7f0;
+  border-radius: 9px;
+  overflow: hidden;
+}
+
+.permission-root + .permission-root {
+  border-top: 1px solid #e1e7f0;
+}
+
+.permission-root-row {
+  min-height: 44px;
+  padding: 0 15px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  background: #f4f7fb;
+  color: #1e2a42;
+  cursor: pointer;
+}
+
+.permission-root-row small {
+  color: #8a96a8;
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.permission-branches {
+  padding: 5px 14px 9px 34px;
+  background: #fff;
+}
+
+.permission-branch {
+  position: relative;
+  display: grid;
+  grid-template-columns: 190px 1fr;
+  min-height: 43px;
+  border-bottom: 1px dashed #e7ebf2;
+}
+
+.permission-branch:last-child {
+  border-bottom: 0;
+}
+
+.permission-branch::before {
+  content: "";
+  position: absolute;
+  left: -15px;
+  top: 0;
+  bottom: -1px;
+  border-left: 1px solid #d7dfeb;
+}
+
+.permission-branch::after {
+  content: "";
+  position: absolute;
+  left: -15px;
+  top: 21px;
+  width: 12px;
+  border-top: 1px solid #d7dfeb;
+}
+
+.permission-branch:last-child::before {
+  bottom: 21px;
+}
+
+.permission-menu-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #344157;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.permission-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 0;
+}
+
+.permission-actions label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 74px;
+  padding: 5px 9px;
+  border: 1px solid #e1e7f0;
+  border-radius: 5px;
+  color: #667389;
+  background: #fafbfd;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.permission-actions label:has(input:checked) {
+  color: #315fae;
+  border-color: #b9cff5;
+  background: #eef4ff;
+}
+
+.permission-tree input[type="checkbox"] {
+  accent-color: #3472df;
+}
+
+.sys-linked-accounts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.sys-linked-accounts > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 11px 13px;
+  border: 1px solid #e3e8f0;
+  border-radius: 7px;
+  background: #fafbfd;
+}
+
+.sys-linked-accounts span,
+.sys-linked-accounts b,
+.sys-linked-accounts small {
+  display: block;
+}
+
+.sys-linked-accounts b {
+  color: #263249;
+  font-size: 13px;
+}
+
+.sys-linked-accounts small {
+  color: #8692a5;
+  margin-top: 4px;
+}
+
+.sys-linked-accounts em {
+  flex: none;
+  font-style: normal;
+}
+
+.sys-empty {
+  color: #8a96a8;
+  padding: 18px 0;
+  text-align: center;
+}
+
+@media (max-width: 900px) {
+  .permission-branch {
+    grid-template-columns: 150px 1fr;
+  }
+
+  .sys-linked-accounts {
+    grid-template-columns: 1fr;
+  }
+}

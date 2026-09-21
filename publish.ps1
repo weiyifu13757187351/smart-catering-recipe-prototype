@@ -2,8 +2,8 @@
   食联网数智餐饮平台 · 原型一键发布
   ============================================================
   做什么：
-    1) 把两个原型「源目录」的内容整体同步到本发布仓库的 tenant\、merchant\
-    2) 生成线上版本信息 version.json（入口页会显示版本时间）
+    1) 把各端原型「源目录」的内容整体同步到本发布仓库的 tenant\、merchant\、opsys\
+    2) 生成线上版本信息 version.json（入口页会显示版本时间与「本次更新」）
     3) 提交并推送到 GitHub，GitHub Actions 自动部署到 GitHub Pages（线上链接固定不变）
 
   怎么用：
@@ -12,11 +12,12 @@
 
   参数：
     -Force     忽略「发布仓库副本被直接改过」的提醒，强制以源目录为准
-    -Message   自定义提交说明，例如：-Message "更新租户端加工步骤"
+    -Message   自定义提交说明，例如：-Message "更新运营端登录流程"
 
   重要：
-    原型请修改「源目录」（见下方 $Sources），不要直接改本目录的 tenant\、merchant\，
-    这两个目录每次发布会按源目录内容整体覆盖（多余文件会被删除）。
+    原型请修改「源目录」（见下方 $Sources），不要直接改本目录下的站点目录，
+    这些目录每次发布会按源目录内容整体覆盖（多余文件会被删除）。
+    新增一端时，只要在 $Sources 里加一行，其余流程（版本文件、入口页小结）自动适配。
 #>
 [CmdletBinding()]
 param(
@@ -33,9 +34,12 @@ $SiteUrl    = 'https://weiyifu13757187351.github.io/smart-catering-recipe-protot
 $Branch     = 'main'
 
 # ============ 原型源目录（搬家时只改这里） ============
+# key    = 发布仓库里的子目录名，同时也是 version.json 里 changes / xxxSourceAt 的字段名
+# label  = 中文名，用于日志和入口页
 $Sources = [ordered]@{
   'tenant'   = @{ label = '租户端'; path = (Join-Path $SourceBase 'restaurant-saas-tenant-prototype-unified-recipe-annotated') }
   'merchant' = @{ label = '商户端'; path = (Join-Path $SourceBase 'merchant-recipe-annotated') }
+  'opsys'    = @{ label = '运营端'; path = 'C:\Users\18024\Documents\ChatGPT\运营端\smart-catering-product-center-prototype-local' }
 }
 
 function Write-Step($m)  { Write-Host ""; Write-Host "=== $m ===" -ForegroundColor Cyan }
@@ -58,32 +62,28 @@ function New-VersionFile {
   param(
     [string]$Label,
     [string]$PublishedAt,
-    [string]$TenantAt,
-    [string]$MerchantAt,
-    $TenantChanges,
-    $MerchantChanges
+    [hashtable]$SourceAt,
+    [hashtable]$Summaries
   )
-  $version = [pscustomobject]@{
-    publishedAt      = $PublishedAt
-    publishLabel     = $Label
-    tenantSourceAt   = $TenantAt
-    merchantSourceAt = $MerchantAt
-    changes          = [pscustomobject]@{
-      tenant   = [pscustomobject]@{
-        modules   = @($TenantChanges.modules)
-        moreCount = $TenantChanges.moreCount
-        fileCount = $TenantChanges.fileCount
-      }
-      merchant = [pscustomobject]@{
-        modules   = @($MerchantChanges.modules)
-        moreCount = $MerchantChanges.moreCount
-        fileCount = $MerchantChanges.fileCount
-      }
-    }
-    site             = $SiteUrl
+  $changes = [ordered]@{}
+  $version = [ordered]@{
+    publishedAt  = $PublishedAt
+    publishLabel = $Label
   }
+  foreach ($key in $Sources.Keys) {
+    $version["${key}SourceAt"] = $SourceAt[$key]
+    $s = $Summaries[$key]
+    $changes[$key] = [pscustomobject]@{
+      modules   = @($s.modules)
+      moreCount = $s.moreCount
+      fileCount = $s.fileCount
+    }
+  }
+  $version['changes'] = [pscustomobject]$changes
+  $version['site']    = $SiteUrl
+
   $p = Join-Path $RepoRoot 'version.json'
-  [System.IO.File]::WriteAllText($p, ($version | ConvertTo-Json -Depth 6), (New-Object System.Text.UTF8Encoding($false)))
+  [System.IO.File]::WriteAllText($p, ([pscustomobject]$version | ConvertTo-Json -Depth 6), (New-Object System.Text.UTF8Encoding($false)))
 }
 
 # 载入「改动文件 → 中文模块名」映射表（同目录 module-map.ps1，维护规则改那个文件）
@@ -93,12 +93,14 @@ Write-Host ''
 Write-Host '食联网数智餐饮平台 · 原型一键发布' -ForegroundColor White
 Write-Host "发布仓库：$RepoRoot" -ForegroundColor DarkGray
 
+$SiteKeys = @($Sources.Keys)
+
 Write-Step '0/5 环境检查'
 if (-not (Get-Command git -ErrorAction SilentlyContinue)) { Write-Err '未找到 git，请先安装 Git for Windows。'; exit 1 }
 if (-not (Test-Path (Join-Path $RepoRoot '.git'))) { Write-Err "当前目录不是 git 仓库：$RepoRoot"; exit 1 }
 Push-Location $RepoRoot
 try {
-  foreach ($key in $Sources.Keys) {
+  foreach ($key in $SiteKeys) {
     $p = $Sources[$key].path
     if (-not (Test-Path $p)) { Write-Err "找不到 $($Sources[$key].label) 源目录：$p"; exit 1 }
     Write-Ok "$($Sources[$key].label) 源目录：$p"
@@ -106,11 +108,11 @@ try {
 
   Write-Step '1/5 检查发布仓库副本是否被直接改动'
   $dirty = @()
-  $dirty += @(Invoke-Native { git diff --name-only -- tenant merchant 2>$null })
-  $dirty += @(Invoke-Native { git diff --cached --name-only -- tenant merchant 2>$null })
+  $dirty += @(Invoke-Native { git diff --name-only -- $SiteKeys 2>$null })
+  $dirty += @(Invoke-Native { git diff --cached --name-only -- $SiteKeys 2>$null })
   $dirty = @($dirty | Where-Object { $_ -and "$_".Trim() } | Select-Object -Unique)
   if ($dirty.Count -gt 0) {
-    Write-Note '发布仓库里的站点文件有未提交的改动（可能是有人直接改了 tenant\ 或 merchant\）：'
+    Write-Note '发布仓库里的站点文件有未提交的改动（可能是有人直接改了站点目录）：'
     $dirty | ForEach-Object { Write-Host "      $_" -ForegroundColor DarkYellow }
     if (-not $Force) {
       Write-Note '继续发布会用源目录的内容覆盖以上改动。'
@@ -123,7 +125,7 @@ try {
   }
 
   Write-Step '2/5 同步源目录到发布仓库（整体镜像）'
-  foreach ($key in $Sources.Keys) {
+  foreach ($key in $SiteKeys) {
     $src = $Sources[$key].path
     $dst = Join-Path $RepoRoot $key
     Write-Host "  $($Sources[$key].label)：$src" -ForegroundColor DarkGray
@@ -134,16 +136,16 @@ try {
 
   Write-Step '3/5 统计本次发布信息'
   $now = Get-Date -Format 'yyyy-MM-dd HH:mm'
-  $tenantAt = '-'; $merchantAt = '-'
-  foreach ($key in $Sources.Keys) {
+  $SourceAt = @{}
+  foreach ($key in $SiteKeys) {
     $latest = Get-ChildItem $Sources[$key].path -Recurse -File -ErrorAction SilentlyContinue |
               Sort-Object LastWriteTime -Descending | Select-Object -First 1
     $v = '-'
     if ($latest) { $v = $latest.LastWriteTime.ToString('yyyy-MM-dd HH:mm') }
-    if ($key -eq 'tenant') { $tenantAt = $v } else { $merchantAt = $v }
+    $SourceAt[$key] = $v
   }
   Write-Ok "发布时刻：$now"
-  Write-Ok "原型最后修改：租户端 $tenantAt / 商户端 $merchantAt"
+  Write-Ok ("原型最后修改：" + (($SiteKeys | ForEach-Object { "$($Sources[$_].label) $($SourceAt[$_])" }) -join ' / '))
 
   Write-Step '4/5 提交并推送到 GitHub'
   Invoke-Native { git add -A } | Out-Null
@@ -159,23 +161,27 @@ try {
   $commitMessage = $Message
 
   # 归纳本次改动（入口页的「本次更新」用）
-  $siteFiles     = @($staged | Where-Object { $_ -notmatch '^version\.json$' })
-  $tenantFiles   = @($siteFiles | Where-Object { $_ -match '^tenant/'   } | ForEach-Object { $_ -replace '^tenant/', '' })
-  $merchantFiles = @($siteFiles | Where-Object { $_ -match '^merchant/' } | ForEach-Object { $_ -replace '^merchant/', '' })
-  $sumTenant     = Get-ChangeSummary -Files $tenantFiles
-  $sumMerchant   = Get-ChangeSummary -Files $merchantFiles
+  $siteFiles = @($staged | Where-Object { $_ -notmatch '^version\.json$' })
+  $Summaries = @{}
+  foreach ($key in $SiteKeys) {
+    $prefix = '^' + [regex]::Escape($key) + '/'
+    $files  = @($siteFiles | Where-Object { $_ -match $prefix } | ForEach-Object { $_ -replace $prefix, '' })
+    $Summaries[$key] = Get-ChangeSummary -Files $files
+  }
 
   # 先把版本信息写进去，再和原型改动一起提交（保证线上入口页显示的版本与本次提交一致）
-  New-VersionFile -Label $commitMessage -PublishedAt $now -TenantAt $tenantAt -MerchantAt $merchantAt `
-                  -TenantChanges $sumTenant -MerchantChanges $sumMerchant
+  New-VersionFile -Label $commitMessage -PublishedAt $now -SourceAt $SourceAt -Summaries $Summaries
   Invoke-Native { git add version.json } | Out-Null
   Write-Ok "version.json：$commitMessage"
-  foreach ($pair in @(@('租户端', $sumTenant), @('商户端', $sumMerchant))) {
-    if ($pair[1].fileCount -eq 0) { Write-Host "    本次更新（$($pair[0])）：无改动" -ForegroundColor DarkGray }
-    else {
+  foreach ($key in $SiteKeys) {
+    $sum = $Summaries[$key]
+    $lbl = $Sources[$key].label
+    if ($sum.fileCount -eq 0) {
+      Write-Host "    本次更新（$lbl）：无改动" -ForegroundColor DarkGray
+    } else {
       $more = ''
-      if ($pair[1].moreCount -gt 0) { $more = "，另有 $($pair[1].moreCount) 个模块" }
-      Write-Host "    本次更新（$($pair[0])）：$($pair[1].modules -join '、')$more（$($pair[1].fileCount) 个文件）" -ForegroundColor DarkGray
+      if ($sum.moreCount -gt 0) { $more = "，另有 $($sum.moreCount) 个模块" }
+      Write-Host "    本次更新（$lbl）：$($sum.modules -join '、')$more（$($sum.fileCount) 个文件）" -ForegroundColor DarkGray
     }
   }
 

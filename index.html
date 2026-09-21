@@ -82,7 +82,7 @@
     <div class="logo">🍲</div>
     <div>
       <h1>食联网数智餐饮平台 · 原型演示</h1>
-      <p class="sub">统一菜谱管理方案 —— 租户端 + 商户端</p>
+      <p class="sub">统一菜谱管理方案 —— 租户端 + 商户端 + 运营端</p>
     </div>
   </div>
 
@@ -107,6 +107,14 @@
       <p class="desc">面向商户门店：接收租户授权菜谱，结合自建菜谱与设备菜谱开展经营。</p>
       <a class="go" href="merchant/index.html">进入商户端 →</a>
       <div class="meta">登录页选择商户后进入演示 &nbsp;·&nbsp; 源码更新：<span id="verMerchant">—</span></div>
+    </section>
+
+    <section class="card">
+      <span class="tag">运营端 · 平台管理</span>
+      <h2>运营账号与权限</h2>
+      <p class="desc">面向平台运营：维护运营角色与权限、开设运营子账号，并处理首次登录改密提醒。</p>
+      <a class="go" href="opsys/index.html">进入运营端 →</a>
+      <div class="meta">右上角可退出登录，用演示账号体验登录校验 &nbsp;·&nbsp; 源码更新：<span id="verOpsys">—</span></div>
     </section>
   </div>
 
@@ -151,10 +159,12 @@
              '（<b>' + Number(n) + '</b> 个文件）</span></div>';
     };
 
-    var total = ((ch.tenant && ch.tenant.fileCount) || 0) + ((ch.merchant && ch.merchant.fileCount) || 0);
+    var total = ((ch.tenant && ch.tenant.fileCount) || 0)
+              + ((ch.merchant && ch.merchant.fileCount) || 0)
+              + ((ch.opsys && ch.opsys.fileCount) || 0);
     rows.innerHTML = (total === 0)
       ? '<div class="update-row none"><em>原型</em><span>本次未改动原型内容（仅更新了入口页或发布脚本）</span></div>'
-      : row('租户端', ch.tenant) + row('商户端', ch.merchant);
+      : row('租户端', ch.tenant) + row('商户端', ch.merchant) + row('运营端', ch.opsys);
 
     var at = document.getElementById('updateAt');
     if (at && v.publishedAt) at.textContent = v.publishedAt;
@@ -169,6 +179,7 @@
       set('verTime', v.publishedAt);
       set('verTenant', v.tenantSourceAt);
       set('verMerchant', v.merchantSourceAt);
+      set('verOpsys', v.opsysSourceAt);
       renderUpdate(v);
     })
     .catch(function () {

@@ -19,6 +19,15 @@ $ModuleRules = @(
   @{ Pattern = 'annotation';                               Label = '业务标注' }
   @{ Pattern = 'prd\.md$';                                 Label = 'PRD 文档' }
 
+  # ---- 运营端（系统管理 / 登录） ----
+  @{ Pattern = 'login-flow';                               Label = '登录流程' }
+  @{ Pattern = 'system-management';                        Label = '运营账号与权限' }
+  @{ Pattern = 'authorization-policy';                     Label = '授权策略' }
+  @{ Pattern = 'recipe-dictionary-extension';              Label = '菜谱标签与字典' }
+  @{ Pattern = 'recipe-center-extension';                  Label = '菜谱中心' }
+  @{ Pattern = 'recipe-center-ingredients';                Label = '菜谱食材' }
+  @{ Pattern = 'recipe-device-tabs';                       Label = '设备菜谱' }
+
   # ---- 统一菜谱 ----
   @{ Pattern = 'unified-recipe-editor';                    Label = '统一菜谱编辑' }
   @{ Pattern = 'unified-recipe-list';                      Label = '统一菜谱列表' }

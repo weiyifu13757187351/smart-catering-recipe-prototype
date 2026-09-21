@@ -8,6 +8,7 @@ const PAGES = [
   '/tenant/index.html',
   '/merchant/index.html',
   '/merchant/' + encodeURIComponent('食联网数智餐饮平台-组织及人员.html'),
+  '/opsys/index.html',
 ];
 
 const attrRe = /(?:src|href)\s*=\s*["']([^"']+)["']/gi;

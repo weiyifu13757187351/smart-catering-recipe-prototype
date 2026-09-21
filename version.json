@@ -1,23 +1,37 @@
 {
-    "publishedAt":  "2026-09-20 10:07",
-    "publishLabel":  "业务标注：确认时间区间口径与列表展示口径，待确认项清零",
+    "publishedAt":  "2026-09-21 13:32",
+    "publishLabel":  "新增运营端原型（系统管理·运营账号与权限）并纳入发布流程",
     "tenantSourceAt":  "2026-09-20 10:07",
-    "merchantSourceAt":  "2026-09-20 10:07",
+    "merchantSourceAt":  "2026-09-20 14:48",
+    "opsysSourceAt":  "2026-09-20 17:39",
     "changes":  {
                     "tenant":  {
                                    "modules":  [
-                                                   "业务标注"
+
                                                ],
                                    "moreCount":  0,
-                                   "fileCount":  3
+                                   "fileCount":  0
                                },
                     "merchant":  {
                                      "modules":  [
-
+                                                     "商品中心",
+                                                     "菜谱只读查看"
                                                  ],
                                      "moreCount":  0,
-                                     "fileCount":  0
-                                 }
+                                     "fileCount":  3
+                                 },
+                    "opsys":  {
+                                  "modules":  [
+                                                  "业务标注",
+                                                  "前端构建产物",
+                                                  "运营账号与权限",
+                                                  "登录流程",
+                                                  "菜谱中心",
+                                                  "菜谱标签与字典"
+                                              ],
+                                  "moreCount":  4,
+                                  "fileCount":  40
+                              }
                 },
     "site":  "https://weiyifu13757187351.github.io/smart-catering-recipe-prototype/"
 }
