@@ -1,9 +1,9 @@
 {
-    "publishedAt":  "2026-09-21 13:32",
-    "publishLabel":  "新增运营端原型（系统管理·运营账号与权限）并纳入发布流程",
+    "publishedAt":  "2026-09-21 13:59",
+    "publishLabel":  "运营端：账号详情去掉首次登录提醒标记（列表与详情均不展示）",
     "tenantSourceAt":  "2026-09-20 10:07",
     "merchantSourceAt":  "2026-09-20 14:48",
-    "opsysSourceAt":  "2026-09-20 17:39",
+    "opsysSourceAt":  "2026-09-21 13:55",
     "changes":  {
                     "tenant":  {
                                    "modules":  [
@@ -14,23 +14,18 @@
                                },
                     "merchant":  {
                                      "modules":  [
-                                                     "商品中心",
-                                                     "菜谱只读查看"
+
                                                  ],
                                      "moreCount":  0,
-                                     "fileCount":  3
+                                     "fileCount":  0
                                  },
                     "opsys":  {
                                   "modules":  [
                                                   "业务标注",
-                                                  "前端构建产物",
-                                                  "运营账号与权限",
-                                                  "登录流程",
-                                                  "菜谱中心",
-                                                  "菜谱标签与字典"
+                                                  "运营账号与权限"
                                               ],
-                                  "moreCount":  4,
-                                  "fileCount":  40
+                                  "moreCount":  0,
+                                  "fileCount":  4
                               }
                 },
     "site":  "https://weiyifu13757187351.github.io/smart-catering-recipe-prototype/"
