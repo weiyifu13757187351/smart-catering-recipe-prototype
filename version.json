@@ -1,30 +1,31 @@
 {
-    "publishedAt":  "2026-09-22 11:23",
-    "publishLabel":  "租户端：商品授权查看抽屉仅保留商品分类并完整展示",
-    "tenantSourceAt":  "2026-09-22 10:59",
-    "merchantSourceAt":  "2026-09-22 11:23",
+    "publishedAt":  "2026-09-22 17:16",
+    "publishLabel":  "租户端与商户端：菜谱标签与字典删除/停用规则（父子级联、失效显示「-」、编辑提交提醒、不影响授权与商户同步）",
+    "tenantSourceAt":  "2026-09-22 17:15",
+    "merchantSourceAt":  "2026-09-22 17:15",
     "opsysSourceAt":  "2026-09-21 13:55",
     "changes":  {
                     "tenant":  {
                                    "modules":  [
+                                                   "业务标注",
+                                                   "统一菜谱编辑",
                                                    "入口页",
-                                                   "前端构建产物",
-                                                   "授权策略",
-                                                   "商品中心",
-                                                   "菜谱中心",
-                                                   "商品中心引用"
+                                                   "菜谱标签与字典",
+                                                   "统一菜谱列表"
                                                ],
                                    "moreCount":  0,
-                                   "fileCount":  7
+                                   "fileCount":  11
                                },
                     "merchant":  {
                                      "modules":  [
+                                                     "业务标注",
                                                      "餐次计划",
-                                                     "merchant-plan-v2",
-                                                     "merchant-production-plan-v1"
+                                                     "菜谱标签与字典",
+                                                     "菜谱编辑",
+                                                     "统一菜谱"
                                                  ],
                                      "moreCount":  0,
-                                     "fileCount":  3
+                                     "fileCount":  9
                                  },
                     "opsys":  {
                                   "modules":  [

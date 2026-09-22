@@ -199,7 +199,7 @@
       "target": {"selector": ".um-table thead th:nth-child(7)"},
       "markdownFile": "annotations/merchant-recipe-management.md",
       "blockId": "list-tags-col",
-      "sourceRefs": ["REQ-04-LIST-FIELD"]
+      "sourceRefs": ["REQ-04-LIST-FIELD", "REQ-26-TENANT-IMPACT"]
     },
     {
       "id": "list-version-col",
@@ -254,7 +254,7 @@
       "moduleName": "本页规则",
       "markdownFile": "annotations/merchant-recipe-management.md",
       "blockId": "sync-rules",
-      "sourceRefs": ["REQ-11-SYNC-DRAWER", "REQ-10-SYNC-COND"]
+      "sourceRefs": ["REQ-11-SYNC-DRAWER", "REQ-10-SYNC-COND", "REQ-26-TENANT-IMPACT"]
     },
     {
       "id": "sync-category-tree",
@@ -265,7 +265,7 @@
       "target": {"selector": ".um-category-side"},
       "markdownFile": "annotations/merchant-recipe-management.md",
       "blockId": "sync-category-tree",
-      "sourceRefs": ["REQ-11-SYNC-DRAWER"]
+      "sourceRefs": ["REQ-11-SYNC-DRAWER", "REQ-26-TENANT-IMPACT"]
     },
     {
       "id": "sync-tools",
@@ -287,7 +287,7 @@
       "target": {"selector": ".um-select-summary"},
       "markdownFile": "annotations/merchant-recipe-management.md",
       "blockId": "sync-summary",
-      "sourceRefs": ["REQ-11-SYNC-DRAWER"]
+      "sourceRefs": ["REQ-11-SYNC-DRAWER", "REQ-26-TENANT-IMPACT"]
     },
     {
       "id": "sync-rows",
@@ -298,7 +298,7 @@
       "target": {"selector": "#umSyncRows"},
       "markdownFile": "annotations/merchant-recipe-management.md",
       "blockId": "sync-rows",
-      "sourceRefs": ["REQ-10-SYNC-COND", "REQ-23-CATEGORY-IMPACT"]
+      "sourceRefs": ["REQ-10-SYNC-COND", "REQ-23-CATEGORY-IMPACT", "REQ-26-TENANT-IMPACT"]
     },
     {
       "id": "sync-confirm",
@@ -331,7 +331,7 @@
       "moduleName": "本页规则",
       "markdownFile": "annotations/merchant-recipe-management.md",
       "blockId": "editor-basic-rules",
-      "sourceRefs": ["REQ-14-EDITOR"]
+      "sourceRefs": ["REQ-14-EDITOR", "REQ-26-TENANT-IMPACT"]
     },
     {
       "id": "editor-basic-fields",
@@ -342,7 +342,7 @@
       "target": {"selector": "#umDrawerBody"},
       "markdownFile": "annotations/merchant-recipe-management.md",
       "blockId": "editor-basic-fields",
-      "sourceRefs": ["REQ-15-EDITOR-BASIC"]
+      "sourceRefs": ["REQ-15-EDITOR-BASIC", "REQ-26-TENANT-IMPACT"]
     },
     {
       "id": "editor-category-field",
@@ -364,7 +364,7 @@
       "target": {"selector": "#umtSubmit"},
       "markdownFile": "annotations/merchant-recipe-management.md",
       "blockId": "editor-footer",
-      "sourceRefs": ["REQ-18-EDITOR-SUBMIT", "REQ-24-STATUS"]
+      "sourceRefs": ["REQ-18-EDITOR-SUBMIT", "REQ-24-STATUS", "REQ-26-TENANT-IMPACT"]
     },
 
     {
@@ -419,7 +419,7 @@
       "moduleName": "本页规则",
       "markdownFile": "annotations/merchant-recipe-management.md",
       "blockId": "detail-current-rules",
-      "sourceRefs": ["REQ-19-DETAIL"]
+      "sourceRefs": ["REQ-19-DETAIL", "REQ-26-TENANT-IMPACT"]
     },
     {
       "id": "detail-version-switch",

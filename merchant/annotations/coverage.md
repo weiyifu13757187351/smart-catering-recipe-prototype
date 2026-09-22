@@ -29,6 +29,6 @@
 | merchant-recipe-management | `REQ-23-CATEGORY-IMPACT` | ../商户端菜谱管理PRD.md#9.4 分类失效对商户端的影响 | 菜谱分类 | `merchant-recipe-management:categories-table`, `merchant-recipe-management:editor-category-field`, `merchant-recipe-management:sync-rows` | 已映射 |
 | merchant-recipe-management | `REQ-24-STATUS` | ../商户端菜谱管理PRD.md#10.1 自建菜谱状态 | 状态与权限 | `merchant-recipe-management:editor-footer`, `merchant-recipe-management:list-version-col` | 已映射 |
 | merchant-recipe-management | `REQ-25-PERM` | ../商户端菜谱管理PRD.md#10.2 组织菜谱操作权限 | 状态与权限 | `merchant-recipe-management:list-action-col` | 已映射 |
-| merchant-recipe-management | `REQ-26-TENANT-IMPACT` | ../商户端菜谱管理PRD.md#10.4 租户侧变化对商户端的影响 | 状态与权限 | `merchant-recipe-management:list-rules` | 已映射 |
+| merchant-recipe-management | `REQ-26-TENANT-IMPACT` | ../商户端菜谱管理PRD.md#10.4 租户侧变化对商户端的影响 | 状态与权限 | `merchant-recipe-management:detail-current-rules`, `merchant-recipe-management:editor-basic-rules`, `merchant-recipe-management:list-rules`, `merchant-recipe-management:sync-rules`, `merchant-recipe-management:editor-basic-fields`, `merchant-recipe-management:editor-footer`, `merchant-recipe-management:list-tags-col`, `merchant-recipe-management:sync-category-tree`, `merchant-recipe-management:sync-rows`, `merchant-recipe-management:sync-summary` | 已映射 |
 | merchant-recipe-management | `REQ-27-EXCEPTION` | ../商户端菜谱管理PRD.md#11. 异常与边界场景 | 异常与边界 | `merchant-recipe-management:list-rows` | 已映射 |
 | merchant-recipe-management | `REQ-28-DATA-SOURCE` | ../商户端菜谱管理PRD.md#3.2 原型演示数据来源 | 数据来源 | `merchant-recipe-management:list-rules` | 已映射 |

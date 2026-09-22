@@ -483,7 +483,7 @@ function openDetail(key) {
         <button type="button" class="mp-inline-btn" id="mpYieldReset" ${locked ? 'disabled' : ''}>恢复菜谱默认</button></label>
       <label class="mp-field"><span>出品量（可编辑）</span><input id="mpOutput" type="number" min="0" step="0.1" value="${out ? Math.round(out * 10) / 10 : ''}" ${locked ? 'disabled' : ''}><i>kg</i></label>
     </div>
-    ${det.memo ? `<div class="mp-memo-note">人均配量沿用 <b>${esc(det.memo)}</b> 的记录值${det.memoAt ? `（${esc(det.memoAt)}）` : ''}，可直接修改覆盖。</div>` : '<div class="mp-memo-note first">尚无历史记录：保存后将记住本次人均配量，下次排此菜时自动代入。</div>'}
+    ${locked ? '' : det.memo ? `<div class="mp-memo-note">人均配量沿用 <b>${esc(det.memo)}</b> 的记录值${det.memoAt ? `（${esc(det.memoAt)}）` : ''}，可直接修改覆盖。</div>` : '<div class="mp-memo-note first">尚无历史记录：保存后将记住本次人均配量，下次排此菜时自动代入。</div>'}
     <div class="mp-derive-row">
       <div><span>出品量</span><b id="mpOutView">${out ? fmtKg(out) : '—'}</b></div><i>=</i>
       <div><span>人数 × 人均配量</span><b id="mpFormula1">${hc} × ${det.perPerson || 0}</b></div>
@@ -502,24 +502,27 @@ function openDetail(key) {
 
   $('#mpDetailClose').onclick = close;
   if (!locked) {
-    const sync = () => {
-      const pp = Number($('#mpPerPerson').value) || 0, y = Number($('#mpYield').value) || 0;
-      const o = hc * pp, i2 = y ? o / (y / 100) : 0;
+    /* 三个输入任一变化：派生数字、公式行、用料换算、锅数提示全部同步重算 */
+    const paint = (o, y) => {
+      const input = y ? o / (y / 100) : 0;
       $('#mpOutView').textContent = o ? fmtKg(o) : '—';
-      $('#mpInpView').textContent = i2 ? fmtKg(i2) : '—';
-      if (document.activeElement !== $('#mpOutput')) $('#mpOutput').value = o ? Math.round(o * 10) / 10 : '';
+      $('#mpInpView').textContent = input ? fmtKg(input) : '—';
+      $('#mpFormula1').textContent = `${hc} × ${Number($('#mpPerPerson').value) || 0}`;
+      $('#mpFormula2').textContent = y ? `${y}%` : '—';
+      $('#mpBomBody').innerHTML = bomRows(input);
+      $('#mpPotHint').innerHTML = potHint(input);
+      if (document.activeElement !== $('#mpOutput')) $('#mpOutput').value = o ? String(Math.round(o * 10) / 10) : '';
     };
+    const sync = () => paint(hc * (Number($('#mpPerPerson').value) || 0), Number($('#mpYield').value) || 0);
+
     $('#mpPerPerson').oninput = sync;
     $('#mpYield').oninput = () => { det.yieldOverridden = true; sync(); };
     /* 出品量可直接编辑 —— 反算人均配量 */
     $('#mpOutput').oninput = () => {
       const o = Number($('#mpOutput').value) || 0;
       if (!hc) { toast('请先填写就餐人数'); return; }
-      const pp = Math.round((o / hc) * 10000) / 10000;
-      $('#mpPerPerson').value = pp || '';
-      const y = Number($('#mpYield').value) || 0;
-      $('#mpOutView').textContent = o ? fmtKg(o) : '—';
-      $('#mpInpView').textContent = y && o ? fmtKg(o / (y / 100)) : '—';
+      $('#mpPerPerson').value = o ? String(Math.round((o / hc) * 10000) / 10000) : '';
+      paint(o, Number($('#mpYield').value) || 0);
     };
     $('#mpYieldReset').onclick = () => { det.yieldOverridden = false; $('#mpYield').value = det.yieldCustom; sync(); };
     $('#mpDetailSave').onclick = () => {
@@ -710,6 +713,7 @@ window.MerchantPlan = {
   isDeviceRecipe: id => !!findRecipe(id)?.hasDevice,
   hideAll, mealPage, toast, drawer, close,
   enterMealPlan: enter,
+  openDetail: key => openDetail(key),
   refresh: () => { if (!mealPage().hidden) { load(week); render(); } },
   onSave: fn => { saveHooks.push(fn); }
 };

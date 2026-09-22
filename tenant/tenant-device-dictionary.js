@@ -40,7 +40,59 @@
   function bind(){$$('[data-dict-type]').forEach(b=>b.onclick=()=>{data.active=b.dataset.dictType;render()});$('#addDictionaryItem').onclick=()=>openEditor(data.active);$('#queryDictionary').onclick=()=>{if(data.active==='process'){filters.processType=$('#dictionaryProcessType').value;filters.processName=$('#dictionaryProcessName').value.trim()}else filters[data.active]=$('#dictionaryKeyword').value.trim();render()};$('#resetDictionary').onclick=()=>{if(data.active==='process'){filters.processType='';filters.processName=''}else filters[data.active]='';render()};$$('.dictionary-filters input').forEach(input=>input.onkeydown=e=>{if(e.key==='Enter')$('#queryDictionary').click()});$$('[data-dict-action]').forEach(b=>b.onclick=()=>handle(b.dataset))}
   function openEditor(type,item=null,parentId=''){if(type==='process')return openProcessEditor(item);const isTag=type==='tags',parent=parentId?findItem('tags',parentId):null,title=item?'编辑字典项':parent?'新增二级标签':isTag?'新增一级标签':'新增字典项';modal(title,`<div class="dictionary-form"><label>名称 <i>*</i><input id="dictionaryName" value="${esc(item?.name||'')}" placeholder="请输入名称"></label>${parent?`<label>上级标签<input value="${esc(parent.name)}" disabled></label>`:''}<div class="recipe-modal-foot"><div class="spacer"></div><button class="secondary" id="cancelDictionaryEdit">取消</button><button class="primary" id="saveDictionaryEdit">保存</button></div></div>`);$('#cancelDictionaryEdit').onclick=()=>$('#dictionaryModal').remove();$('#saveDictionaryEdit').onclick=()=>{const name=$('#dictionaryName').value.trim();if(!name)return toast('请输入名称');if(item)item.name=name;else if(parent)parent.children.push({id:`${parent.id}-${String(parent.children.length+1).padStart(3,'0')}`,name,status:'启用',refs:0});else if(isTag)data.tags.push({id:`TG${String(data.tags.length+1).padStart(3,'0')}`,name,status:'启用',refs:0,children:[]});else data[type].push({id:`${idPrefix[type]}${String(data[type].length+1).padStart(3,'0')}`,name,status:'启用',refs:0});$('#dictionaryModal').remove();render();toast('字典项已保存')}}
   function openProcessEditor(item=null){const title=item?'编辑字典项':'新增字典项';modal(title,`<div class="dictionary-form process-dictionary-form"><label>工艺类型 <i>*</i><select id="processType">${processTypes.map(x=>`<option ${x===item?.type?'selected':''}>${x}</option>`).join('')}</select></label><label>工艺名称 <i>*</i><input id="processName" value="${esc(item?.name||'')}" placeholder="请输入工艺名称"></label><label>处理步骤 <i>*</i><textarea id="processSteps" placeholder="请输入处理步骤">${esc(item?.steps||'')}</textarea></label><label class="dictionary-check"><input id="processRatioEnabled" type="checkbox" ${item?.ratioEnabled?'checked':''}><span>处理比例 <small>（一般用于处理后的食材比例变化）</small></span></label><div class="ratio-row ${item?.ratioEnabled?'':'is-hidden'}" id="processRatioRow"><label>处理前<input id="processRatioBefore" value="1" disabled></label><label>处理后<input id="processRatioAfter" type="number" min="0" step="0.01" value="${esc(item?.after||'1')}"></label></div><div class="recipe-modal-foot"><div class="spacer"></div><button class="secondary" id="cancelDictionaryEdit">取消</button><button class="primary" id="saveDictionaryEdit">保存</button></div></div>`);$('#cancelDictionaryEdit').onclick=()=>$('#dictionaryModal').remove();$('#processRatioEnabled').onchange=e=>$('#processRatioRow').classList.toggle('is-hidden',!e.target.checked);$('#saveDictionaryEdit').onclick=()=>{const type=$('#processType').value,name=$('#processName').value.trim(),steps=$('#processSteps').value.trim(),ratioEnabled=$('#processRatioEnabled').checked,after=$('#processRatioAfter').value.trim()||'1';if(!name)return toast('请输入工艺名称');if(!steps)return toast('请输入处理步骤');if(ratioEnabled&&!/^\d+(\.\d{1,2})?$/.test(after))return toast('处理后比例最多支持两位小数');if(item)Object.assign(item,{type,name,steps,ratioEnabled,before:'1',after});else data.process.push({id:`PR${String(data.process.length+1).padStart(3,'0')}`,type,name,steps,ratioEnabled,before:'1',after,status:'启用',refs:0});$('#dictionaryModal').remove();render();toast('字典项已保存')}}
-  function handle(ds){const item=findItem(ds.type,ds.id,ds.parent);if(ds.dictAction==='edit')return openEditor(ds.type,item,ds.parent);if(ds.dictAction==='child')return openEditor('tags',null,ds.id);if(ds.dictAction==='toggle'){const on=item.status==='启用';if(!confirm(on?`确认停用“${item.name}”？\n\n停用后新建菜谱不可再选择该项，已引用该字典项的菜谱不受影响；历史归属保留并显示“已停用”。`:`确认重新启用“${item.name}”？`))return;item.status=on?'已停用':'启用';render();return toast(`字典项已${item.status}`)}if(ds.dictAction==='delete'){if(ds.type==='tags'&&!ds.parent&&item.children.length)return toast('一级标签下存在二级标签，不能删除');if(!confirm(`确认删除${ds.type==='tags'&&ds.parent?'二级标签':'字典项'}“${item.name}”？${item.refs?`\n\n当前有 ${item.refs} 个菜谱引用该项，删除后不会被下架或删除，历史归属保留并显示“已删除”。`:''}`))return;item.status='已删除';render();toast('字典项已删除，历史归属已保留')}}
+  // 失效登记：标签与字典项被停用/删除后，引用它的菜谱不再显示该值（显示「-」），
+  // 编辑提交时提示存在未完成的内容；但不影响已授权给商户、也不影响商户同步。
+  const removed={tags:[],cooking:[],province:[],cuisine:[],process:[]};
+  function markRemoved(type,names,on){const list=removed[type]||(removed[type]=[]);(names||[]).forEach(name=>{if(!name)return;const i=list.indexOf(name);if(on&&i<0)list.push(name);if(!on&&i>=0)list.splice(i,1)})}
+  function itemStatus(type,name){if(!name)return null;if(type==='tags'){for(const p of data.tags){if(p.name===name)return p.status;const c=p.children.find(x=>x.name===name);if(c)return c.status}return null}const it=(data[type]||[]).find(x=>x.name===name);return it?it.status:null}
+  function isRemoved(type,name){if(!name)return true;if((removed[type]||[]).includes(name))return true;const s=itemStatus(type,name);return !!s&&s!=='启用'}
+  function dictText(type,name){return isRemoved(type,name)?'-':name}
+  window.recipeDictState={
+    removed,
+    isRemoved,
+    dictText,
+    tagGroups:groups=>(groups||[]).map(([group,items])=>[group,items.filter(name=>!isRemoved('tags',name))]).filter(x=>x[1].length),
+    options:(type,list)=>(list||[]).filter(name=>!isRemoved(type,name)),
+    invalidSummary:items=>(items||[]).filter(x=>isRemoved(x[0],x[1])).map(x=>`${x[2]||x[0]}「${x[1]}」`)
+  };
+  function handle(ds){const item=findItem(ds.type,ds.id,ds.parent);if(ds.dictAction==='edit')return openEditor(ds.type,item,ds.parent);if(ds.dictAction==='child')return openEditor('tags',null,ds.id);const isTag=ds.type==='tags',isParentTag=isTag&&!ds.parent&&Array.isArray(item.children),kids=isParentTag?item.children:[],scope=isParentTag?'一级标签':isTag?'二级标签':'字典项';
+    if(ds.dictAction==='toggle'){
+      const on=item.status==='启用';
+      if(on){
+        const cascade=isParentTag?kids.filter(c=>c.status==='启用'):[];
+        const msg=`确认停用${scope}“${item.name}”？${cascade.length?`\n\n其下 ${cascade.length} 个二级标签将一并停用。`:''}\n\n停用后：新建菜谱不可再选择该项；引用该项的菜谱不再显示该标签（显示「-」），编辑提交时提示存在未完成的内容；不影响已授权给商户。`;
+        if(!confirm(msg))return;
+        item.status='已停用';
+        if(isParentTag){cascade.forEach(c=>c.status='已停用');markRemoved('tags',cascade.map(c=>c.name),true)}
+        else if(isTag)markRemoved('tags',[item.name],true);
+        else markRemoved(ds.type,[item.name],true);
+        render();return toast(`${scope}已停用`);
+      }
+      if(isParentTag){
+        if(!confirm(`确认启用一级标签“${item.name}”？\n\n其下二级标签仍保持当前状态。`))return;
+        item.status='启用';
+      }else if(isTag){
+        const parent=data.tags.find(p=>p.children.some(c=>c.id===item.id));
+        if(!confirm(`确认启用二级标签“${item.name}”？${parent&&parent.status!=='启用'?`\n\n父级标签“${parent.name}”将一并启用。`:''}`))return;
+        item.status='启用';markRemoved('tags',[item.name],false);
+        if(parent&&parent.status!=='启用')parent.status='启用';
+      }else{
+        if(!confirm(`确认启用${scope}“${item.name}”？`))return;
+        item.status='启用';markRemoved(ds.type,[item.name],false);
+      }
+      render();return toast(`${scope}已启用`);
+    }
+    if(ds.dictAction==='delete'){
+      const cascade=isParentTag?kids.filter(c=>c.status!=='已删除'):[];
+      const msg=`确认删除${scope}“${item.name}”？${cascade.length?`\n\n其下 ${cascade.length} 个二级标签将一并删除。`:''}${item.refs?`\n\n当前有 ${item.refs} 个菜谱引用该项。`:''}\n\n删除后：新建菜谱不可再选择该项；引用该项的菜谱不再显示该标签（显示「-」），编辑提交时提示存在未完成的内容；不影响已授权给商户。`;
+      if(!confirm(msg))return;
+      item.status='已删除';
+      if(isParentTag){cascade.forEach(c=>c.status='已删除');markRemoved('tags',cascade.map(c=>c.name),true)}
+      else if(isTag)markRemoved('tags',[item.name],true);
+      else markRemoved(ds.type,[item.name],true);
+      render();toast(`${scope}已删除，历史归属已保留`);
+    }
+  }
   function enabledTags(){return data.tags.map(p=>({...p,children:p.children.filter(x=>x.status==='启用')})).filter(p=>p.status==='启用'&&p.children.length)}
   window.renderRecipeDictionary=render;
   window.openBatchRecipeTags=(records,onSave)=>{const groups=enabledTags();modal('批量设置菜谱标签',`<div class="batch-tag-summary">已选择 <b>${records.length}</b> 个设备菜谱，本次标签将追加到已有标签中。</div><div class="batch-tag-groups">${groups.map(p=>`<section><h3>${p.name}</h3><div>${p.children.map(x=>`<label><input type="checkbox" value="${x.name}"> ${x.name}</label>`).join('')}</div></section>`).join('')}</div><div class="recipe-modal-foot"><div class="spacer"></div><button class="secondary" id="cancelBatchTags">取消</button><button class="primary" id="saveBatchTags">确认追加</button></div>`);$('#cancelBatchTags').onclick=()=>$('#dictionaryModal').remove();$('#saveBatchTags').onclick=()=>{const tags=$$('#dictionaryModal input:checked').map(x=>x.value);if(!tags.length)return toast('请至少选择一个二级标签');onSave(tags);$('#dictionaryModal').remove();toast(`已为${records.length}个设备菜谱追加标签`)}}

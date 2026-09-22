@@ -5,9 +5,9 @@
     active:'tags',
     tags:[
       {id:'TG001',name:'辅助疾病治疗',status:'启用',refs:8,children:makeItems(['癌症','肿瘤','骨质疏松','营养缺乏'],'TG001-')},
-      {id:'TG002',name:'菜品营养功能',status:'启用',refs:12,children:makeItems(['动物性蛋白','植物性蛋白','高嘌呤','高胆固醇'],'TG002-')}
+      {id:'TG002',name:'菜品营养功能',status:'启用',refs:12,children:makeItems(['动物性蛋白','植物性蛋白','高嘌呤','高胆固醇'],'TG002-').map(x=>x.name==='植物性蛋白'?{...x,status:'已停用'}:x)}
     ],
-    cooking:makeItems(['炒','爆','烩','煎','烤'],'CK'),
+    cooking:[...makeItems(['炒','爆','烩','煎','烤'],'CK'),{id:'CK006',name:'炖',status:'已停用',refs:2}],
     province:makeItems(provinces,'PV'),
     cuisine:makeItems(['川菜','湘菜','浙菜','徽菜'],'CU'),
     category:makeItems(['素菜','大荤','小荤','半荤','主食'],'CT'),
@@ -17,6 +17,15 @@
       {id:'PR002',type:'焯水',name:'快速焯水',steps:'水沸后放入食材，焯至断生后捞出沥水。',ratioEnabled:false,before:'1',after:'1',status:'启用',refs:2},
       {id:'PR003',type:'炒制',name:'高温快炒',steps:'热锅后投料，保持高温快速翻炒至成熟。',ratioEnabled:true,before:'1',after:'0.88',status:'启用',refs:0}
     ]
+  };
+  // 租户端删除/停用字典的结果（原型演示数据）：商户端只读，用于展示标签与字典失效后
+  // 「已同步 / 未同步菜谱仍展示该字段、取值显示 -」以及「不影响同步」的表现。
+  window.merchantTenantDictState={
+    removed:{tags:['植物性蛋白','低脂','校园餐'],cooking:['炖'],province:[],cuisine:[],process:[]},
+    isRemoved(type,name){return !!name&&(this.removed[type]||[]).includes(name)},
+    tagCount(tags){return (tags||[]).filter(x=>!this.isRemoved('tags',x)).length},
+    tagsText(tags){const list=(tags||[]).filter(x=>!this.isRemoved('tags',x));return list.length?list.join('、'):'-'},
+    dictText(type,name){return !name||this.isRemoved(type,name)?'-':name}
   };
   const processTypes=['预处理','焯水','炒制','调味','装盘'];
   const types=[['tags','菜谱标签'],['cooking','烹饪分类'],['province','菜谱省份'],['cuisine','菜系分类'],['category','菜谱分类'],['process','工艺处理']];
