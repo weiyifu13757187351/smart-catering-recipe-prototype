@@ -1,5 +1,5 @@
 const productReferencePages={standardIngredients:'ingredients',tenantProducts:'products',tenantSkus:'skus',productPublish:'publish',brandLibrary:'brands',productCategories:'categories',productAuthorization:'authorization'};
-tenantProductCenterPage=function(page){return `<iframe class="product-reference-frame" src="./product-center-app/index.html?v=20260917-1&page=${productReferencePages[page]}"></iframe>`};
+tenantProductCenterPage=function(page){return `<iframe class="product-reference-frame" src="./product-center-app/index.html?v=20260922-1&page=${productReferencePages[page]}"></iframe>`};
 bindTenantProductCenter=function(page){
   const frame=$('.product-reference-frame');
   const apply=()=>{

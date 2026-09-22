@@ -1,0 +1,170 @@
+/* 商户端 · 计划管理 V2 增量样式
+   覆盖：排餐计划的「人数 / 人均配量 / 出品量」三输入，生产计划页面
+   加载顺序：本文件必须在 merchant-meal-plan-v1.css 之后 */
+
+/* ============================ 排餐计划：增量 ============================ */
+
+/* 计算口径提示条 */
+.mp-calc-note{display:flex;flex-wrap:wrap;align-items:center;gap:9px;margin:0 22px 4px;padding:11px 14px;border:1px solid #dbe9ff;border-radius:7px;color:#546e8f;background:#f6faff;font-size:12px}
+.mp-calc-note b{margin-right:4px;color:#245fbd}
+.mp-calc-note i{color:#9fb3cc;font-style:normal}
+.mp-calc-note span{color:#42597a}
+
+/* 餐次表头加开餐时间 */
+.mp-meal-head small{display:block;margin-top:5px;color:#a3b0c0;font-size:10px;font-weight:400}
+
+/* 就餐人数 */
+.mp-headcount{display:flex;align-items:center;gap:4px;margin-bottom:7px;padding-bottom:7px;border-bottom:1px dashed #e7edf5;color:#7b8ca1;font-size:11px}
+.mp-headcount b{color:#245fbd;font-size:13px}
+.mp-headcount i{font-style:normal}
+.mp-headcount em{margin-left:auto;padding:1px 6px;border-radius:9px;color:#3f7a63;background:#eaf8f2;font-size:10px;font-style:normal;cursor:help}
+.mp-headcount.edit input{width:56px;height:26px;padding:0 6px;border:1px solid #dce5ef;border-radius:4px;color:#334b68;background:#fff;font:13px inherit;outline:0}
+.mp-headcount.edit input:focus{border-color:#80adfb;box-shadow:0 0 0 3px #edf5ff}
+.mp-dim{color:#adb7c3;font-size:11px}
+
+/* 菜品卡片：名称 + 出品量 */
+.mp-dish-chip{flex-direction:column;align-items:flex-start;gap:2px}
+.mp-dish-name{color:#2f4a6b;font-size:12px;font-weight:600;line-height:1.35}
+.mp-dish-meta{color:#7f90a6;font-size:10px;line-height:1.3}
+.mp-dish-chip.prod-producing{background:#fff8ec}
+.mp-dish-chip.prod-complete{background:#f0faf6;opacity:.9}
+.mp-dish-chip.prod-producing .mp-dish-meta,.mp-dish-chip.prod-complete .mp-dish-meta{color:#98a6b6}
+.mp-production-legend .none{background:#dfe5ec}
+
+/* 菜品详情抽屉 */
+.mp-detail-grid{display:grid;grid-template-columns:repeat(2,minmax(190px,1fr));gap:14px;margin-bottom:14px}
+.mp-field{display:block;color:#52677f;font-size:12px}
+.mp-field>span{display:flex;align-items:center;gap:6px;margin-bottom:7px}
+.mp-field>span b{color:#e65c5c}
+.mp-field input,.mp-field select{box-sizing:border-box;width:100%;height:36px;padding:0 10px;border:1px solid #dce5ef;border-radius:5px;color:#334b68;background:#fff;font:14px inherit;outline:0}
+.mp-field input:focus,.mp-field select:focus{border-color:#80adfb;box-shadow:0 0 0 3px #edf5ff}
+.mp-field input:disabled{color:#8b9bad;background:#f5f7fa}
+.mp-field>i{display:inline-block;margin-top:5px;color:#9aa9ba;font-size:11px;font-style:normal}
+.mp-inline-btn{margin-top:6px;padding:0;border:0;color:#2678ff;background:none;cursor:pointer;font:12px inherit}
+.mp-inline-btn:disabled{color:#b3bfcd;cursor:not-allowed}
+.mp-memo-note{margin-bottom:14px;padding:10px 12px;border-radius:6px;color:#3f7a63;background:#f0faf6;font-size:12px;line-height:1.7}
+.mp-memo-note.first{color:#7d6227;background:#fffaf0}
+.mp-lock-note{margin-bottom:14px;padding:11px 13px;border:1px solid #ffd9d9;border-radius:6px;color:#a24646;background:#fff6f6;font-size:12px;line-height:1.7}
+.mp-derive-row{display:flex;align-items:center;gap:12px;margin-bottom:9px;padding:11px 13px;border:1px solid #e5ebf3;border-radius:7px;background:#fbfcfe}
+.mp-derive-row>div{display:flex;flex-direction:column;gap:4px}
+.mp-derive-row span{color:#8b9bad;font-size:11px}
+.mp-derive-row b{color:#245fbd;font-size:14px}
+.mp-derive-row i{color:#b3bfcd;font-style:normal}
+.mp-detail-section{margin-top:18px}
+.mp-detail-section h4{display:flex;align-items:center;gap:10px;margin:0 0 10px;color:#314967;font-size:14px}
+.mp-pot-hint{margin-left:auto;color:#7f90a6;font-size:12px;font-weight:400}
+.mp-pot-hint b{color:#245fbd}
+.mp-mini-table{width:100%;border-collapse:separate;border-spacing:0;border:1px solid #e5ebf3;border-radius:7px;overflow:hidden;font-size:12px}
+.mp-mini-table th{padding:9px 11px;color:#7b8ca1;background:#f7f9fc;font-weight:500;text-align:left;white-space:nowrap}
+.mp-mini-table td{padding:9px 11px;border-top:1px solid #eef2f7;color:#455d79}
+.mp-mini-table b{color:#245fbd}
+.mp-main-tag{padding:1px 6px;border-radius:8px;color:#245fbd;background:#eaf3ff;font-size:10px;font-weight:500}
+.mp-danger{height:36px;padding:0 16px;border:0;border-radius:5px;color:#e65c5c;background:#fff0f0;cursor:pointer;font:14px inherit}
+.mp-danger:hover{background:#ffe4e4}
+
+/* 菜谱选择器：6 列（新增「加工方式」） */
+.mp-recipe-table-head,.mp-recipe-item{grid-template-columns:24px 58px minmax(140px,1fr) minmax(120px,.8fr) minmax(145px,1fr) 92px!important}
+.mp-recipe-thumb-wrap{display:block;width:54px;height:42px;border-radius:6px;overflow:hidden;background:#eef3f8}
+.mp-recipe-thumb-wrap img{display:block;width:100%;height:100%;object-fit:cover}
+.mp-recipe-item.used{opacity:.55;cursor:not-allowed}
+.mp-recipe-item.used:hover{border-color:#e1e8f1;background:#fff}
+.mp-tag{display:inline-flex;align-items:center;height:20px;padding:0 7px;border-radius:10px;font-size:10px;font-style:normal;white-space:nowrap}
+.mp-tag.device{color:#316ec4;background:#eaf3ff}
+.mp-tag.manual{color:#39745d;background:#eaf8f2}
+
+/* ============================ 生产计划 ============================ */
+
+.pp-page{max-width:1480px;color:#334b68}
+.pp-workspace{padding-bottom:22px}
+.pp-date-picker{display:flex;align-items:center;gap:9px;height:40px;padding:0 14px;border:1px solid #d6dfeb;border-radius:6px;background:#fff}
+.pp-date-picker span{color:#9baabc}
+.pp-date-picker input{border:0;color:#53677f;background:transparent;font:15px inherit;outline:0}
+.pp-view-switch{display:flex;gap:2px;margin-left:14px;padding:3px;border-radius:7px;background:#eef3f8}
+.pp-view-switch button{height:34px;padding:0 16px;border:0;border-radius:5px;color:#5b7391;background:transparent;cursor:pointer;font:14px inherit}
+.pp-view-switch button.active{color:#245fbd;background:#fff;box-shadow:0 1px 3px rgba(30,68,121,.12)}
+
+.pp-stats{display:grid;grid-template-columns:repeat(6,minmax(120px,1fr));gap:12px;padding:16px 22px 4px}
+.pp-stats>div{display:flex;align-items:baseline;gap:6px;padding:13px 15px;border:1px solid #e5ebf3;border-radius:8px;background:#fbfcfe}
+.pp-stats span{color:#8494a8;font-size:12px}
+.pp-stats b{margin-left:auto;color:#2f4a6b;font-size:19px}
+.pp-stats b.on{color:#d98217}
+.pp-stats b.done{color:#1c9a70}
+.pp-stats i{color:#9aa9ba;font-size:11px;font-style:normal}
+.pp-stats>div.warn{border-color:#ffd9d9;background:#fff7f7}
+.pp-stats>div.warn b{color:#e65c5c}
+
+.pp-filters{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:14px 22px 0;padding:12px 14px;border:1px solid #edf1f6;border-radius:7px;background:#fbfcfe}
+.pp-filters select{box-sizing:border-box;height:34px;padding:0 10px;border:1px solid #dce5ef;border-radius:5px;color:#455d79;background:#fff;font:13px inherit;outline:0}
+.pp-filter-note{color:#8797aa;font-size:12px}
+.pp-note{color:#9aa9ba;font-size:11px}
+
+.pp-empty{padding:56px 24px}
+.pp-empty b{display:block;margin-bottom:8px;color:#456082;font-size:15px}
+.pp-empty p{margin:0 auto;max-width:620px;color:#91a0b3;font-size:12px;line-height:1.8}
+
+.pp-table-wrap{overflow:auto;margin:14px 22px 0;border:1px solid #e4eaf2;border-radius:8px}
+.pp-table{width:100%;min-width:1380px;border-collapse:separate;border-spacing:0}
+.pp-table th{padding:11px 12px;border-bottom:1px solid #e9eef5;color:#7b8ca1;background:#f7f9fc;font-size:12px;font-weight:500;text-align:left;white-space:nowrap}
+.pp-table td{padding:11px 12px;border-bottom:1px solid #eef2f7;color:#455d79;font-size:12px;vertical-align:middle}
+.pp-table tr:last-child td{border-bottom:0}
+.pp-table tr.conflict td{background:#fffafa}
+.pp-table td b{color:#2f4a6b}
+.pp-dish{display:flex;align-items:center;gap:10px}
+.pp-dish img{width:44px;height:34px;border-radius:5px;object-fit:cover}
+.pp-dish b{display:block;font-size:13px}
+.pp-dish small{display:block;margin-top:3px;color:#93a1b3;font-size:10px}
+.pp-tag{display:inline-flex;align-items:center;height:18px;margin-left:6px;padding:0 6px;border-radius:9px;color:#316ec4;background:#eaf3ff;font-size:10px;font-style:normal;white-space:nowrap}
+.pp-tag.warn{color:#8b6b1c;background:#fff6dd}
+.pp-tag.danger{margin-left:5px;color:#c04a4a;background:#ffeded}
+
+.pp-status{display:inline-flex;align-items:center;height:24px;padding:0 10px;border-radius:12px;font-size:12px;white-space:nowrap}
+.pp-status.st-not_started{color:#7b8797;background:#eef1f5}
+.pp-status.st-producing{color:#9c6210;background:#fff3dc}
+.pp-status.st-complete{color:#16845e;background:#eaf8f2}
+
+.pp-actions{display:flex;gap:6px;white-space:nowrap}
+.pp-actions button{height:28px;padding:0 11px;border:1px solid #dce5ef;border-radius:5px;color:#566d88;background:#fff;cursor:pointer;font:12px inherit}
+.pp-actions button:hover:not(:disabled){border-color:#82affb;color:#245fbd;background:#f5f9ff}
+.pp-actions button.primary{border-color:#2678ff;color:#fff;background:#2678ff}
+.pp-actions button.primary:hover{background:#1f6ae6;color:#fff}
+.pp-actions button:disabled{opacity:.45;cursor:not-allowed}
+
+/* 设备时间轴 */
+.pp-timeline{margin:16px 22px 0;padding:16px;border:1px solid #e4eaf2;border-radius:8px;background:#fdfefe}
+.pp-axis,.pp-lane{display:grid;grid-template-columns:150px 1fr;align-items:center;gap:12px}
+.pp-axis{height:26px}
+.pp-axis span{position:absolute;transform:translateX(-50%);color:#9aa9ba;font-size:10px}
+.pp-lane{min-height:56px;padding:9px 0;border-top:1px solid #eef2f7}
+.pp-lane-name{color:#3d5674;font-size:12px;font-weight:600;line-height:1.4}
+.pp-lane-track{position:relative;height:40px;border-radius:6px;background:#f5f8fc}
+.pp-grid{position:absolute;top:0;bottom:0;width:1px;background:#e6ecf4}
+.pp-open{position:absolute;top:-3px;bottom:-3px;width:2px;background:#e65c5c;opacity:.55}
+.pp-block{position:absolute;top:3px;bottom:3px;display:flex;flex-direction:column;justify-content:center;gap:2px;min-width:34px;padding:0 8px;border-left:3px solid #9aa7b6;border-radius:5px;color:#3d5674;background:#eef1f5;overflow:hidden;cursor:default}
+.pp-block.main{background:#e8f1fe}
+.pp-block b{font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pp-block small{color:#7f90a6;font-size:10px;white-space:nowrap}
+.pp-block.st-producing{border-left-color:#f2a53b;background:#fff6e8}
+.pp-block.st-complete{border-left-color:#24a879;background:#eefaf5}
+.pp-block.conflict{border-left-color:#e65c5c;background:#fff0f0}
+.pp-legend{display:flex;flex-wrap:wrap;align-items:center;gap:16px;margin-top:12px;padding-top:12px;border-top:1px solid #eef2f7;color:#8797aa;font-size:11px}
+.pp-legend .sw{display:inline-block;width:10px;height:10px;margin-right:5px;border-radius:3px;vertical-align:-1px;background:#eef1f5}
+.pp-legend .sw.st-producing{background:#f2a53b}
+.pp-legend .sw.st-complete{background:#24a879}
+.pp-legend .sw.conflict{background:#e65c5c}
+
+/* 生产计划抽屉 */
+.pp-adjust-note,.pp-confirm-note{padding:12px 14px;border:1px solid #dceaff;border-radius:7px;color:#536e91;background:#f5f9ff;font-size:12px;line-height:1.8}
+.pp-confirm-note p{margin:0}
+.pp-confirm-note p+p{margin-top:8px}
+.pp-confirm-note b{color:#245fbd}
+.pp-adjust-note{margin-bottom:16px}
+.pp-adjust-calc{display:grid;grid-template-columns:repeat(4,minmax(120px,1fr));gap:10px;margin-top:16px}
+.pp-adjust-calc>div{padding:11px 13px;border:1px solid #e5ebf3;border-radius:7px;background:#fbfcfe}
+.pp-adjust-calc span{display:block;margin-bottom:6px;color:#8b9bad;font-size:11px}
+.pp-adjust-calc b{color:#245fbd;font-size:14px}
+
+@media(max-width:1200px){
+  .pp-stats{grid-template-columns:repeat(3,minmax(120px,1fr))}
+  .pp-adjust-calc{grid-template-columns:repeat(2,minmax(120px,1fr))}
+  .mp-detail-grid{grid-template-columns:1fr}
+}

@@ -1,31 +1,37 @@
 {
-    "publishedAt":  "2026-09-21 13:59",
-    "publishLabel":  "运营端：账号详情去掉首次登录提醒标记（列表与详情均不展示）",
-    "tenantSourceAt":  "2026-09-20 10:07",
-    "merchantSourceAt":  "2026-09-20 14:48",
+    "publishedAt":  "2026-09-22 11:23",
+    "publishLabel":  "租户端：商品授权查看抽屉仅保留商品分类并完整展示",
+    "tenantSourceAt":  "2026-09-22 10:59",
+    "merchantSourceAt":  "2026-09-22 11:23",
     "opsysSourceAt":  "2026-09-21 13:55",
     "changes":  {
                     "tenant":  {
                                    "modules":  [
-
+                                                   "入口页",
+                                                   "前端构建产物",
+                                                   "授权策略",
+                                                   "商品中心",
+                                                   "菜谱中心",
+                                                   "商品中心引用"
                                                ],
                                    "moreCount":  0,
-                                   "fileCount":  0
+                                   "fileCount":  7
                                },
                     "merchant":  {
                                      "modules":  [
-
+                                                     "餐次计划",
+                                                     "merchant-plan-v2",
+                                                     "merchant-production-plan-v1"
                                                  ],
                                      "moreCount":  0,
-                                     "fileCount":  0
+                                     "fileCount":  3
                                  },
                     "opsys":  {
                                   "modules":  [
-                                                  "业务标注",
-                                                  "运营账号与权限"
+
                                               ],
                                   "moreCount":  0,
-                                  "fileCount":  4
+                                  "fileCount":  0
                               }
                 },
     "site":  "https://weiyifu13757187351.github.io/smart-catering-recipe-prototype/"
