@@ -2,8 +2,8 @@
   const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const find=id=>tenantDishes.find(d=>d.id==id);
   const defaults=[
-    {id:1,alias:'东坡肉',version:'V3',process:'含设备加工',devices:['智谷·智能炒菜机器人 A8','优特·智能炒菜机器人 UT-C16'],tags:[['菜品营养功能',['动物性蛋白','高蛋白']],['适用场景',['团餐']]],cooking:'炖',cuisine:'浙菜',province:'浙江',createdAt:'2026-08-20',updatedBy:'陈晓宇',updatedAt:'2026-09-14 10:20'},
-    {id:2,alias:'宫爆鸡丁',version:'V2',process:'含设备加工',devices:['智谷·智能炒菜机器人 A8','智谷·智能汤锅 ZG-T30','优特·智能炒菜机器人 UT-C16'],tags:[['菜品营养功能',['动物性蛋白']],['辅助疾病治疗',['营养缺乏']],['适用人群',['学生']]],cooking:'炒',cuisine:'川菜',province:'四川',createdAt:'2026-08-22',updatedBy:'陈晓宇',updatedAt:'2026-09-13 16:40',status:'已上架',newVersion:true},
+    {id:1,alias:'东坡肉',version:'V3',process:'含设备加工',devices:['智谷·智能炒菜机器人 A8'],tags:[['菜品营养功能',['动物性蛋白','高蛋白']],['适用场景',['团餐']]],cooking:'炖',cuisine:'浙菜',province:'浙江',createdAt:'2026-08-20',updatedBy:'陈晓宇',updatedAt:'2026-09-14 10:20'},
+    {id:2,alias:'宫爆鸡丁',version:'V2',process:'含设备加工',devices:['智谷·智能炒菜机器人 A8'],tags:[['菜品营养功能',['动物性蛋白']],['辅助疾病治疗',['营养缺乏']],['适用人群',['学生']]],cooking:'炒',cuisine:'川菜',province:'四川',createdAt:'2026-08-22',updatedBy:'陈晓宇',updatedAt:'2026-09-13 16:40',status:'已上架',newVersion:true},
     {id:3,alias:'紫菜鸡蛋汤',version:'—',process:'纯人工',devices:[],tags:[],cooking:'煮',cuisine:'家常菜',province:'全国',createdAt:'2026-09-12',updatedBy:'运营端下发',updatedAt:'2026-09-12 09:10',status:'待完善',category:''},
     {id:4,alias:'醋溜土豆丝',version:'—',process:'纯人工',devices:[],tags:[['菜品营养功能',['植物性蛋白']]],cooking:'炒',cuisine:'鲁菜',province:'山东',createdAt:'2026-09-14',updatedBy:'陈晓宇',updatedAt:'2026-09-14 09:35',status:'草稿'},
     {id:5,alias:'牛肉炖土豆',version:'V1',process:'含设备加工',devices:['优特·万能蒸烤箱 UT-P40'],tags:[['适用场景',['团餐','校园餐']]],cooking:'炖',cuisine:'家常菜',province:'全国',createdAt:'2026-09-01',updatedBy:'陈晓宇',updatedAt:'2026-09-08 15:25',status:'已下架',category:'热菜 / 大荤'}

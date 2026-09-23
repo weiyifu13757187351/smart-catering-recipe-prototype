@@ -33,8 +33,19 @@ const dishArt = (name, index) => `data:image/svg+xml;charset=UTF-8,${encodeURICo
   `<svg xmlns="http://www.w3.org/2000/svg" width="320" height="240"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="${['#f5a85f','#dc6f55','#f0c76b','#65b7a4','#80b96a'][index % 5]}"/><stop offset="1" stop-color="#fff1d8"/></linearGradient></defs><rect width="320" height="240" rx="18" fill="url(#g)"/><ellipse cx="160" cy="128" rx="108" ry="76" fill="#fff" opacity=".92"/><ellipse cx="160" cy="128" rx="82" ry="52" fill="#f4d089"/><circle cx="130" cy="112" r="18" fill="#d9583b"/><circle cx="180" cy="139" r="22" fill="#74a953"/><circle cx="190" cy="103" r="14" fill="#f0a13a"/><text x="160" y="218" text-anchor="middle" font-family="Microsoft YaHei,sans-serif" font-size="25" font-weight="700" fill="#59432d">${name}</text></svg>`)}`;
 
 /* 设备主数据：单锅产能（额定容量）挂在设备型号上，不挂在菜谱上 */
-const DEVICES = { '智谷 A8': 12, '优特 UT-C16': 15, '智谷 ZG-T30': 30, '优特 UT-P40': 14 };
+/* —— 设备型号主数据：厂家 + 型号 拼成唯一标识，capacity 为该型号的额定容量（kg/锅）—— */
+const DEVICE_MODELS = [
+  { maker: '智谷', model: 'A8',     capacity: 12 },
+  { maker: '智谷', model: 'ZG-T30', capacity: 30 },
+  { maker: '优特', model: 'UT-C16', capacity: 15 },
+  { maker: '优特', model: 'UT-P40', capacity: 14 }
+];
+const deviceLabel = (maker, model) => `${maker} ${model}`;            // 厂家 + 型号
+const DEVICES = Object.fromEntries(DEVICE_MODELS.map(d => [deviceLabel(d.maker, d.model), d.capacity]));
 const deviceCapacity = d => DEVICES[d] ?? 0;
+const deviceOf = label => DEVICE_MODELS.find(d => deviceLabel(d.maker, d.model) === label) || null;
+const deviceMaker = label => (deviceOf(label) || {}).maker || String(label).split(' ')[0];
+const deviceModel = label => (deviceOf(label) || {}).model || String(label).split(' ').slice(1).join(' ');
 
 /* 用料单位折算：克/千克为质量，毫升/升按 1 g/ml 折算；个/只/条/份/适量折不了，不进合计但照常按倍数放大 */
 const GRAM = { g: 1, kg: 1000, ml: 1, L: 1000 };
@@ -114,7 +125,7 @@ const recipes = Object.entries(RAW).map(([id, r], i) => {
   return {
     id, name, category, version, bom: bomRows, steps: stepRows,
     image: dishArt(name, i),
-    device: steps.length ? [...new Set(steps.map(s => s.device))].join('、') : '—',
+    device: stepRows.length ? [...new Set(stepRows.map(s => s.device))].join('、') : '—',
     hasDevice: stepRows.length > 0,
     capacity: stepRows.length ? deviceCapacity(mainStepDevice(stepRows)) : 0,
     batchGram: q,                                   // 基准批次量 Q（克），只算能折成质量的行
@@ -150,6 +161,12 @@ const fmtQty = (qty, unit) => {
   if (unit === 'ml' || unit === 'L') { const ml = unit === 'ml' ? n : n * 1000; return ml >= 1000 ? `${trimNum(ml / 1000)} L` : `${trimNum(ml)} ml`; }
   return `${trimNum(n)} ${unit}`;
 };
+/* 菜谱原值显示：按菜谱配置的单位原样展示，不做进位 —— 设备菜的用料单位统一为 g，就必须显示成 g */
+const fmtRawQty = (qty, unit) => `${trimNum(qty)} ${unit}`;
+/* 入锅投料总量：展示精度与用料行（2 位）对齐，避免「把本次用量列加起来比它多 0.01」 */
+const fmtKg2 = v => `${(Math.round(v * 100) / 100).toFixed(2).replace(/\.?0+$/, '')}kg`;
+/* 人均配量统一收敛到 3 位小数（0.001 kg = 1 g）—— 录入、存储、展示同一口径，所见即所存 */
+const round3 = v => Math.round(v * 1000) / 1000;
 
 const weekValue = d => {
   const x = new Date(monday(d) + 'T00:00:00'), j = new Date(x.getFullYear(), 0, 4),
@@ -265,13 +282,23 @@ const inputTotalKg = (p, d, m, id) => {
   if (!det || !det.yieldCoef) return 0;
   return outputKg(p, d, m, id) / (det.yieldCoef / 100);
 };
-/* 单锅产能取「主加工步骤所用设备」的额定容量（设备主数据），菜谱本身不维护产能 */
+/* 单锅产能取设备型号主数据上的额定容量，菜谱本身不维护产能 */
 const mainStep = r => r.steps.find(s => s.isMain) || r.steps[0] || null;
-const potCountOf = (p, d, m, id) => {
-  const r = findRecipe(id), cap = r?.capacity || 0;
-  if (!cap) return 1;
-  return Math.max(1, Math.ceil(inputTotalKg(p, d, m, id) / cap));
+/* 换主加工设备 = 把原本挂在「原主设备」上的步骤整体挪到新设备上（生产计划的人工调整）。
+   下面的两个 helper 是这套挪动的唯一实现，排餐和生产计划共用，避免两处口径分叉 */
+const effDeviceOf = (r, deviceOverride, dev) => {
+  const orig = mainStep(r)?.device || r.steps[0]?.device || '';
+  return (deviceOverride && deviceOverride !== orig && dev === orig) ? deviceOverride : dev;
 };
+const effDevices = (r, deviceOverride) => [...new Set(r.steps.map(s => effDeviceOf(r, deviceOverride, s.device)))];
+/* 锅数 = ⌈W ÷ 设备额定容量⌉。一道菜可能跨多台设备，每台都得装得下 —— 取所有设备的锅数最大值。
+   只按「主加工步骤」的产能算会漏掉非主步骤：焯水在小设备上时那一锅装不下 */
+const potCountFor = (r, inputKg, deviceOverride) => {
+  if (!r || !inputKg) return 1;
+  const caps = effDevices(r, deviceOverride).map(deviceCapacity).filter(Boolean);
+  return caps.length ? Math.max(1, ...caps.map(c => Math.ceil(inputKg / c))) : 1;
+};
+const potCountOf = (p, d, m, id) => potCountFor(findRecipe(id), inputTotalKg(p, d, m, id));
 
 /* 用料换算的通用口径：Q = 基准批次量（能折成质量的行之和，单位克）；k = 本次要几份配方 */
 const batchGram = r => r?.batchGram || 0;
@@ -291,10 +318,11 @@ const usageOf = (r, inputKg) => {
   });
 };
 /* 纯人工菜：基准是「一份」，所以人均配量可以直接从菜谱派生 = Q × 出餐成品系数
-   保留 6 位小数 —— Q×r/100000 对整数克最多 5 位小数，这样换算出来的倍数正好等于就餐人数 */
+   截到 3 位小数（0.001 kg = 1 g）—— 派生值与用户手输走同一口径，界面所见即所存。
+   代价：倍数不再正好等于就餐人数（116 g × 91% = 105.56 g → 0.106 kg → k = 120.5） */
 const derivedPerPerson = (r, yieldCoef) => {
   const Q = batchGram(r);
-  return Q && yieldCoef ? Math.round((Q * (yieldCoef / 100)) / 1000 * 1e6) / 1e6 : 0;
+  return Q && yieldCoef ? round3((Q * (yieldCoef / 100)) / 1000) : 0;
 };
 const taskDurationSec = (id, potCount) => {
   const r = findRecipe(id); if (!r) return 0;
@@ -344,7 +372,11 @@ const historical = () => week < monday(today());
 const dirty = () => Object.keys(buffers).length > 0;
 function load(w) {
   week = monday(w);
-  current = clone(buffers[week] || saved(week) || makePlan(week));
+  const live = saved(week);                     // store 实体：生产计划的状态直接写在这里
+  current = clone(buffers[week] || live || makePlan(week));
+  /* statuses 归生产计划所有。排餐的未保存缓冲里没有它，
+     如果照搬缓冲，刚在生产计划点的「开始生产」会被无声覆盖掉 */
+  if (live) current.statuses = clone(live.statuses || {});
   current.headcounts ||= {}; current.details ||= {}; current.statuses ||= {}; current.adjustments ||= {};
 }
 function mark() { current.updated = ''; buffers[week] = clone(current); }
@@ -453,7 +485,7 @@ function cell(p, i, m) {
   const hc = p.headcounts[`${i}|${m}`];
 
   const headcount = can
-    ? `<div class="mp-headcount edit"><span>就餐</span><input type="number" min="1" step="1" data-headcount="${i}|${m}" value="${hc?.value ?? ''}" placeholder="人数"><i>人</i>${hc?.memo ? `<em title="沿用上次：${esc(hc.memo)}">沿用${esc(hc.memo)}</em>` : ''}</div>`
+    ? `<div class="mp-headcount edit"><span>就餐</span><input type="number" min="1" max="9999" step="1" data-headcount="${i}|${m}" value="${hc?.value ?? ''}" placeholder="人数"><i>人</i>${hc?.memo ? `<em title="沿用上次：${esc(hc.memo)}">沿用${esc(hc.memo)}</em>` : ''}</div>`
     : `<div class="mp-headcount">${hc?.value ? `<span>就餐</span><b>${hc.value}</b><i>人</i>` : '<span class="mp-dim">未填人数</span>'}</div>`;
 
   const chips = ids.map(id => {
@@ -507,7 +539,9 @@ function commit() {
   Object.values(buffers).forEach(p => {
     p.status = 'active'; p.updated = stamp;
     const i = ps.findIndex(x => x.start === p.start);
-    i < 0 ? ps.push(clone(p)) : ps[i] = clone(p);
+    if (i < 0) ps.push(clone(p));
+    /* 排餐从不修改 statuses，保存时把生产计划写的状态原样带回去，别被缓冲里的旧值覆盖 */
+    else { p.statuses = ps[i].statuses || {}; ps[i] = clone(p); }
     memoCommit(p);           // 保存时才写记忆
   });
   buffers = {};
@@ -552,12 +586,12 @@ function openDetail(key) {
   const st = statusOf(current, d, m, id);
   const locked = ['producing', 'complete'].includes(st);
 
-  /* 用料换算：本次用量 = 基准投料 × k。整条链路与设备无关 —— 排餐这边不出现设备、锅数、时间 */
-  const basis = r.hasDevice ? '每批投料' : '每份投料';
+  /* 用料换算：本次用量 = 菜谱投料 × k。整条链路与设备无关 —— 排餐这边不出现设备、锅数、时间 */
+  const basis = r.hasDevice ? '菜谱投料' : '每份投料';
   const bomRows = input => usageOf(r, input).map(u => `<tr>
       <td><em class="mp-role ${u.role === '主料' ? 'main' : u.role === '辅料' ? 'side' : 'season'}">${esc(u.role)}</em></td>
       <td><b>${esc(u.ingredient)}</b>${u.selfSupply ? ' <em class="mp-tag self">自采</em>' : ''}<small>${esc(u.inputState)} · ${esc(u.cut)}</small></td>
-      <td>${fmtQty(u.qty, u.unit)}</td>
+      <td>${fmtRawQty(u.qty, u.unit)}</td>
       <td>${u.ratio != null ? `${Math.round(u.ratio * 1000) / 10}%` : '<span class="mp-dim" title="计数单位不进合计">—</span>'}</td>
       <td><b>${u.usageText}</b></td></tr>`).join('');
   const kHint = input => {
@@ -576,26 +610,25 @@ function openDetail(key) {
   drawer(`${r.name}`, `${DAYS[d]} · ${m}　${st === 'producing' ? '生产中 · 已锁定' : st === 'complete' ? '生产完成 · 已锁定' : '未开始'}`,
     `${locked ? '<div class="mp-lock-note">该菜已开工，不能在排餐计划中修改或删除。如需调整请在生产计划中线下处理后重新排餐。</div>' : ''}
     <div class="mp-detail-grid">
-      <label class="mp-field"><span>就餐人数</span><input type="number" min="1" value="${hc}" disabled><i>人</i></label>
+      <label class="mp-field"><span>就餐人数</span><input type="number" min="1" max="9999" value="${hc}" disabled><i>人</i></label>
       <label class="mp-field"><span>人均配量 <b>*</b></span><input id="mpPerPerson" type="number" min="0.001" step="0.001" value="${det.perPerson || ''}" placeholder="请输入人均配量" ${locked ? 'disabled' : ''}><i>kg/人</i></label>
       <label class="mp-field"><span>出餐成品系数 <b>*</b></span><input id="mpYield" type="number" min="1" max="100" step="1" value="${det.yieldCoef || ''}" ${locked ? 'disabled' : ''}><i>%</i>
         <button type="button" class="mp-inline-btn" id="mpYieldReset" ${locked ? 'disabled' : ''}>恢复菜谱默认</button></label>
-      <label class="mp-field"><span>出品量（可编辑）</span><input id="mpOutput" type="number" min="0" step="0.1" value="${out ? Math.round(out * 10) / 10 : ''}" ${locked ? 'disabled' : ''}><i>kg</i></label>
     </div>
-    ${locked ? '' : '<div class="mp-dish-basis"><em class="mp-tag ' + (r.hasDevice ? 'device' : 'manual') + '">' + (r.hasDevice ? '含设备加工' : '纯人工') + '</em><span>用料明细按「' + (r.hasDevice ? '一批' : '一份') + '」配置</span></div>'}
+    ${locked ? '' : '<div class="mp-dish-basis"><em class="mp-tag ' + (r.hasDevice ? 'device' : 'manual') + '">' + (r.hasDevice ? '含设备加工' : '纯人工') + '</em><span>用料明细按「' + (r.hasDevice ? '一次投料' : '一份') + '」配置</span></div>'}
     <div id="mpMemoNote">${memoNote()}</div>
     <div class="mp-derive-row">
-      <div><span>出品量</span><b id="mpOutView">${out ? fmtKg(out) : '—'}</b></div><i>=</i>
+      <div><span>出品量</span><b id="mpOutView">${out ? fmtKg2(out) : '—'}</b></div><i>=</i>
       <div><span>人数 × 人均配量</span><b id="mpFormula1">${hc} × ${det.perPerson || 0}</b></div>
     </div>
     <div class="mp-derive-row">
-      <div><span>入锅投料总量</span><b id="mpInpView">${inp ? fmtKg(inp) : '—'}</b></div><i>=</i>
-      <div><span>出品量 ÷ 出餐成品系数</span><b id="mpFormula2">${det.yieldCoef ? det.yieldCoef + '%' : '—'}</b></div>
+      <div><span>入锅投料总量</span><b id="mpInpView">${inp ? fmtKg2(inp) : '—'}</b></div><i>=</i>
+      <div><span>出品量 ÷ 出餐成品系数</span><b id="mpFormula2">${det.yieldCoef ? `${trimNum(out)} ÷ ${det.yieldCoef}%` : '—'}</b></div>
     </div>
     <div class="mp-detail-section"><h4>用料换算　<span class="mp-pot-hint" id="mpKHint">${kHint(inp)}</span></h4>
       <table class="mp-mini-table"><thead><tr><th>用料角色</th><th>标准食材</th><th>${basis}</th><th>占比</th><th>本次用量</th></tr></thead><tbody id="mpBomBody">${bomRows(inp)}</tbody></table>
       <p class="mp-table-note">${basis}合计 <b>${fmtQty(batchGram(r), 'g')}</b>，每行本次用量 = 该行投料 × 倍数，单位保持菜谱原单位。${r.hasDevice
-        ? '一批是一个菜谱基准批次，<b>与设备无关</b>；实际分几锅由生产计划按所选设备产能决定。'
+        ? '菜谱投料 = 菜谱一次的投料量，<b>与设备无关</b>；实际分几锅由生产计划按所选设备产能决定。'
         : '一份是一人份，本次用量按就餐人数等比放大。'}${r.hasUnmeasurable ? '<br><b>⚠ 有行走计数单位（个/只等），不计入合计，但仍按倍数放大。</b>' : ''}</p></div>`,
     `<button class="mp-secondary" id="mpDetailClose">关闭</button><span class="mp-spacer"></span>
      ${locked ? '' : `<button class="mp-danger" id="mpDetailRemove">删除此菜</button><button class="mp-secondary" id="mpDetailReplace">替换菜谱</button><button class="mp-primary" id="mpDetailSave">确定</button>`}`,
@@ -603,23 +636,31 @@ function openDetail(key) {
 
   $('#mpDetailClose').onclick = close;
   if (!locked) {
-    /* 三个输入任一变化：派生数字、公式行、用料换算、倍数提示、来源提示全部同步重算 */
+    /* 两个输入任一变化：派生数字、公式行、用料换算、倍数提示、来源提示全部同步重算。
+       出品量是只读派生值，不存在反算路径 */
+    const ppNow = () => round3(Number($('#mpPerPerson').value) || 0);
     const paint = (o, y) => {
       const input = y ? o / (y / 100) : 0;
-      $('#mpOutView').textContent = o ? fmtKg(o) : '—';
-      $('#mpInpView').textContent = input ? fmtKg(input) : '—';
-      $('#mpFormula1').textContent = `${hc} × ${Number($('#mpPerPerson').value) || 0}`;
-      $('#mpFormula2').textContent = y ? `${y}%` : '—';
+      $('#mpOutView').textContent = o ? fmtKg2(o) : '—';
+      $('#mpInpView').textContent = input ? fmtKg2(input) : '—';
+      $('#mpFormula1').textContent = `${hc} × ${ppNow()}`;
+      /* 公式行要把两个操作数都回显出来，只回显系数会让人看不出被除数是多少 */
+      $('#mpFormula2').textContent = y ? `${trimNum(o)} ÷ ${y}%` : '—';
       $('#mpBomBody').innerHTML = bomRows(input);
       $('#mpKHint').innerHTML = kHint(input);
       $('#mpMemoNote').innerHTML = memoNote();
-      if (document.activeElement !== $('#mpOutput')) $('#mpOutput').value = o ? String(Math.round(o * 10) / 10) : '';
     };
-    const sync = () => paint(hc * (Number($('#mpPerPerson').value) || 0), Number($('#mpYield').value) || 0);
+    const sync = () => paint(hc * ppNow(), Number($('#mpYield').value) || 0);
     /* 派生来源→人工值：改过之后不再被菜谱刷新 */
     const toManual = () => { det.perPersonFrom = 'manual'; det.memo = ''; };
 
     $('#mpPerPerson').oninput = () => { toManual(); sync(); };
+    /* 失焦时把输入值收敛到 3 位小数，界面上看到的数就是实际参与计算的数 */
+    $('#mpPerPerson').onblur = () => {
+      const v = ppNow();
+      $('#mpPerPerson').value = v ? String(v) : '';
+      sync();
+    };
     /* 出餐成品系数：来源是「菜谱派生」的人均配量跟着一起算，人工值不动 */
     $('#mpYield').oninput = () => {
       det.yieldOverridden = true;
@@ -629,14 +670,6 @@ function openDetail(key) {
         $('#mpPerPerson').value = det.perPerson ? String(det.perPerson) : '';
       }
       sync();
-    };
-    /* 出品量可直接编辑 —— 反算人均配量，并转为人工值 */
-    $('#mpOutput').oninput = () => {
-      const o = Number($('#mpOutput').value) || 0;
-      if (!hc) { toast('请先填写就餐人数'); return; }
-      toManual();
-      $('#mpPerPerson').value = o ? String(Math.round((o / hc) * 1e6) / 1e6) : '';
-      paint(o, Number($('#mpYield').value) || 0);
     };
     $('#mpYieldReset').onclick = () => {
       det.yieldOverridden = false;
@@ -648,7 +681,7 @@ function openDetail(key) {
       sync();
     };
     $('#mpDetailSave').onclick = () => {
-      const pp = Number($('#mpPerPerson').value) || 0, y = Number($('#mpYield').value) || 0;
+      const pp = ppNow(), y = Number($('#mpYield').value) || 0;
       if (!pp) return toast('请输入人均配量');
       if (!y || y > 100) return toast('出餐成品系数取值应大于 0 且不超过 100%');
       det.perPerson = pp; det.yieldCoef = y;
@@ -667,7 +700,7 @@ function picker(key, replace = '') {
   const selected = new Set(single ? [replace] : []);
   const used = new Set((current.schedule[d][m] || []).filter(x => x !== replace));
   const cats = [...new Set(recipes.map(r => r.category))];
-  const makers = [...new Set(recipes.flatMap(r => r.hasDevice ? r.steps.map(s => s.device.split(' ')[0]) : []))];
+  const makers = [...new Set(recipes.flatMap(r => r.hasDevice ? r.steps.map(s => deviceMaker(s.device)) : []))];
 
   drawer(single ? '替换菜谱' : '添加菜谱', `${DAYS[d]} · ${m}`,
     `<div class="mp-recipe-tools">
@@ -684,7 +717,7 @@ function picker(key, replace = '') {
     $('#mpRecipeList').innerHTML = recipes.filter(r => {
       const okKw = !kw || r.name.includes(kw);
       const okCat = !c || r.category === c;
-      const okMk = !mk || (mk === 'none' ? !r.hasDevice : r.steps.some(s => s.device.startsWith(mk + ' ')));
+      const okMk = !mk || (mk === 'none' ? !r.hasDevice : r.steps.some(s => deviceMaker(s.device) === mk));
       return okKw && okCat && okMk;
     }).map(r => {
       const disabled = used.has(r.id);
@@ -829,10 +862,12 @@ function orgConfirm(button) {
 /* ============================ 14. 对外暴露 ============================ */
 
 window.MerchantPlan = {
-  MEALS, DAYS, OPEN_TIME, BUFFER_MIN, recipes, findRecipe, DEVICES, deviceCapacity,
-  today, add, monday, dayIndex, hm, toMin, fmt, fmtKg, fmtQty, trimNum, esc, clone,
+  MEALS, DAYS, OPEN_TIME, BUFFER_MIN, recipes, findRecipe, DEVICES, DEVICE_MODELS, deviceCapacity,
+  deviceLabel, deviceMaker, deviceModel,
+  today, add, monday, dayIndex, hm, toMin, fmt, fmtKg, fmtKg2, fmtQty, fmtRawQty, trimNum, esc, clone,
   org, allowed, plans, saved, overrides,
-  headcountOf, detailOf, statusOf, lockedOf, outputKg, inputTotalKg, potCountOf, taskDurationSec, mainStep,
+  headcountOf, detailOf, statusOf, lockedOf, outputKg, inputTotalKg, potCountOf, potCountFor,
+  effDevices, effDeviceOf, taskDurationSec, mainStep,
   toGram, batchGram, factorOf, derivedPerPerson, usageOf,
   /* 用料换算结果（采购计划的输入）：每行含 食材/原单位/是否计入基准量/占比/本次用量 */
   bomUsageOf: (p, d, m, id) => usageOf(findRecipe(id), inputTotalKg(p, d, m, id)),

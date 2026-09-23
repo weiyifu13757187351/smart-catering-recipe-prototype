@@ -68,7 +68,7 @@
     invalidSeed=seedInvalid(d);
     base={image:'',name:d?.name||'',alias:d?.alias||'',foreign:{},cooking:dictValue('cooking',d?.cooking||'炒'),province:dictValue('province',d?.province||'全国'),yieldRate:'100',categoryLevel1,categoryLevel2,cuisine:dictValue('cuisine',d?.cuisine||'川菜'),intro:'',tags:d?.tags?[...d.tags].flatMap(g=>g[1]):['动物性蛋白'],...(saved?.base||{})};
     // 编辑态回显已保存内容；含设备加工的菜谱保留设备加工模式与已选设备型号，不再一律重置为人工处理。
-    const seedSteps=()=>{const steps=initialSteps().map(x=>({...x,mode:'manual',processId:'',processName:'',deviceConfigs:[]}));const models=[...new Set(d?.devices||[])];if(d&&d.process==='含设备加工'&&models.length)steps[0]={...steps[0],mode:'device',deviceConfigs:models.map(m=>({modelId:m,actions:[]})),activeModelId:models[0]};return steps};
+    const seedSteps=()=>{const steps=initialSteps().map(x=>({...x,mode:'manual',processId:'',processName:'',deviceConfigs:[]}));const models=[...new Set(d?.devices||[])].slice(0,1);if(d&&d.process==='含设备加工'&&models.length)steps[0]={...steps[0],mode:'device',deviceConfigs:models.map(m=>({modelId:m,actions:[]})),activeModelId:models[0]};return steps};
     editIngredients=saved?JSON.parse(JSON.stringify(saved.ingredients)):initialIngredients();
     editSteps=saved?JSON.parse(JSON.stringify(saved.steps)):seedSteps();
     dishDrawer(d?'编辑菜谱':'新建菜谱','<div id="unifiedRecipeEditorRoot" class="unified-recipe-editor-root"></div>','保存草稿');

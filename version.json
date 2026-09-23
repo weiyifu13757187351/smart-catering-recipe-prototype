@@ -1,29 +1,31 @@
 {
-    "publishedAt":  "2026-09-23 09:47",
-    "publishLabel":  "租户端与商户端：新建菜谱设备操作步骤投料明细单位统一为「克」（克值自动带入、非克留空需手工填写、未填不允许提交）",
-    "tenantSourceAt":  "2026-09-23 09:45",
-    "merchantSourceAt":  "2026-09-23 09:45",
+    "publishedAt":  "2026-09-23 13:27",
+    "publishLabel":  "租户端与商户端：新建/修改菜谱的加工步骤，一个步骤仅可关联一台设备（已有设备时「适配设备型号」行置灰不可再添加，删除后恢复）",
+    "tenantSourceAt":  "2026-09-23 11:21",
+    "merchantSourceAt":  "2026-09-23 11:52",
     "opsysSourceAt":  "2026-09-21 13:55",
     "changes":  {
                     "tenant":  {
                                    "modules":  [
                                                    "业务标注",
+                                                   "统一菜谱",
                                                    "入口页",
-                                                   "统一菜谱"
+                                                   "统一菜谱编辑",
+                                                   "统一菜谱列表"
                                                ],
                                    "moreCount":  0,
-                                   "fileCount":  6
+                                   "fileCount":  9
                                },
                     "merchant":  {
                                      "modules":  [
                                                      "业务标注",
                                                      "餐次计划",
-                                                     "merchant-plan-v2",
                                                      "merchant-production-plan-v1",
+                                                     "菜谱编辑",
                                                      "统一菜谱"
                                                  ],
                                      "moreCount":  0,
-                                     "fileCount":  10
+                                     "fileCount":  7
                                  },
                     "opsys":  {
                                   "modules":  [
