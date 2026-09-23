@@ -1,31 +1,29 @@
 {
-    "publishedAt":  "2026-09-22 17:16",
-    "publishLabel":  "租户端与商户端：菜谱标签与字典删除/停用规则（父子级联、失效显示「-」、编辑提交提醒、不影响授权与商户同步）",
-    "tenantSourceAt":  "2026-09-22 17:15",
-    "merchantSourceAt":  "2026-09-22 17:15",
+    "publishedAt":  "2026-09-23 09:47",
+    "publishLabel":  "租户端与商户端：新建菜谱设备操作步骤投料明细单位统一为「克」（克值自动带入、非克留空需手工填写、未填不允许提交）",
+    "tenantSourceAt":  "2026-09-23 09:45",
+    "merchantSourceAt":  "2026-09-23 09:45",
     "opsysSourceAt":  "2026-09-21 13:55",
     "changes":  {
                     "tenant":  {
                                    "modules":  [
                                                    "业务标注",
-                                                   "统一菜谱编辑",
                                                    "入口页",
-                                                   "菜谱标签与字典",
-                                                   "统一菜谱列表"
+                                                   "统一菜谱"
                                                ],
                                    "moreCount":  0,
-                                   "fileCount":  11
+                                   "fileCount":  6
                                },
                     "merchant":  {
                                      "modules":  [
                                                      "业务标注",
                                                      "餐次计划",
-                                                     "菜谱标签与字典",
-                                                     "菜谱编辑",
+                                                     "merchant-plan-v2",
+                                                     "merchant-production-plan-v1",
                                                      "统一菜谱"
                                                  ],
                                      "moreCount":  0,
-                                     "fileCount":  9
+                                     "fileCount":  10
                                  },
                     "opsys":  {
                                   "modules":  [

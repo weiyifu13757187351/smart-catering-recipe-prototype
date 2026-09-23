@@ -1,7 +1,8 @@
 /* 商户端 · 计划管理 —— 生产计划 V1
    计算口径见《商户端计划管理PRD》V1.0：
      - 只派生「含设备加工」的菜；纯人工菜不进生产计划
-     - 锅数 = ⌈入锅投料总量 ÷ 单锅标准产能⌉，一道菜一个锅数，作用于该菜全部设备步骤
+     - 锅数 = ⌈入锅投料总量 ÷ 设备额定容量⌉，一道菜一个锅数，作用于该菜全部设备步骤
+       单锅产能挂在设备型号主数据上，生产人员选设备时即可看到上限；换设备只建议新锅数，不自动覆盖人工值
      - 状态只有 2 个：生产中（开火前点确认）、生产完成（结束后点完成）
      - 派生值自动刷新，人工调整值永不自动覆盖
    依赖 window.MerchantPlan（merchant-meal-plan-v1.js） */
@@ -80,16 +81,17 @@ function scheduleAll(list) {
 
     group.forEach(t => {
       const ops = opsOf(t);
-      let end = t.startOverride != null ? t.startOverride + totalSec(t) : deadline;
+      /* 时间刻度统一用「分钟」：ops[].seconds 是秒，参与排程前必须 ÷60 */
+      let end = t.startOverride != null ? t.startOverride + totalSec(t) / 60 : deadline;
       if (t.startOverride == null) {
         for (let i = ops.length - 1; i >= 0; i--) {
           end = Math.min(end, devFree[ops[i].device] ?? deadline);
-          ops[i].end = end; ops[i].start = end - ops[i].seconds;
+          ops[i].end = end; ops[i].start = end - ops[i].seconds / 60;
           end = ops[i].start;
         }
       } else {
         let cur = t.startOverride;
-        ops.forEach(o => { o.start = cur; o.end = cur + o.seconds; cur = o.end; });
+        ops.forEach(o => { o.start = cur; o.end = cur + o.seconds / 60; cur = o.end; });
       }
       t.ops = ops;
       t.startMin = ops[0].start;
@@ -267,7 +269,7 @@ function timeline(all, devices) {
         ${ticks.map(m => `<i class="pp-grid" style="left:${(m - from) / span * 100}%"></i>`).join('')}
         <i class="pp-open" style="left:${(openMax - from) / span * 100}%" title="最晚开餐时间"></i>
         ${blocks.map(({ t, o }) => `<div class="pp-block st-${t.status} ${t.conflict ? 'conflict' : ''} ${o.isMain ? 'main' : ''}"
-            style="left:${(o.start - from) / span * 100}%;width:${Math.max(1.5, o.seconds / span * 100)}%"
+            style="left:${(o.start - from) / span * 100}%;width:${Math.max(1.5, o.seconds / 60 / span * 100)}%"
             title="${esc(t.recipe.name)} · ${esc(o.stepName)}　${hm(o.start)}-${hm(o.end)}　${t.potCount}锅${o.isMain ? '　主加工' : ''}">
             <b>${esc(t.recipe.name)}</b><small>${t.potCount}锅 · ${durText(o.seconds)}</small>
           </div>`).join('')}
@@ -317,21 +319,27 @@ const findTask = key => scheduleAll(tasksOf(date)).find(t => t.key === key);
 function openAdjust(t) {
   if (!t) return;
   const devs = [...new Set(t.recipe.steps.map(s => s.device))];
-  const ms = mainStep(t.recipe);
+  /* 单锅产能取所选设备的额定容量 —— 生产人员选设备时就能看到上限 */
+  const potSuggest = dev => {
+    const cap = MP.deviceCapacity(dev);
+    return cap ? Math.max(1, Math.ceil(t.inputTotal / cap)) : 1;
+  };
+  const capOf = dev => MP.deviceCapacity(dev) || '—';
   drawer('调整生产任务', `${t.meal} · ${t.recipe.name}`, `
     <div class="pp-adjust-note">现场调整只写生产计划，<b>不回写排餐计划</b>。派生值（出品量、入锅投料总量）会随排餐自动刷新，此处的人工调整值不会被覆盖。</div>
     <div class="mp-detail-grid">
       <label class="mp-field"><span>出品量（排餐派生）</span><input value="${t.output ? MP.fmtKg(t.output) : '—'}" disabled></label>
       <label class="mp-field"><span>入锅投料总量（排餐派生）</span><input value="${t.inputTotal ? MP.fmtKg(t.inputTotal) : '—'}" disabled></label>
       <label class="mp-field"><span>主加工设备</span>
-        <select id="ppAdjDevice">${devs.map(d => `<option ${d === t.mainDevice ? 'selected' : ''}>${esc(d)}</option>`).join('')}</select></label>
+        <select id="ppAdjDevice">${devs.map(d => `<option ${d === t.mainDevice ? 'selected' : ''}>${esc(d)}</option>`).join('')}</select>
+        <i id="ppAdjCap">单锅产能 ${capOf(t.mainDevice)} kg/锅（设备额定容量）</i></label>
       <label class="mp-field"><span>锅数</span><input id="ppAdjPots" type="number" min="1" step="1" value="${t.potCount}"><i>锅</i>
         <button type="button" class="mp-inline-btn" id="ppAdjPotsAuto">按产能自动算（${t.autoPots} 锅）</button></label>
       <label class="mp-field"><span>加工顺序</span><input id="ppAdjSeq" type="number" min="0" step="1" value="${t.sequence || ''}" placeholder="留空为自动"><i>序号</i></label>
       <label class="mp-field"><span>计划开始时间</span><input id="ppAdjStart" type="time" value="${t.startOverride != null ? hm(t.startOverride) : ''}" placeholder="留空为自动倒推"></label>
     </div>
     <div class="pp-adjust-calc">
-      <div><span>单锅标准产能</span><b>${ms ? ms.capacity + 'kg/锅' : '—'}</b></div>
+      <div><span>设备额定容量</span><b id="ppAdjCapCell">${capOf(t.mainDevice)} kg/锅</b></div>
       <div><span>当前锅数</span><b>${t.potCount} 锅</b></div>
       <div><span>预计总时长</span><b>${durText(totalSec(t))}</b></div>
       <div><span>自动排定时间</span><b>${hm(t.startMin)} — ${hm(t.endMin)}</b></div>
@@ -342,17 +350,25 @@ function openAdjust(t) {
     `<button class="mp-secondary" id="ppAdjCancel">取消</button><span class="mp-spacer"></span>
      <button class="mp-primary" id="ppAdjSave">保存调整</button>`);
 
-  $('#ppAdjPotsAuto').onclick = () => { $('#ppAdjPots').value = t.autoPots; };
+  /* 换设备 → 立刻显示新设备的产能上限与建议锅数（不自动覆盖人工锅数） */
+  $('#ppAdjDevice').onchange = () => {
+    const dev = $('#ppAdjDevice').value;
+    $('#ppAdjCap').textContent = `单锅产能 ${capOf(dev)} kg/锅（设备额定容量）`;
+    $('#ppAdjCapCell').textContent = `${capOf(dev)} kg/锅`;
+    $('#ppAdjPotsAuto').textContent = `按新设备建议锅数为 ${potSuggest(dev)}`;
+  };
+  $('#ppAdjPotsAuto').onclick = () => { $('#ppAdjPots').value = potSuggest($('#ppAdjDevice').value); };
   $('#ppAdjCancel').onclick = close;
   $('#ppAdjSave').onclick = () => {
     const pots = Number($('#ppAdjPots').value) || 1;
     if (pots < 1) return toast('锅数必须为大于 0 的整数');
     const seq = Number($('#ppAdjSeq').value) || 0;
     const st = $('#ppAdjStart').value;
+    const dev = $('#ppAdjDevice').value;
     setOverride(t, {
-      mainDevice: $('#ppAdjDevice').value,
+      mainDevice: dev,
       potCount: pots,
-      potCountOverridden: pots !== t.autoPots,
+      potCountOverridden: pots !== potSuggest(dev),
       sequence: seq || undefined,
       startOverride: st ? toMin(st) : undefined,
       sourceChanged: false

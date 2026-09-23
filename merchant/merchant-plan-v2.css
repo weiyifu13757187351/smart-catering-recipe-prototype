@@ -163,6 +163,18 @@
 .pp-adjust-calc span{display:block;margin-bottom:6px;color:#8b9bad;font-size:11px}
 .pp-adjust-calc b{color:#245fbd;font-size:14px}
 
+/* 排餐抽屉：用料换算（倍数放大口径） */
+.mp-dish-basis{display:flex;align-items:center;gap:9px;margin-bottom:12px;color:#7b8ca1;font-size:12px}
+.mp-memo-note.derived{color:#316ec4;background:#f2f7ff}
+.mp-role{display:inline-flex;align-items:center;height:20px;padding:0 7px;border-radius:10px;font-size:10px;font-style:normal;white-space:nowrap}
+.mp-role.main{color:#b1541f;background:#fff1e2}
+.mp-role.side{color:#39745d;background:#eaf8f2}
+.mp-role.season{color:#6b6f86;background:#eef1f5}
+.mp-tag.self{color:#8b6b1c;background:#fff6dd}
+.mp-mini-table td small{display:block;margin-top:3px;color:#9aa9ba;font-size:10px}
+.mp-table-note{margin:9px 0 0;color:#8797aa;font-size:11px;line-height:1.85}
+.mp-table-note b{color:#5b7391}
+
 @media(max-width:1200px){
   .pp-stats{grid-template-columns:repeat(3,minmax(120px,1fr))}
   .pp-adjust-calc{grid-template-columns:repeat(2,minmax(120px,1fr))}

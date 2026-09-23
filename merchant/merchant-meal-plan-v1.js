@@ -2,7 +2,8 @@
    计算口径见《商户端计划管理PRD》V1.0：
      出品量   = 就餐人数 × 人均配量
      投料总量 = 出品量 ÷ 出餐成品系数
-     食材用量 = 投料总量 × (菜谱投料量 ÷ Σ菜谱投料量)
+     倍数 k   = 投料总量 ÷ 基准批次量 Q   （纯人工菜 Q = 一份；含设备菜 Q = 一批）
+     每行用量 = 该行投料 × k              （整条链路与设备无关，锅数归生产计划）
    本模块同时向 merchant-production-plan-v1.js 暴露共享数据层 window.MerchantPlan */
 (() => {
 'use strict';
@@ -24,53 +25,104 @@ const PAGES = ['#organizationPage', '#rolesPage', '#adminsPage', '#usersPage', '
 
 /* ============================ 2. 菜谱主数据 ============================ */
 /* 字段：bom 用料明细（标准食材 + 投料量 kg + 投料状态 + 切配方式）
-        steps 设备加工步骤（设备 + 单锅时长秒 + 单锅标准产能 kg + 是否主加工）
+        bom  用料明细（用料角色 + 标准食材 + 投料量 + 单位 + 投料状态 + 切配方式；纯人工=一份，含设备=一批）
+        steps 设备加工步骤（设备型号 + 单锅时长秒 + 是否主加工；单锅产能挂在设备型号主数据上）
         steps 为空 => 纯人工菜，不进生产计划 */
 
 const dishArt = (name, index) => `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(
   `<svg xmlns="http://www.w3.org/2000/svg" width="320" height="240"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="${['#f5a85f','#dc6f55','#f0c76b','#65b7a4','#80b96a'][index % 5]}"/><stop offset="1" stop-color="#fff1d8"/></linearGradient></defs><rect width="320" height="240" rx="18" fill="url(#g)"/><ellipse cx="160" cy="128" rx="108" ry="76" fill="#fff" opacity=".92"/><ellipse cx="160" cy="128" rx="82" ry="52" fill="#f4d089"/><circle cx="130" cy="112" r="18" fill="#d9583b"/><circle cx="180" cy="139" r="22" fill="#74a953"/><circle cx="190" cy="103" r="14" fill="#f0a13a"/><text x="160" y="218" text-anchor="middle" font-family="Microsoft YaHei,sans-serif" font-size="25" font-weight="700" fill="#59432d">${name}</text></svg>`)}`;
 
+/* 设备主数据：单锅产能（额定容量）挂在设备型号上，不挂在菜谱上 */
+const DEVICES = { '智谷 A8': 12, '优特 UT-C16': 15, '智谷 ZG-T30': 30, '优特 UT-P40': 14 };
+const deviceCapacity = d => DEVICES[d] ?? 0;
+
+/* 用料单位折算：克/千克为质量，毫升/升按 1 g/ml 折算；个/只/条/份/适量折不了，不进合计但照常按倍数放大 */
+const GRAM = { g: 1, kg: 1000, ml: 1, L: 1000 };
+const toGram = (qty, unit) => (GRAM[unit] != null ? qty * GRAM[unit] : null);
+
+/* 用料角色 / 食材 / 数量 / 单位 / 投料状态 / 切配 / 是否自采（自采不参与采购） */
 const RAW = {
+  /* —— 含设备加工：用料按「一批」配置，单位统一 g —— */
   CP001: [ '宫保鸡丁', '热菜 / 小荤', 'V3',
-    [['鸡胸肉', 30, '已切配', '切丁'], ['花生米', 8, '原始', '—'], ['黄瓜', 10, '已切配', '切丁'], ['调味料', 2, '已调制', '—']],
-    [['预热炒锅', '智谷 A8', 60, 12, false], ['主料炒制', '智谷 A8', 180, 12, true], ['酱汁投放', '智谷 A8', 20, 12, false]] ],
+    [['主料', '鸡胸肉', 7200, 'g', '已切配', '切丁'],
+     ['主料', '花生米', 1800, 'g', '原始', '—'],
+     ['辅料', '黄瓜', 2400, 'g', '已切配', '切丁'],
+     ['调料', '生抽', 400, 'g', '已调制', '—'],
+     ['调料', '香油', 200, 'g', '已调制', '—']],
+    [['预热炒锅', '智谷 A8', 60, false], ['主料炒制', '智谷 A8', 180, true], ['酱汁投放', '智谷 A8', 20, false]] ],
   CP002: [ '红烧肉', '热菜 / 大荤', 'V4',
-    [['五花肉', 32, '已切配', '切块'], ['土豆', 12, '已切配', '滚刀块'], ['调味料', 6, '已调制', '—']],
-    [['煸炒上色', '优特 UT-C16', 240, 15, true], ['焖煮收汁', '优特 UT-C16', 600, 15, false]] ],
-  CP003: [ '番茄炒蛋', '热菜 / 半荤半素', 'V2',
-    [['番茄', 20, '已切配', '切块'], ['鸡蛋', 15, '原始', '—'], ['调味料', 3, '已调制', '—']], [] ],
+    [['主料', '五花肉', 9000, 'g', '已切配', '切块'],
+     ['主料', '土豆', 3600, 'g', '已切配', '滚刀块'],
+     ['调料', '生抽', 1200, 'g', '已调制', '—'],
+     ['调料', '冰糖', 900, 'g', '已调制', '—'],
+     ['调料', '料酒', 300, 'g', '已调制', '—']],
+    [['煸炒上色', '优特 UT-C16', 240, true], ['焖煮收汁', '优特 UT-C16', 600, false]] ],
   CP004: [ '紫菜蛋花汤', '汤粥 / 汤类', 'V2',
-    [['紫菜', 1.5, '原始', '—'], ['鸡蛋', 6, '原始', '—'], ['调味料', 1.5, '已调制', '—']],
-    [['批量煮制', '智谷 ZG-T30', 420, 30, true]] ],
-  CP005: [ '清炒时蔬', '热菜 / 素菜', 'V5',
-    [['时令蔬菜', 25, '已切配', '切段'], ['调味料', 1.5, '已调制', '—']], [] ],
+    [['辅料', '饮用水', 22000, 'g', '原始', '—', true],
+     ['主料', '鸡蛋', 6000, 'g', '原始', '—'],
+     ['主料', '紫菜', 1500, 'g', '原始', '—'],
+     ['调料', '食盐', 400, 'g', '已调制', '—'],
+     ['调料', '香油', 100, 'g', '已调制', '—']],
+    [['批量煮制', '智谷 ZG-T30', 420, true]] ],
   CP006: [ '葱油拌面', '主食 / 面食', 'V1',
-    [['面条', 22, '原始', '—'], ['葱油', 3, '已预制', '—'], ['调味料', 1, '已调制', '—']],
-    [['煮面', '优特 UT-P40', 150, 10, true], ['拌制', '优特 UT-P40', 60, 10, false]] ],
+    [['主料', '面条', 9000, 'g', '原始', '—'],
+     ['调料', '生抽', 2100, 'g', '已调制', '—'],
+     ['主料', '葱油', 1400, 'g', '已预制', '—'],
+     ['调料', '白糖', 800, 'g', '已调制', '—'],
+     ['辅料', '小葱', 700, 'g', '已切配', '切段']],
+    [['煮面', '优特 UT-P40', 150, true], ['拌制', '优特 UT-P40', 60, false]] ],
   CP007: [ '小米南瓜粥', '汤粥 / 粥类', 'V1',
-    [['小米', 8, '原始', '—'], ['南瓜', 10, '已切配', '切块'], ['饮用水', 30, '原始', '—']],
-    [['熬煮', '智谷 ZG-T30', 1800, 25, true]] ],
-  CP008: [ '鸡蛋饼', '主食 / 点心', 'V2',
-    [['面粉', 12, '原始', '—'], ['鸡蛋', 8, '原始', '—'], ['调味料', 1, '已调制', '—']], [] ],
+    [['辅料', '饮用水', 21000, 'g', '原始', '—', true],
+     ['主料', '南瓜', 4800, 'g', '已切配', '切块'],
+     ['主料', '小米', 4000, 'g', '原始', '—'],
+     ['调料', '冰糖', 200, 'g', '已调制', '—']],
+    [['熬煮', '智谷 ZG-T30', 1800, true]] ],
   CP009: [ '土豆烧牛肉', '热菜 / 大荤', 'V3',
-    [['牛肉', 28, '已切配', '切块'], ['土豆', 18, '已切配', '滚刀块'], ['调味料', 4, '已调制', '—']],
-    [['焯水', '优特 UT-P40', 120, 14, false], ['烧制', '优特 UT-P40', 900, 14, true]] ],
+    [['主料', '牛肉', 7000, 'g', '已切配', '切块'],
+     ['主料', '土豆', 4500, 'g', '已切配', '滚刀块'],
+     ['调料', '生抽', 1400, 'g', '已调制', '—'],
+     ['调料', '料酒', 700, 'g', '已调制', '—'],
+     ['调料', '食盐', 400, 'g', '已调制', '—']],
+    [['焯水', '智谷 ZG-T30', 120, false], ['烧制', '优特 UT-P40', 900, true]] ],
+
+  /* —— 纯人工：用料按「一份」配置 —— */
+  CP003: [ '番茄炒蛋', '热菜 / 半荤半素', 'V2',
+    [['主料', '番茄', 120, 'g', '已切配', '切块'],
+     ['主料', '鸡蛋', 80, 'g', '原始', '—'],
+     ['调料', '食用油', 8, 'ml', '原始', '—'],
+     ['调料', '食盐', 3, 'g', '已调制', '—']], [] ],
+  CP005: [ '清炒时蔬', '热菜 / 素菜', 'V5',
+    [['主料', '时令蔬菜', 150, 'g', '已切配', '切段'],
+     ['调料', '食用油', 8, 'ml', '原始', '—'],
+     ['调料', '食盐', 3, 'g', '已调制', '—']], [] ],
+  CP008: [ '鸡蛋饼', '主食 / 点心', 'V2',
+    [['主料', '面粉', 60, 'g', '原始', '—'],
+     ['主料', '鸡蛋', 50, 'g', '原始', '—'],
+     ['调料', '食用油', 5, 'ml', '原始', '—'],
+     ['调料', '食盐', 1, 'g', '已调制', '—']], [] ],
   CP010: [ '水果拼盘', '其他 / 水果', 'V1',
-    [['时令水果', 20, '已切配', '切块']], [] ]
+    [['主料', '哈密瓜', 100, 'g', '已切配', '切块'],
+     ['主料', '圣女果', 80, 'g', '已切配', '对半切']], [] ]
 };
 
 const recipes = Object.entries(RAW).map(([id, r], i) => {
   const [name, category, version, bom, steps] = r;
-  const bomRows = bom.map(([ingredient, qty, inputState, cut]) => ({ ingredient, qty, inputState, cut }));
-  const stepRows = steps.map(([stepName, device, seconds, capacity, isMain]) => ({ stepName, device, seconds, capacity, isMain }));
+  const bomRows = bom.map(([role, ingredient, qty, unit, inputState, cut, selfSupply]) =>
+    ({ role, ingredient, qty, unit, inputState, cut, selfSupply: !!selfSupply }));
+  const stepRows = steps.map(([stepName, device, seconds, isMain]) => ({ stepName, device, seconds, isMain }));
+  const q = bomRows.reduce((s, b) => s + (toGram(b.qty, b.unit) ?? 0), 0);
   return {
     id, name, category, version, bom: bomRows, steps: stepRows,
     image: dishArt(name, i),
     device: steps.length ? [...new Set(steps.map(s => s.device))].join('、') : '—',
     hasDevice: stepRows.length > 0,
-    bomTotal: bomRows.reduce((s, b) => s + b.qty, 0)
+    capacity: stepRows.length ? deviceCapacity(mainStepDevice(stepRows)) : 0,
+    batchGram: q,                                   // 基准批次量 Q（克），只算能折成质量的行
+    hasUnmeasurable: bomRows.some(b => toGram(b.qty, b.unit) === null)
   };
 });
+
+function mainStepDevice(steps) { return (steps.find(s => s.isMain) || steps[0] || {}).device || ''; }
 
 const findRecipe = id => recipes.find(r => r.id === id);
 
@@ -90,6 +142,14 @@ const fmt = d => d.slice(5).replace('-', '/');
 const hm = min => `${String(Math.floor(min / 60)).padStart(2, '0')}:${String(Math.round(min % 60)).padStart(2, '0')}`;
 const toMin = t => { const [h, m] = String(t).split(':').map(Number); return h * 60 + m; };
 const fmtKg = v => `${(Math.round(v * 10) / 10).toFixed(1).replace(/\.0$/, '')}kg`;
+/* 用料数量显示：内部一律按原单位保留，只在展示时进位（≥1000g → kg，≥1000ml → L） */
+const trimNum = v => String(Math.round(v * 100) / 100);
+const fmtQty = (qty, unit) => {
+  const n = Math.round(qty * 100) / 100;
+  if (unit === 'g' || unit === 'kg') { const g = unit === 'g' ? n : n * 1000; return g >= 1000 ? `${trimNum(g / 1000)} kg` : `${trimNum(g)} g`; }
+  if (unit === 'ml' || unit === 'L') { const ml = unit === 'ml' ? n : n * 1000; return ml >= 1000 ? `${trimNum(ml / 1000)} L` : `${trimNum(ml)} ml`; }
+  return `${trimNum(n)} ${unit}`;
+};
 
 const weekValue = d => {
   const x = new Date(monday(d) + 'T00:00:00'), j = new Date(x.getFullYear(), 0, 4),
@@ -130,12 +190,14 @@ const makePlan = (start, schedule = blank()) => {
     p.headcounts[`${d}|${m}`] = { value: DEFAULT_HEADCOUNT[m] || 100, memo: '' };
     ids.forEach(id => {
       const r = findRecipe(id); if (!r) return;
-      const c0 = r.category.split(' / ')[0];
+      const c0 = r.category.split(' / ')[0], y = r.yieldDefault;
+      /* 已有的历史计划：纯人工菜按菜谱派生，含设备菜代表「之前人工填过」 */
       p.details[`${d}|${m}|${id}`] = {
-        perPerson: DEFAULT_PER_PERSON[c0] ?? 0.15,
-        yieldCoef: r.yieldDefault,
+        perPerson: r.hasDevice ? (DEFAULT_PER_PERSON[c0] ?? 0.15) : derivedPerPerson(r, y),
+        perPersonFrom: r.hasDevice ? 'manual' : 'recipe',
+        yieldCoef: y,
         yieldOverridden: false,
-        yieldCustom: r.yieldDefault,
+        yieldCustom: y,
         memo: '', memoAt: ''
       };
     });
@@ -182,7 +244,7 @@ const memoCommit = p => {
   Object.entries(p.details).forEach(([k, d]) => {
     const [di, m, id] = k.split('|');
     const src = `${fmt(add(p.start, +di))} ${m}`;
-    if (d?.perPerson) memoWrite('perPerson', id, d.perPerson, src);
+    if (d?.perPerson && d.perPersonFrom !== 'recipe') memoWrite('perPerson', id, d.perPerson, src);
     if (d?.yieldOverridden && d?.yieldCoef) memoWrite('yieldCoef', id, d.yieldCoef, src);
   });
 };
@@ -203,33 +265,65 @@ const inputTotalKg = (p, d, m, id) => {
   if (!det || !det.yieldCoef) return 0;
   return outputKg(p, d, m, id) / (det.yieldCoef / 100);
 };
-/* 单锅标准产能取「主加工设备步骤」 */
+/* 单锅产能取「主加工步骤所用设备」的额定容量（设备主数据），菜谱本身不维护产能 */
 const mainStep = r => r.steps.find(s => s.isMain) || r.steps[0] || null;
 const potCountOf = (p, d, m, id) => {
-  const r = findRecipe(id); const ms = r && mainStep(r);
-  if (!ms || !ms.capacity) return 1;
-  return Math.max(1, Math.ceil(inputTotalKg(p, d, m, id) / ms.capacity));
+  const r = findRecipe(id), cap = r?.capacity || 0;
+  if (!cap) return 1;
+  return Math.max(1, Math.ceil(inputTotalKg(p, d, m, id) / cap));
+};
+
+/* 用料换算的通用口径：Q = 基准批次量（能折成质量的行之和，单位克）；k = 本次要几份配方 */
+const batchGram = r => r?.batchGram || 0;
+const factorOf = (r, inputKg) => { const Q = batchGram(r); return Q > 0 && inputKg > 0 ? (inputKg * 1000) / Q : 0; };
+const usageOf = (r, inputKg) => {
+  const Q = batchGram(r), k = factorOf(r, inputKg);
+  return r.bom.map(b => {
+    const gram = toGram(b.qty, b.unit);
+    return {
+      role: b.role, ingredient: b.ingredient, qty: b.qty, unit: b.unit, gram,
+      counted: gram !== null,                                   // 是否计入基准批次量
+      ratio: gram !== null && Q ? gram / Q : null,
+      usage: k ? b.qty * k : 0,
+      usageText: k ? fmtQty(b.qty * k, b.unit) : '—',
+      inputState: b.inputState, cut: b.cut, selfSupply: b.selfSupply
+    };
+  });
+};
+/* 纯人工菜：基准是「一份」，所以人均配量可以直接从菜谱派生 = Q × 出餐成品系数
+   保留 6 位小数 —— Q×r/100000 对整数克最多 5 位小数，这样换算出来的倍数正好等于就餐人数 */
+const derivedPerPerson = (r, yieldCoef) => {
+  const Q = batchGram(r);
+  return Q && yieldCoef ? Math.round((Q * (yieldCoef / 100)) / 1000 * 1e6) / 1e6 : 0;
 };
 const taskDurationSec = (id, potCount) => {
   const r = findRecipe(id); if (!r) return 0;
   return r.steps.reduce((s, x) => s + potCount * x.seconds, 0);
 };
 
-/* 首次进入某菜：带入记忆值 */
+/* 首次进入某菜：纯人工菜按「每份投料 × 出餐成品系数」派生人均配量；含设备菜带入记忆值，无记忆则留空必填 */
 function ensureDetail(p, d, m, id) {
   const key = `${d}|${m}|${id}`;
   if (p.details[key]) return p.details[key];
   const r = findRecipe(id);
   const memP = memoRead('perPerson', id);
   const memY = memoRead('yieldCoef', id);
-  p.details[key] = {
-    perPerson: memP ? memP.value : '',
-    yieldCoef: memY ? memY.value : (r?.yieldDefault ?? 90),
+  const yieldCoef = memY ? memY.value : (r?.yieldDefault ?? 90);
+  const det = {
+    perPerson: '', perPersonFrom: 'manual',
+    yieldCoef,
     yieldOverridden: !!memY,
     yieldCustom: r?.yieldDefault ?? 90,   // 菜谱标准出餐成品系数 r0
     memo: memP ? memP.source : '',
     memoAt: memP ? memP.at : ''
   };
+  if (memP) {                      // 人工覆盖过的值优先，不被菜谱刷新
+    det.perPerson = memP.value; det.perPersonFrom = 'memory';
+  } else if (r && !r.hasDevice) {  // 纯人工菜：一份的料 × 出餐成品系数 = 每人出品量
+    det.perPerson = derivedPerPerson(r, yieldCoef);
+    det.perPersonFrom = 'recipe';
+  }
+  p.details[key] = det;
   return p.details[key];
 }
 
@@ -319,7 +413,7 @@ function workspace() {
       <b>计算口径</b>
       <span>出品量 = 就餐人数 × 人均配量</span><i>→</i>
       <span>入锅投料总量 = 出品量 ÷ 出餐成品系数</span><i>→</i>
-      <span>生产锅数 = ⌈投料总量 ÷ 单锅标准产能⌉</span>
+      <span>每行用量 = 基准投料 × 倍数（倍数 = 投料总量 ÷ 基准批次量）</span>
     </div>
     <div class="mp-section mp-week-section">
       <div class="mp-section-head">
@@ -458,21 +552,26 @@ function openDetail(key) {
   const st = statusOf(current, d, m, id);
   const locked = ['producing', 'complete'].includes(st);
 
-  /* 用料换算行随三输入实时重算 */
-  const bomRows = input => r.bom.map(b => {
-    const q = input ? input * (b.qty / r.bomTotal) : 0;
-    return `<tr><td>${esc(b.ingredient)}</td><td>${b.qty}kg</td><td>${Math.round(b.qty / r.bomTotal * 1000) / 10}%</td><td><b>${q ? fmtKg(q) : '—'}</b></td><td>${esc(b.inputState)} · ${esc(b.cut)}</td></tr>`;
-  }).join('');
-
-  /* 预计锅数取主加工步骤的单锅产能，随投料量实时重算 */
-  const capKg = mainStep(r)?.capacity;
-  const potHint = input => r.steps.length
-    ? `预计锅数 <b>${capKg && input ? Math.max(1, Math.ceil(input / capKg)) : 1}</b> 锅`
-    : '纯人工菜谱，不进入生产计划';
-
-  const stepRows = r.steps.length
-    ? r.steps.map(s => `<tr><td>${esc(s.stepName)}</td><td>${esc(s.device)}</td><td>${s.seconds}s</td><td>${s.capacity}kg/锅${s.isMain ? ' <b class="mp-main-tag">主加工</b>' : ''}</td></tr>`).join('')
-    : '<tr><td colspan="4" class="mp-dim">纯人工菜谱，不进入生产计划</td></tr>';
+  /* 用料换算：本次用量 = 基准投料 × k。整条链路与设备无关 —— 排餐这边不出现设备、锅数、时间 */
+  const basis = r.hasDevice ? '每批投料' : '每份投料';
+  const bomRows = input => usageOf(r, input).map(u => `<tr>
+      <td><em class="mp-role ${u.role === '主料' ? 'main' : u.role === '辅料' ? 'side' : 'season'}">${esc(u.role)}</em></td>
+      <td><b>${esc(u.ingredient)}</b>${u.selfSupply ? ' <em class="mp-tag self">自采</em>' : ''}<small>${esc(u.inputState)} · ${esc(u.cut)}</small></td>
+      <td>${fmtQty(u.qty, u.unit)}</td>
+      <td>${u.ratio != null ? `${Math.round(u.ratio * 1000) / 10}%` : '<span class="mp-dim" title="计数单位不进合计">—</span>'}</td>
+      <td><b>${u.usageText}</b></td></tr>`).join('');
+  const kHint = input => {
+    const k = factorOf(r, input);
+    return k ? `本次用量 = ${basis} × <b>${trimNum(k)}</b>` : `本次用量 = ${basis} × —`;
+  };
+  /* 人均配量默认值来源：纯人工=菜谱派生（菜谱改了自动刷新）；含设备=记忆代入 / 首次手填 */
+  const memoNote = () => {
+    if (locked) return '';
+    if (det.perPersonFrom === 'recipe') return `<div class="mp-memo-note derived">人均配量按菜谱派生：${fmtQty(batchGram(r), 'g')} × 出餐成品系数 ${det.yieldCoef}% = <b>${det.perPerson}</b> kg/人，可直接修改。</div>`;
+    if (det.perPersonFrom === 'memory') return `<div class="mp-memo-note">人均配量沿用 <b>${esc(det.memo)}</b> 的记录值${det.memoAt ? `（${esc(det.memoAt)}）` : ''}，可直接修改覆盖。</div>`;
+    if (!det.perPerson) return '<div class="mp-memo-note first">该菜含设备加工，无法从菜谱推算人均配量，请填写；保存后下次排此菜自动代入。</div>';
+    return '';
+  };
 
   drawer(`${r.name}`, `${DAYS[d]} · ${m}　${st === 'producing' ? '生产中 · 已锁定' : st === 'complete' ? '生产完成 · 已锁定' : '未开始'}`,
     `${locked ? '<div class="mp-lock-note">该菜已开工，不能在排餐计划中修改或删除。如需调整请在生产计划中线下处理后重新排餐。</div>' : ''}
@@ -483,7 +582,8 @@ function openDetail(key) {
         <button type="button" class="mp-inline-btn" id="mpYieldReset" ${locked ? 'disabled' : ''}>恢复菜谱默认</button></label>
       <label class="mp-field"><span>出品量（可编辑）</span><input id="mpOutput" type="number" min="0" step="0.1" value="${out ? Math.round(out * 10) / 10 : ''}" ${locked ? 'disabled' : ''}><i>kg</i></label>
     </div>
-    ${locked ? '' : det.memo ? `<div class="mp-memo-note">人均配量沿用 <b>${esc(det.memo)}</b> 的记录值${det.memoAt ? `（${esc(det.memoAt)}）` : ''}，可直接修改覆盖。</div>` : '<div class="mp-memo-note first">尚无历史记录：保存后将记住本次人均配量，下次排此菜时自动代入。</div>'}
+    ${locked ? '' : '<div class="mp-dish-basis"><em class="mp-tag ' + (r.hasDevice ? 'device' : 'manual') + '">' + (r.hasDevice ? '含设备加工' : '纯人工') + '</em><span>用料明细按「' + (r.hasDevice ? '一批' : '一份') + '」配置</span></div>'}
+    <div id="mpMemoNote">${memoNote()}</div>
     <div class="mp-derive-row">
       <div><span>出品量</span><b id="mpOutView">${out ? fmtKg(out) : '—'}</b></div><i>=</i>
       <div><span>人数 × 人均配量</span><b id="mpFormula1">${hc} × ${det.perPerson || 0}</b></div>
@@ -492,17 +592,18 @@ function openDetail(key) {
       <div><span>入锅投料总量</span><b id="mpInpView">${inp ? fmtKg(inp) : '—'}</b></div><i>=</i>
       <div><span>出品量 ÷ 出餐成品系数</span><b id="mpFormula2">${det.yieldCoef ? det.yieldCoef + '%' : '—'}</b></div>
     </div>
-    <div class="mp-detail-section"><h4>用料换算</h4>
-      <table class="mp-mini-table"><thead><tr><th>标准食材</th><th>菜谱投料</th><th>占比</th><th>本次用量</th><th>投料状态</th></tr></thead><tbody id="mpBomBody">${bomRows(inp)}</tbody></table></div>
-    <div class="mp-detail-section"><h4>设备加工步骤　<span class="mp-pot-hint" id="mpPotHint">${potHint(inp)}</span></h4>
-      <table class="mp-mini-table"><thead><tr><th>步骤</th><th>设备</th><th>单锅时长</th><th>单锅产能</th></tr></thead><tbody>${stepRows}</tbody></table></div>`,
+    <div class="mp-detail-section"><h4>用料换算　<span class="mp-pot-hint" id="mpKHint">${kHint(inp)}</span></h4>
+      <table class="mp-mini-table"><thead><tr><th>用料角色</th><th>标准食材</th><th>${basis}</th><th>占比</th><th>本次用量</th></tr></thead><tbody id="mpBomBody">${bomRows(inp)}</tbody></table>
+      <p class="mp-table-note">${basis}合计 <b>${fmtQty(batchGram(r), 'g')}</b>，每行本次用量 = 该行投料 × 倍数，单位保持菜谱原单位。${r.hasDevice
+        ? '一批是一个菜谱基准批次，<b>与设备无关</b>；实际分几锅由生产计划按所选设备产能决定。'
+        : '一份是一人份，本次用量按就餐人数等比放大。'}${r.hasUnmeasurable ? '<br><b>⚠ 有行走计数单位（个/只等），不计入合计，但仍按倍数放大。</b>' : ''}</p></div>`,
     `<button class="mp-secondary" id="mpDetailClose">关闭</button><span class="mp-spacer"></span>
      ${locked ? '' : `<button class="mp-danger" id="mpDetailRemove">删除此菜</button><button class="mp-secondary" id="mpDetailReplace">替换菜谱</button><button class="mp-primary" id="mpDetailSave">确定</button>`}`,
     true);
 
   $('#mpDetailClose').onclick = close;
   if (!locked) {
-    /* 三个输入任一变化：派生数字、公式行、用料换算、锅数提示全部同步重算 */
+    /* 三个输入任一变化：派生数字、公式行、用料换算、倍数提示、来源提示全部同步重算 */
     const paint = (o, y) => {
       const input = y ? o / (y / 100) : 0;
       $('#mpOutView').textContent = o ? fmtKg(o) : '—';
@@ -510,26 +611,48 @@ function openDetail(key) {
       $('#mpFormula1').textContent = `${hc} × ${Number($('#mpPerPerson').value) || 0}`;
       $('#mpFormula2').textContent = y ? `${y}%` : '—';
       $('#mpBomBody').innerHTML = bomRows(input);
-      $('#mpPotHint').innerHTML = potHint(input);
+      $('#mpKHint').innerHTML = kHint(input);
+      $('#mpMemoNote').innerHTML = memoNote();
       if (document.activeElement !== $('#mpOutput')) $('#mpOutput').value = o ? String(Math.round(o * 10) / 10) : '';
     };
     const sync = () => paint(hc * (Number($('#mpPerPerson').value) || 0), Number($('#mpYield').value) || 0);
+    /* 派生来源→人工值：改过之后不再被菜谱刷新 */
+    const toManual = () => { det.perPersonFrom = 'manual'; det.memo = ''; };
 
-    $('#mpPerPerson').oninput = sync;
-    $('#mpYield').oninput = () => { det.yieldOverridden = true; sync(); };
-    /* 出品量可直接编辑 —— 反算人均配量 */
+    $('#mpPerPerson').oninput = () => { toManual(); sync(); };
+    /* 出餐成品系数：来源是「菜谱派生」的人均配量跟着一起算，人工值不动 */
+    $('#mpYield').oninput = () => {
+      det.yieldOverridden = true;
+      const y = Number($('#mpYield').value) || 0;
+      if (det.perPersonFrom === 'recipe') {
+        det.perPerson = derivedPerPerson(r, y);
+        $('#mpPerPerson').value = det.perPerson ? String(det.perPerson) : '';
+      }
+      sync();
+    };
+    /* 出品量可直接编辑 —— 反算人均配量，并转为人工值 */
     $('#mpOutput').oninput = () => {
       const o = Number($('#mpOutput').value) || 0;
       if (!hc) { toast('请先填写就餐人数'); return; }
-      $('#mpPerPerson').value = o ? String(Math.round((o / hc) * 10000) / 10000) : '';
+      toManual();
+      $('#mpPerPerson').value = o ? String(Math.round((o / hc) * 1e6) / 1e6) : '';
       paint(o, Number($('#mpYield').value) || 0);
     };
-    $('#mpYieldReset').onclick = () => { det.yieldOverridden = false; $('#mpYield').value = det.yieldCustom; sync(); };
+    $('#mpYieldReset').onclick = () => {
+      det.yieldOverridden = false;
+      $('#mpYield').value = det.yieldCustom;
+      if (det.perPersonFrom === 'recipe') {
+        det.perPerson = derivedPerPerson(r, det.yieldCustom);
+        $('#mpPerPerson').value = det.perPerson ? String(det.perPerson) : '';
+      }
+      sync();
+    };
     $('#mpDetailSave').onclick = () => {
       const pp = Number($('#mpPerPerson').value) || 0, y = Number($('#mpYield').value) || 0;
       if (!pp) return toast('请输入人均配量');
       if (!y || y > 100) return toast('出餐成品系数取值应大于 0 且不超过 100%');
-      det.perPerson = pp; det.yieldCoef = y; det.memo = '';
+      det.perPerson = pp; det.yieldCoef = y;
+      if (det.perPersonFrom !== 'recipe') det.memo = '';   // 人工值才清掉来源标记
       mark(); close(); workspace(); toast('已更新，保存后生效');
     };
     $('#mpDetailReplace').onclick = () => { close(); picker(`${d}|${m}`, id); };
@@ -706,10 +829,13 @@ function orgConfirm(button) {
 /* ============================ 14. 对外暴露 ============================ */
 
 window.MerchantPlan = {
-  MEALS, DAYS, OPEN_TIME, BUFFER_MIN, recipes, findRecipe,
-  today, add, monday, dayIndex, hm, toMin, fmt, fmtKg, esc, clone,
+  MEALS, DAYS, OPEN_TIME, BUFFER_MIN, recipes, findRecipe, DEVICES, deviceCapacity,
+  today, add, monday, dayIndex, hm, toMin, fmt, fmtKg, fmtQty, trimNum, esc, clone,
   org, allowed, plans, saved, overrides,
   headcountOf, detailOf, statusOf, lockedOf, outputKg, inputTotalKg, potCountOf, taskDurationSec, mainStep,
+  toGram, batchGram, factorOf, derivedPerPerson, usageOf,
+  /* 用料换算结果（采购计划的输入）：每行含 食材/原单位/是否计入基准量/占比/本次用量 */
+  bomUsageOf: (p, d, m, id) => usageOf(findRecipe(id), inputTotalKg(p, d, m, id)),
   isDeviceRecipe: id => !!findRecipe(id)?.hasDevice,
   hideAll, mealPage, toast, drawer, close,
   enterMealPlan: enter,

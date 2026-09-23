@@ -16,6 +16,10 @@
   }
 
   function resolveView() {
+    // 设备操作步骤抽屉叠加在编辑抽屉之上，单独作为一个视图。
+    if (isVisible(document.querySelector('.umt-action-drawer'))) {
+      return 'recipe-editor-operation';
+    }
     // 叠加在最上层的抽屉先判定，避免被底层列表吞掉。
     const drawer = visibleDrawer();
     if (drawer) {

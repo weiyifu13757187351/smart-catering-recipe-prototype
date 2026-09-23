@@ -18,6 +18,7 @@
       "recipe-editor-basic": "新建与编辑菜谱 / 基础信息",
       "recipe-editor-ingredients": "新建与编辑菜谱 / 用料明细",
       "recipe-editor-process": "新建与编辑菜谱 / 加工步骤",
+      "recipe-editor-operation": "新建与编辑菜谱 / 设备操作步骤",
       "recipe-detail-current": "菜谱详情 / 当前版本",
       "recipe-detail-latest": "菜谱详情 / 最新授权版本",
       "recipe-categories": "菜谱分类"
@@ -56,7 +57,8 @@
     {"id": "REQ-25-PERM", "source": "../商户端菜谱管理PRD.md#10.2 组织菜谱操作权限", "page": "状态与权限"},
     {"id": "REQ-26-TENANT-IMPACT", "source": "../商户端菜谱管理PRD.md#10.4 租户侧变化对商户端的影响", "page": "状态与权限"},
     {"id": "REQ-27-EXCEPTION", "source": "../商户端菜谱管理PRD.md#11. 异常与边界场景", "page": "异常与边界"},
-    {"id": "REQ-28-DATA-SOURCE", "source": "../商户端菜谱管理PRD.md#3.2 原型演示数据来源", "page": "数据来源"}
+    {"id": "REQ-28-DATA-SOURCE", "source": "../商户端菜谱管理PRD.md#3.2 原型演示数据来源", "page": "数据来源"},
+    {"id": "REQ-29-EDITOR-OPERATION", "source": "../商户端菜谱管理PRD.md#7.7.1 设备操作步骤编辑抽屉", "page": "新建与编辑菜谱"}
   ],
   "annotations": [
     {
@@ -519,6 +521,17 @@
       "markdownFile": "annotations/merchant-recipe-management.md",
       "blockId": "categories-table",
       "sourceRefs": ["REQ-23-CATEGORY-IMPACT"]
+    },
+    {
+      "id": "editor-operation",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["recipe-editor-operation"],
+      "moduleName": "设备操作步骤编辑抽屉",
+      "target": {"selector": ".umt-action-drawer"},
+      "markdownFile": "annotations/merchant-recipe-management.md",
+      "blockId": "editor-operation",
+      "sourceRefs": ["REQ-29-EDITOR-OPERATION"]
     }
   ]
 }
