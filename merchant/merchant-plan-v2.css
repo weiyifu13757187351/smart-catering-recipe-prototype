@@ -92,6 +92,7 @@
 .pp-stats i{color:#9aa9ba;font-size:11px;font-style:normal}
 .pp-stats>div.warn{border-color:#ffd9d9;background:#fff7f7}
 .pp-stats>div.warn b{color:#e65c5c}
+.pp-stats .pp-hide-hint{color:#d98217;font-size:10px;font-style:normal;background:#fff6e8;border:1px solid #ffe0b8;border-radius:4px;padding:1px 5px;white-space:nowrap}
 
 .pp-filters{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:14px 22px 0;padding:12px 14px;border:1px solid #edf1f6;border-radius:7px;background:#fbfcfe}
 .pp-filters select{box-sizing:border-box;height:34px;padding:0 10px;border:1px solid #dce5ef;border-radius:5px;color:#455d79;background:#fff;font:13px inherit;outline:0}
@@ -109,6 +110,37 @@
 .pp-table tr:last-child td{border-bottom:0}
 .pp-table tr.conflict td{background:#fffafa}
 .pp-table td b{color:#2f4a6b}
+/* 任务视图：列表顺序 = 加工顺序 = 计划开始时间升序。
+   餐次分隔行承担餐次信息（故不再单列「餐次」列）；顺序不单独维护，故也不设「加工顺序」列 */
+.pp-meal-sep td{padding:8px 12px;border-bottom:1px solid #dbe7fa;border-top:1px solid #dbe7fa;background:#f3f8ff;color:#123b83}
+.pp-meal-sep b{margin-right:12px;font-size:13px}
+.pp-meal-sep span{margin-right:14px;color:#8495ad;font-size:12px}
+.pp-meal-sep em{float:right;color:#8495ad;font-size:12px;font-style:normal}
+.pp-meal-sep.locked{background:#fdf6f4}
+.pp-th-note{display:block;margin-top:2px;color:#a8b6c8;font-size:10px;font-weight:400}
+/* 计划加工时间：开始时间行内可改（唯一的排序手段），结束时间是派生值 */
+.pp-time-in{width:74px;padding:2px 4px;border:1px solid transparent;border-radius:5px;background:transparent;
+  color:#2f4a6b;font:inherit;font-size:12px;font-weight:600}
+.pp-time-in:hover:not(:disabled){border-color:#c9dbf5;background:#f7fbff}
+.pp-time-in:focus{border-color:#2678ff;background:#fff;outline:none}
+.pp-time-in.pinned{border-color:#c9dbf5;background:#eaf3ff;color:#1b5fc4}
+/* 灰字建议值：<input type="time"> 不支持 placeholder（浏览器只画自己的 --:--），
+   所以建议值必须用独立的灰字元素；点一下即采用 */
+.pp-suggest{font-style:normal;color:#a9b7c9;font-size:12px;cursor:pointer;border-bottom:1px dashed #cfd9e6}
+.pp-suggest:hover{color:#1b5fc4;border-bottom-color:#9dc0f0}
+.pp-time-in:disabled{color:#8b98a8;background:transparent;cursor:not-allowed}
+/* 未填就想开工时闪一下，把注意力引到输入框 */
+.pp-time-in.need-fill{border-color:#e65c5c;background:#fff0f0;animation:pp-nudge .4s 2}
+@keyframes pp-nudge{0%,100%{transform:translateX(0)}50%{transform:translateX(-3px)}}
+/* 时间轴顶部的「待排」提示条：未填时间的任务画不到轨道上，只报数量 */
+.pp-pending-bar{display:flex;align-items:center;gap:9px;margin:0 22px 12px;padding:9px 13px;border:1px solid #f3dfb8;border-radius:7px;background:#fffaf0}
+.pp-pending-bar i{font-style:normal;color:#d99414}
+.pp-pending-bar b{color:#8b6b1c;font-size:13px}
+.pp-pending-bar span{color:#9a8654;font-size:12px}
+.pp-time-end{color:#7b8ca1;font-size:12px}
+.pp-time-clear{margin-left:3px;width:16px;height:16px;padding:0;border:0;border-radius:8px;background:#e6edf7;color:#7b8ca1;
+  font-size:11px;line-height:16px;cursor:pointer}
+.pp-time-clear:hover{background:#ffeded;color:#c04a4a}
 .pp-dish{display:flex;align-items:center;gap:10px}
 .pp-dish img{width:44px;height:34px;border-radius:5px;object-fit:cover}
 .pp-dish b{display:block;font-size:13px}
@@ -134,18 +166,28 @@
 .pp-axis,.pp-lane{display:grid;grid-template-columns:150px 1fr;align-items:center;gap:12px}
 .pp-axis{height:26px}
 .pp-axis span{position:absolute;transform:translateX(-50%);color:#9aa9ba;font-size:10px}
+/* 首尾刻度改成贴边对齐：居中会被轨道裁掉一半（轴自适应后刻度常正好落在 0% 与 100% 上） */
+.pp-axis span.first{transform:none}
+.pp-axis span.last{transform:translateX(-100%)}
 .pp-lane{min-height:56px;padding:9px 0;border-top:1px solid #eef2f7}
 .pp-lane-name{color:#3d5674;font-size:12px;font-weight:600;line-height:1.4}
-.pp-lane-track{position:relative;height:40px;border-radius:6px;background:#f5f8fc}
+.pp-lane-track{position:relative;height:40px;border-radius:6px;background:#f5f8fc;overflow:hidden}
 .pp-grid{position:absolute;top:0;bottom:0;width:1px;background:#e6ecf4}
 .pp-open{position:absolute;top:-3px;bottom:-3px;width:2px;background:#e65c5c;opacity:.55}
-.pp-block{position:absolute;top:3px;bottom:3px;display:flex;flex-direction:column;justify-content:center;gap:2px;min-width:34px;padding:0 8px;border-left:3px solid #9aa7b6;border-radius:5px;color:#3d5674;background:#eef1f5;overflow:hidden;cursor:default}
+.pp-block{position:absolute;top:3px;bottom:3px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;gap:2px;min-width:34px;padding:0 8px;border-left:3px solid #9aa7b6;border-radius:5px;color:#3d5674;background:#eef1f5;overflow:hidden;cursor:default}
 .pp-block.main{background:#e8f1fe}
 .pp-block b{font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pp-block small{color:#7f90a6;font-size:10px;white-space:nowrap}
 .pp-block.st-producing{border-left-color:#f2a53b;background:#fff6e8}
 .pp-block.st-complete{border-left-color:#24a879;background:#eefaf5}
 .pp-block.conflict{border-left-color:#e65c5c;background:#fff0f0}
+/* 块窄到放不下菜名时：块内只留色带（宽度严格按时间比例，不再用 min-width 撑宽 —— 撑宽会让靠右的块越过轨道被裁），
+   菜名改成挂到块外侧的小标签，靠左的块挂右边、其余挂左边，免得顶出轨道 */
+.pp-block.narrow{min-width:3px;padding:0;overflow:visible}
+.pp-block.narrow small{display:none}
+.pp-block.narrow b{position:absolute;top:50%;transform:translateY(-50%);padding:2px 6px;border-radius:4px;background:#fff;box-shadow:0 1px 4px rgba(31,58,95,.18);pointer-events:none;z-index:2}
+.pp-block.narrow b.tag-left{right:100%;margin-right:5px}
+.pp-block.narrow b.tag-right{left:100%;margin-left:5px}
 .pp-legend{display:flex;flex-wrap:wrap;align-items:center;gap:16px;margin-top:12px;padding-top:12px;border-top:1px solid #eef2f7;color:#8797aa;font-size:11px}
 .pp-legend .sw{display:inline-block;width:10px;height:10px;margin-right:5px;border-radius:3px;vertical-align:-1px;background:#eef1f5}
 .pp-legend .sw.st-producing{background:#f2a53b}

@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>车间端 · 计划执行</title>
+<link rel="stylesheet" href="merchant-device-recipe.css?v=20260913b">
+<link rel="stylesheet" href="merchant-unified-recipe-v1.css?v=20260914c">
+<link rel="stylesheet" href="merchant-unified-editor-v2.css?v=20260924-dev-1">
+<link rel="stylesheet" href="merchant-unified-detail-v3.css?v=20260914d">
+<link rel="stylesheet" href="merchant-plan-v2.css?v=20260924b">
+<link rel="stylesheet" href="merchant-meal-plan-v1.css?v=20260924b">
+<link rel="stylesheet" href="merchant-mobile.css?v=1">
+</head>
+<body class="mb-body">
+
+<!-- ==========================================================================
+     车间端（手机）：排餐调整 + 生产确认
+     车间里没有电脑，所以这一端只做两件事：看今天要做什么、把它确认掉。
+     它**不重新实现任何计划规则** —— 排餐与生产的算法、校验、锁定、开工定格全部复用
+     merchant-meal-plan-v1.js / merchant-production-plan-v1.js 的实现（见页面底部注释）。
+     ========================================================================== -->
+<div class="mb-app" id="mbApp">
+  <header class="mb-head">
+    <div class="mb-head-top">
+      <button class="mb-org" id="mbOrgBtn" title="切换食堂">
+        <b id="mbOrgName">—</b><small>切换食堂 ▾</small>
+      </button>
+      <div class="mb-today">
+        <b id="mbDate">—</b><small id="mbWeekday">—</small>
+      </div>
+    </div>
+    <nav class="mb-tabs">
+      <button class="mb-tab is-on" data-tab="prod">生产确认</button>
+      <button class="mb-tab" data-tab="meal">排餐调整</button>
+    </nav>
+  </header>
+
+  <main class="mb-main" id="mbMain"></main>
+
+  <div class="mb-sheet-mask" id="mbSheetMask" hidden>
+    <section class="mb-sheet" id="mbSheet" role="dialog" aria-modal="true"></section>
+  </div>
+
+  <div class="mb-toast" id="mbToast" hidden></div>
+</div>
+
+<!-- 切换食堂：车间人员的范围是「本食堂」，但允许切换看别的食堂。
+     值必须与桌面端组织名一致，两端共享的存储键才落在同一份数据上 -->
+<div class="mb-sheet-mask" id="mbOrgMask" hidden>
+  <section class="mb-sheet" id="mbOrgSheet" role="dialog" aria-modal="true">
+    <header class="mb-sheet-head"><h2>选择食堂</h2><button class="mb-x" id="mbOrgClose">关闭</button></header>
+    <div class="mb-sheet-body" id="mbOrgList"></div>
+  </section>
+</div>
+
+<!-- 桌面模块的渲染容器：模块必须在场（手机端复用它们的逻辑与动作），
+     但它们的表格/时间轴在手机上不可用，所以整体隐藏，手机端自己画卡片 -->
+<div id="mealPlanPage" class="mp-page mb-off"></div>
+<div id="productionPlanPage" class="pp-page mb-off"></div>
+<!-- 模块靠这个元素判断「当前是哪个食堂」（org()），必须在模块加载前就存在 -->
+<span id="currentOrganization" class="mb-off">东校区第一食堂</span>
+
+<script src="merchant-native-device-editor.js?v=20260913h"></script>
+<script src="merchant-device-recipe.js?v=20260913l"></script>
+<script src="merchant-unified-recipe-v1.js?v=20260924-dev-1"></script>
+<script src="merchant-meal-plan-v1.js?v=20260924b"></script>
+<script src="merchant-production-plan-v1.js?v=20260924b"></script>
+<script src="merchant-mobile.js?v=1"></script>
+</body>
+</html>

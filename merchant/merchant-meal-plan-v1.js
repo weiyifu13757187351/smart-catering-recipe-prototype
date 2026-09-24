@@ -18,7 +18,6 @@ const clone = v => JSON.parse(JSON.stringify(v));
 const MEALS = ['早餐', '早点', '午餐', '午点', '晚餐', '夜宵'];
 const DAYS  = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
 const OPEN_TIME  = { 早餐: '06:30', 早点: '09:30', 午餐: '11:30', 午点: '15:00', 晚餐: '17:30', 夜宵: '21:00' };
-const BUFFER_MIN = 15;              // 出品静置缓冲
 
 const PAGES = ['#organizationPage', '#rolesPage', '#adminsPage', '#usersPage', '#recipePage',
                '#dishCategoryPage', '#deviceRecipePage', '#mealPlanPage', '#productionPlanPage'];
@@ -150,7 +149,13 @@ const monday = d => { const x = new Date(d + 'T00:00:00'), n = (x.getDay() + 6) 
 const dayIndex = d => (new Date(d + 'T00:00:00').getDay() + 6) % 7;
 const range = d => `${d} - ${add(d, 6)}`;
 const fmt = d => d.slice(5).replace('-', '/');
-const hm = min => `${String(Math.floor(min / 60)).padStart(2, '0')}:${String(Math.round(min % 60)).padStart(2, '0')}`;
+/* 分钟 → HH:MM。**先取整**：排程算出来的分钟数会带浮点尘埃
+   （例：17:00 可能存成 1019.9999999999999），不取整就会打出「16:60」这种非法时间，
+   而它会被写进 <input type="time"> 的 value，浏览器直接判为无效 */
+const hm = min => {
+  const m = Math.round(min);
+  return `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
+};
 const toMin = t => { const [h, m] = String(t).split(':').map(Number); return h * 60 + m; };
 const fmtKg = v => `${(Math.round(v * 10) / 10).toFixed(1).replace(/\.0$/, '')}kg`;
 /* 用料数量显示：内部一律按原单位保留，只在展示时进位（≥1000g → kg，≥1000ml → L） */
@@ -185,13 +190,22 @@ const allowed = () => /(食堂|档口)$/.test(org());
 
 const blank = () => Object.fromEntries(DAYS.map((_, i) => [i, Object.fromEntries(MEALS.map(m => [m, []]))]));
 
+/* 原型示例排餐（按星期几给菜）。刻意压这几件事：
+   ① 每个餐次 1–4 道，不再是「一餐一道」，用来验证待排排序 / 时间轴多块并存；
+   ② 同一餐次里有两道菜抢同一台设备 —— 周三午餐的 CP009（焯水）与 CP004 都在智谷 ZG-T30；
+   ③ 设备菜与纯人工菜混排，且**周五晚餐全是人工菜**（生产计划应为 0 道，验证过滤）；
+   ④ 周三午餐含 CP002（种子里的「生产中」）与 CP001（周二午餐「生产完成」），两端的示例状态都指向真实存在的菜。 */
+const SEED_WEEK = [
+  { 早餐: ['CP007', 'CP008'],                        午餐: ['CP001', 'CP009', 'CP005', 'CP002'], 晚餐: ['CP006', 'CP004', 'CP003'] },
+  { 早餐: ['CP007', 'CP010'],                        午餐: ['CP001', 'CP002', 'CP005'],           晚餐: ['CP009', 'CP006', 'CP003'] },
+  { 早餐: ['CP007', 'CP006', 'CP008'],               午餐: ['CP002', 'CP001', 'CP009', 'CP004', 'CP005'], 晚餐: ['CP004', 'CP006', 'CP003'] },
+  { 早餐: ['CP007', 'CP008'],                        午餐: ['CP009', 'CP002', 'CP004', 'CP005'], 晚餐: ['CP001', 'CP006', 'CP003'] },
+  { 早餐: ['CP007', 'CP010'],                        午餐: ['CP001', 'CP002', 'CP005'],           晚餐: ['CP003', 'CP008', 'CP010'] },
+];
+
 const seed = () => {
   const s = blank();
-  [['早餐', 'CP007,CP008'], ['午餐', 'CP002,CP005,CP004'], ['晚餐', 'CP006,CP005']].forEach(([m, v]) => s[0][m] = v.split(','));
-  s[1]['早餐'] = ['CP007', 'CP008']; s[1]['午餐'] = ['CP001', 'CP005']; s[1]['晚餐'] = ['CP009', 'CP004'];
-  s[2]['早餐'] = ['CP007', 'CP008']; s[2]['午餐'] = ['CP002', 'CP005']; s[2]['晚餐'] = ['CP003', 'CP004'];
-  s[3]['早餐'] = ['CP007', 'CP008']; s[3]['午餐'] = ['CP003', 'CP005', 'CP004']; s[3]['晚餐'] = ['CP006', 'CP005'];
-  s[4]['早餐'] = ['CP007', 'CP008']; s[4]['午餐'] = ['CP009', 'CP005']; s[4]['晚餐'] = ['CP003', 'CP004'];
+  SEED_WEEK.forEach((day, i) => MEALS.forEach(m => { if (day[m]) s[i][m] = day[m].slice(); }));
   return s;
 };
 
@@ -222,23 +236,53 @@ const makePlan = (start, schedule = blank()) => {
   return p;
 };
 
+/* ============================ 4b. 本地存储（原型的「服务端」） ============================
+   原型是纯静态页、没有后端，但「电脑上提前排好餐、车间用手机确认生产」要求两端看到**同一份数据** ——
+   所以排餐计划和生产现场调整都落 localStorage：同一浏览器同源即可共享
+   （演示时开两个标签，一个桌面宽、一个手机宽，数据就是通的），将来换成服务端只需换这一层。
+   为什么必须先做这一步：原来两边都只在内存里（`stores` / `taskOverrides`），刷新页面就回到种子，
+   换浏览器什么都没有 —— 手机根本看不到电脑排的餐。
+   STORE_V 进 key：种子或结构一变，旧的本地数据自动失效，不会让上一版计划伪装成本轮的 bug。 */
+const STORE_V = 'v1';
+const lsGet = k => { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch { return null; } };
+const lsSet = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* 配额满/隐私模式：忽略 */ } };
+const planKey = (o, start) => `mp:plan:${STORE_V}:${o}:${start}`;
+const ovrKey = o => `mp:ovr:${STORE_V}:${o}`;
+
 const stores = {};
+/* 每周一份、按周起始日分别存 —— 否则跨周（周日排下周的餐、周一再进生产）会把改动整片丢掉 */
+function loadOrSeedPlan(o, start, isCurrent) {
+  const saved = lsGet(planKey(o, start));
+  if (saved && saved.schedule && saved.start) return saved;
+  const p = makePlan(start, seed());
+  p.activeDays = [0, 1, 2, 3, 4];
+  if (isCurrent) {
+    p.updated = '2026-09-16 09:30';
+    p.statuses = { '2|午餐|CP002': 'producing', '1|午餐|CP001': 'complete' };
+    p.adjustments = { 2: [{ time: '10:15', meal: '午餐', type: '新增', detail: '清炒时蔬', reason: '临时增加配菜', operator: '张晓东' }] };
+  } else {
+    p.updated = start === add(monday(today()), -7) ? '2026-09-12 16:20' : '2026-09-05 15:40';
+  }
+  return p;
+}
 function plans() {
   const k = org();
   if (!stores[k]) {
     const m = monday(today());
-    const p = makePlan(m, seed()), p1 = makePlan(add(m, -7), seed()), p2 = makePlan(add(m, -14), seed());
-    p.activeDays = p1.activeDays = p2.activeDays = [0, 1, 2, 3, 4];
-    p.updated = '2026-09-16 09:30'; p1.updated = '2026-09-12 16:20'; p2.updated = '2026-09-05 15:40';
-    p.statuses = { '2|午餐|CP002': 'producing', '1|午餐|CP001': 'complete' };
-    p.adjustments = { 2: [{ time: '10:15', meal: '午餐', type: '新增', detail: '清炒时蔬', reason: '临时增加配菜', operator: '张晓东' }] };
-    stores[k] = [p, p1, p2];
+    stores[k] = [0, -7, -14].map(off => loadOrSeedPlan(k, add(m, off), off === 0));
   }
   return stores[k];
 }
+/* 落盘：排餐计划与生产现场调整是两个独立的 key（一个按周、一个按组织） */
+const persistPlans = () => { const k = org(); (stores[k] || []).forEach(p => lsSet(planKey(k, p.start), p)); };
+const persistOverrides = () => lsSet(ovrKey(org()), taskOverrides[org()] || {});
+/* 生产计划改完状态/现场调整后调用：它写的是排餐计划里的 statuses 和共享的 taskOverrides */
+const persist = () => { persistPlans(); persistOverrides(); };
 
 const taskOverrides = {};
-const overrides = () => (taskOverrides[org()] ||= {});
+/* 现场调整（计划加工时间 / 设备 / 锅数 / 状态 / 开工定格）也要落盘：只有排餐计划落盘的话，
+   手机上看到的是一份「没有任何排产状态」的排餐，等于没联动 */
+const overrides = () => (taskOverrides[org()] ||= lsGet(ovrKey(org())) || {});
 
 let week = monday(today()), edit = false, current = null, buffers = {}, activeOrg = org(), switchBypass = false;
 
@@ -273,11 +317,52 @@ const detailOf    = (p, d, m, id) => p.details[`${d}|${m}|${id}`] || null;
 const statusOf    = (p, d, m, id) => p.statuses[`${d}|${m}|${id}`] || '';
 const lockedOf    = (p, d, m, id) => ['producing', 'complete'].includes(statusOf(p, d, m, id));
 
+/* 生产计划的现场调整记录（主加工设备 / 锅数 / 计划加工时间 / 状态 / 开工定格）。
+   taskOverrides 是按组织存的模块级对象，两个模块共用同一个实例（生产计划从 MP 解构），
+   但**只有生产计划写**，排餐这边只读。读它是为了两件事：
+   ① 已开工的菜按「开工那一刻」的口径定格，之后改就餐人数不再牵动它
+      （真实后厨语义：已经下锅的量，不会因为后来改了人数而变）；
+   ② 角标气泡里显示「待排 / 已排产 + 时间 + 主加工设备 + 锅数」。
+   纯逻辑测试里没加载生产计划，overrides 为空 → 自动降级成只看排餐自己的口径。 */
+const prodOverrideOf = (p, d, m, id) => overrides()[`${add(p.start, +d)}|${m}|${id}`] || null;
+const frozenOf = (p, d, m, id) => prodOverrideOf(p, d, m, id)?.frozen || null;
+
+/* 角标气泡：状态之外，含设备加工的菜还带上排产信息。
+   排餐本身不显示设备/锅数/时间（职责分工），但这些信息在「临时改菜会不会打乱已有排程」
+   这个判断上是必需的 —— 放在悬停气泡里，不侵入版面。 */
+function chipTip(p, i, m, id, r, st) {
+  const base = st === 'producing' ? '生产中 · 已锁定'
+    : st === 'complete' ? '生产完成 · 已锁定'
+      : '未开始 · 可修改';
+  /* 纯人工菜不进生产计划（生产计划第一道过滤就是「只考虑设备加工的菜」），
+     既没有排产状态、也没有设备和锅数 —— 所以只说「可修改」。
+     写成「未开始」是个空指：那是设备任务的执行状态，纯人工菜没有这个状态机，
+     读起来会让人以为它以后会变成「生产中」。 */
+  if (!r?.hasDevice) {
+    /* 兜底：纯人工菜的状态恒为空（只有生产计划写 statuses，而它只处理设备菜；
+       「复制排餐」也会清空 statuses），万一出现状态就照实说，别谎报「可修改」 */
+    return ['producing', 'complete'].includes(st) ? base : '可修改';
+  }
+  const ov = prodOverrideOf(p, i, m, id), bits = [base];
+  if (ov?.frozen) bits.push('用量按开工时定格');
+  else if (ov?.plannedStart != null) bits.push(`已排产 ${hm(ov.plannedStart)}`);
+  else if (!['producing', 'complete'].includes(st)) bits.push('待排产');
+  const dev = ov?.mainDevice || mainStep(r)?.device || '—';
+  const pots = ov?.potCountOverridden ? ov.potCount : potCountOf(p, i, m, id);
+  bits.push(`${dev} · ${pots} 锅`);
+  return bits.join(' · ');
+}
+
 const outputKg = (p, d, m, id) => {
+  /* 已开工 → 用开工时定格的出品量 */
+  const fz = frozenOf(p, d, m, id);
+  if (fz && fz.output) return fz.output;
   const det = detailOf(p, d, m, id);
   return det ? headcountOf(p, d, m) * det.perPerson : 0;
 };
 const inputTotalKg = (p, d, m, id) => {
+  const fz = frozenOf(p, d, m, id);
+  if (fz && fz.inputTotal) return fz.inputTotal;
   const det = detailOf(p, d, m, id);
   if (!det || !det.yieldCoef) return 0;
   return outputKg(p, d, m, id) / (det.yieldCoef / 100);
@@ -299,6 +384,31 @@ const potCountFor = (r, inputKg, deviceOverride) => {
   return caps.length ? Math.max(1, ...caps.map(c => Math.ceil(inputKg / c))) : 1;
 };
 const potCountOf = (p, d, m, id) => potCountFor(findRecipe(id), inputTotalKg(p, d, m, id));
+
+/* 装载口径：前几锅装满、尾锅装余量 —— 不是均分。
+   后厨不会把一批料平均摊到每锅：菜谱 BOM 是「一批」的量，均分会让每锅都要按
+   非整数倍折算整张 BOM（宫保鸡丁 10.91kg ÷ 一批 12kg = 0.909 倍），没法执行。
+   装满取「最小占用设备的额定容量」：同一份料要走完所有步骤，得让每台都装得下。
+   由 锅数 = max⌈W÷C⌉ = ⌈W÷Cmin⌉ 可证 尾锅量 = W −(锅数−1)×Cmin ∈ (0, Cmin]，恒不为负也不超上限。
+   尾锅量**不预先取整**：一旦取整，「满锅量 × 满锅数 ＋ 尾锅量 = W」就不再精确成立，
+   逐行每锅投料也跟着偏。展示层按 2 位收即可。
+   人为主观多开锅（锅数 > 最少锅数）时「装满」会把后面几锅留空 → 尾锅变负数，
+   这种情况退回均分（每锅 = W ÷ 锅数），并用 even 标出来。 */
+const potLoadOf = (r, inputKg, deviceOverride, potsOverride) => {
+  const caps = r ? effDevices(r, deviceOverride).map(deviceCapacity).filter(Boolean) : [];
+  const cap = caps.length ? Math.min(...caps) : 0;
+  const minPots = cap && inputKg ? Math.max(1, Math.ceil(inputKg / cap)) : 1;
+  const pots = potsOverride || potCountFor(r, inputKg, deviceOverride);
+  const even = pots > minPots;
+  const fullPots = even ? 0 : Math.max(0, pots - 1);
+  const tail = even
+    ? (pots ? (inputKg || 0) / pots : 0)
+    : (cap ? inputKg - fullPots * cap : (inputKg || 0));
+  return {
+    pots, cap, minPots, even, fullPots, tail,
+    overCap: !even && !!cap && tail > cap + 1e-9     // 人工把锅数改小到一锅装不下
+  };
+};
 
 /* 用料换算的通用口径：Q = 基准批次量（能折成质量的行之和，单位克）；k = 本次要几份配方 */
 const batchGram = r => r?.batchGram || 0;
@@ -414,7 +524,8 @@ function enter() { hideAll($('#mealPlanNav')); mealPage().hidden = false; if (ac
 function render() {
   if (!allowed()) {
     mealPage().innerHTML = '<section class="mp-card mp-gate"><i>周</i><h2>请选择食堂或档口</h2><p>排餐计划仅开放给食堂和档口。<br>请通过左上角“切换组织”选择实际供餐组织后继续。</p></section>';
-    $('.breadcrumb').innerHTML = '计划管理&nbsp; / &nbsp;<strong>排餐计划</strong>';
+    /* 面包屑属于桌面端外壳；手机端没有它，但不能因此让渲染中断（手机端复用的是本模块的逻辑） */
+  const bc = $('.breadcrumb'); if (bc) bc.innerHTML = '计划管理&nbsp; / &nbsp;<strong>排餐计划</strong>';
     return;
   }
   workspace();
@@ -457,7 +568,8 @@ function workspace() {
       ${table(p)}
     </div>
   </section>`;
-  $('.breadcrumb').innerHTML = '计划管理&nbsp; / &nbsp;<strong>排餐计划</strong>';
+  /* 面包屑属于桌面端外壳；手机端没有它，但不能因此让渲染中断（手机端复用的是本模块的逻辑） */
+  const bc = $('.breadcrumb'); if (bc) bc.innerHTML = '计划管理&nbsp; / &nbsp;<strong>排餐计划</strong>';
   bind();
 }
 
@@ -493,7 +605,7 @@ function cell(p, i, m) {
     const out = outputKg(p, i, m, id), inp = inputTotalKg(p, i, m, id);
     const locked = ['producing', 'complete'].includes(st);
     return `<div class="mp-dish-chip ${st ? 'prod-' + st : ''} ${locked ? 'blocked' : ''}"
-      data-tip="${st === 'producing' ? '生产中 · 已锁定' : st === 'complete' ? '生产完成 · 已锁定' : '未开始 · 可修改'}"
+      data-tip="${esc(chipTip(p, i, m, id, r, st))}"
       ${can ? `data-detail="${i}|${m}|${id}"` : ''}>
       <span class="mp-dish-name">${esc(r?.name || id)}</span>
       <span class="mp-dish-meta">${out ? fmtKg(out) : '未设出品量'}${inp ? ` · 投料 ${fmtKg(inp)}` : ''}</span>
@@ -545,6 +657,7 @@ function commit() {
     memoCommit(p);           // 保存时才写记忆
   });
   buffers = {};
+  persistPlans();                                                   // 保存即落盘：手机那侧才看得到
   saveHooks.forEach(f => { try { f(); } catch { /* 忽略 */ } });   // 通知生产计划刷新
 }
 
@@ -743,14 +856,8 @@ function picker(key, replace = '') {
   $('#mpRecipeConfirm').onclick = () => {
     const ids = [...selected];
     if (!ids.length) return toast('请至少选择一道菜谱');
-    if (single) current.schedule[d][m] = (current.schedule[d][m] || []).map(x => x === replace ? ids[0] : x);
-    else current.schedule[d][m] = [...(current.schedule[d][m] || []), ...ids];
-    ids.forEach(id => ensureDetail(current, d, m, id));
-    if (!current.headcounts[`${d}|${m}`]?.value) {
-      const mem = memoRead('headcount', m);
-      current.headcounts[`${d}|${m}`] = { value: mem ? mem.value : '', memo: mem ? mem.source : '' };
-    }
-    mark(); close(); workspace();
+    applyAdd(d, m, ids, single, replace);
+    close(); workspace();
     if (!single) toast('已加入，请补全人均配量后保存');
   };
   draw();
@@ -800,6 +907,57 @@ function copyPlan() {
   mark(); close(); workspace(); toast('排餐已复制，请保存后生效');
 }
 
+/* 删除的准入判定：桌面弹窗与手机端走**同一条** —— 规则只能有一处实现 */
+function removeBlock(v) {
+  const [d, m, id] = v.split('|');
+  const st = statusOf(current, d, m, id);
+  if (['producing', 'complete'].includes(st)) return `该菜${st === 'producing' ? '正在生产' : '已生产完成'}，不能修改或删除`;
+  return null;
+}
+/* 真正落地一次删除（不含确认与原因询问） */
+function applyRemove(v, why) {
+  const [d, m, id] = v.split('|');
+  const date = add(current.start, +d);
+  current.schedule[d][m] = current.schedule[d][m].filter(x => x !== id);
+  delete current.statuses[v]; delete current.details[v];
+  /* 生产计划那边的现场调整（计划加工时间 / 锅数 / 设备 / 状态 / 开工定格）按**日期**另一套键存的，
+     必须一起清掉 —— 否则「删掉再加回来」会把旧时间、旧锅数、旧定格原样复活 */
+  delete overrides()[`${date}|${m}|${id}`];
+  persistOverrides();
+  if (date === today()) record(+d, m, '删除', findRecipe(id)?.name || id, why);
+  mark();
+}
+function removeDish(v) {
+  const [d, m, id] = v.split('|');
+  const date = add(current.start, +d);
+  const name = findRecipe(id)?.name || id;
+  const blocked = removeBlock(v);
+  if (blocked) return toast(blocked);
+  const r = findRecipe(id);
+  if (statusOf(current, d, m, id) === '' && r?.hasDevice && date >= today()) {
+    if (!confirm('该菜已进入生产计划，删除后生产准备需重新安排，是否继续？')) return;
+  }
+  const apply = why => { applyRemove(v, why); close(); workspace(); };
+  date === today() ? reason('删除菜谱', apply) : (confirm(`确认删除“${name}”吗？`) && apply(''));
+}
+
+/* 真正落地一次加菜 / 换菜（不含确认与原因询问）。why 有值才记调整记录 ——
+   桌面原来的加菜不记，保持原样；手机端必填原因，走同一条落地逻辑 */
+function applyAdd(d, m, ids, single, replace, why) {
+  const before = current.schedule[d][m] || [];
+  if (single) current.schedule[d][m] = before.map(x => x === replace ? ids[0] : x);
+  else current.schedule[d][m] = [...before, ...ids];
+  ids.forEach(id => ensureDetail(current, d, m, id));
+  if (!current.headcounts[`${d}|${m}`]?.value) {
+    const mem = memoRead('headcount', m);
+    current.headcounts[`${d}|${m}`] = { value: mem ? mem.value : '', memo: mem ? mem.source : '' };
+  }
+  if (why != null && add(current.start, +d) === today()) {
+    ids.forEach(id => record(+d, m, single ? '替换' : '新增', findRecipe(id)?.name || id, why));
+  }
+  mark();
+}
+
 function removeDay(i) {
   if (current.activeDays.length <= 1) return toast('每周至少保留一个排餐日期，当前日期不能移除；如当天不排餐，可将各餐次菜谱留空。');
   const n = Object.values(current.schedule[i]).flat().length;
@@ -822,23 +980,102 @@ function record(d, m, type, detail, why) {
   current.adjustments[d].push({ time: new Date().toTimeString().slice(0, 5), meal: m, type, detail, reason: why, operator: '平台管理员' });
 }
 
-function removeDish(v) {
-  const [d, m, id] = v.split('|');
-  const st = statusOf(current, d, m, id);
-  const date = add(current.start, +d);
-  const name = findRecipe(id)?.name || id;
-  if (['producing', 'complete'].includes(st)) return toast(`该菜${st === 'producing' ? '正在生产' : '已生产完成'}，不能修改或删除`);
-  const r = findRecipe(id);
-  if (st === '' && r?.hasDevice && date >= today()) {
-    if (!confirm('该菜已进入生产计划，删除后生产准备需重新安排，是否继续？')) return;
-  }
-  const apply = why => {
-    current.schedule[d][m] = current.schedule[d][m].filter(x => x !== id);
-    delete current.statuses[v]; delete current.details[v];
-    if (date === today()) record(+d, m, '删除', name, why);
-    mark(); close(); workspace();
-  };
-  date === today() ? reason('删除菜谱', apply) : (confirm(`确认删除“${name}”吗？`) && apply(''));
+/* ============================ 12c. 手机端（车间）接口 ============================
+   车间没有电脑，排餐调整与生产确认都在手机页上做。手机页**不重新实现任何规则**，
+   只调这里和 MerchantProduction 的动作：编辑缓冲、校验、原因记录、落盘、锁定与定格判定全部复用。
+   全部返回「错误文案或 null」，不弹 toast / confirm —— 反馈形式交给手机页自己决定。 */
+const mobile = {
+  today,
+  /* 只允许改今天：与桌面「过去的日期只读」同一条口径 */
+  begin(date = today()) {
+    if (date !== today()) return '只能调整今天的排餐';
+    week = monday(date); load(week); edit = true;
+    return validateToday();
+  },
+  /* 今日各餐次的口径：读的是**编辑缓冲**，所以未保存的改动立刻可见 */
+  view() {
+    const di = dayIndex(today());
+    return {
+      di, meals: MEALS.map(m => ({
+        meal: m,
+        headcount: headcountOf(current, di, m),
+        dishes: (current?.schedule?.[di]?.[m] || []).map(id => ({
+          id, recipe: findRecipe(id),
+          output: outputKg(current, di, m, id),
+          input: inputTotalKg(current, di, m, id),
+          perPerson: detailOf(current, di, m, id)?.perPerson || 0,
+          yieldCoef: detailOf(current, di, m, id)?.yieldCoef || 0,
+          status: statusOf(current, di, m, id),
+          locked: lockedOf(current, di, m, id),
+          /* 能删：未开工即可删（与桌面同一条 removeBlock 判定） */
+          removable: !removeBlock(`${di}|${m}|${id}`),
+        })),
+      })),
+    };
+  },
+  /* 候选菜谱：排除本餐次已加的（与桌面 picker 同一条规则） */
+  candidates(meal) {
+    const di = dayIndex(today());
+    const used = new Set(current?.schedule?.[di]?.[meal] || []);
+    return recipes.filter(r => !used.has(r.id));
+  },
+  setHeadcount(meal, v) {
+    const di = dayIndex(today());
+    const n = Math.round(Number(v));
+    if (!Number.isFinite(n) || n <= 0) return '请填写就餐人数';
+    if (n > 9999) return '就餐人数不能超过 9999';
+    (current.headcounts[`${di}|${meal}`] ||= {}).value = n;
+    mark();
+    return null;
+  },
+  setPerPerson(meal, id, v) {
+    const di = dayIndex(today());
+    const n = Number(v);
+    if (!Number.isFinite(n) || n <= 0) return '请输入大于 0 的人均配量';
+    const det = ensureDetail(current, di, meal, id);
+    det.perPerson = n; det.perPersonFrom = 'manual';
+    mark();
+    return null;
+  },
+  setYield(meal, id, v) {
+    const di = dayIndex(today());
+    const n = Number(v);
+    if (!Number.isFinite(n) || n <= 0 || n > 100) return '出餐成品系数需在 0–100 之间';
+    const det = ensureDetail(current, di, meal, id);
+    det.yieldCoef = n; det.yieldOverridden = true;
+    mark();
+    return null;
+  },
+  /* 加菜 / 删菜：原因必填（车间改动都会进当日调整记录） */
+  add(meal, id, why) {
+    if (!String(why || '').trim()) return '请填写调整原因';
+    const di = dayIndex(today());
+    if ((current.schedule[di][meal] || []).includes(id)) return '这道菜已经在本餐次里了';
+    applyAdd(di, meal, [id], false, '', String(why).trim());
+    return null;
+  },
+  remove(meal, id, why) {
+    if (!String(why || '').trim()) return '请填写调整原因';
+    const di = dayIndex(today());
+    const blocked = removeBlock(`${di}|${meal}|${id}`);
+    if (blocked) return blocked;
+    applyRemove(`${di}|${meal}|${id}`, String(why).trim());
+    return null;
+  },
+  adjustments() { return current?.adjustments?.[dayIndex(today())] || []; },
+  /* 保存：走的是与桌面完全相同的校验与提交 */
+  commit() {
+    const bad = validate();
+    if (bad) return bad;
+    commit(); edit = false;
+    return null;
+  },
+  cancel() { buffers = {}; load(week); edit = false; return null; },
+};
+function validateToday() {
+  if (!current) return '排餐数据未就绪';
+  if (!(current.activeDays || []).includes(dayIndex(today()))) return '今天不在排餐日期内';
+  return null;
 }
 
 function openHistory(d) {
@@ -849,31 +1086,54 @@ function openHistory(d) {
   $('#mpHistoryClose').onclick = close;
 }
 
-/* ============================ 13. 组织切换拦截 ============================ */
+/* ============================ 13. 切页 / 组织切换拦截 ============================ */
+
+/* 生产计划按「已保存」的排餐数据派生。排餐有未保存修改时直接切过去，
+   用户会以为刚才的编辑已经生效，但生产计划里根本看不到 —— 必须先拦一下 */
+function planNavConfirm() {
+  drawer('切换到生产计划', '当前排餐还有未保存的修改',
+    '<div class="mp-org-switch-tip">生产计划按<b>已保存</b>的排餐数据派生，未保存的修改<b>不会</b>体现在生产计划里。<br>保存后将带着最新数据进入生产计划；如需继续编辑，请取消切换。</div>',
+    '<button class="mp-secondary" id="mpPlanCancel">取消切换</button><span class="mp-spacer"></span><button class="mp-primary" id="mpPlanSave">保存后切换</button>');
+  $('#mpPlanCancel').onclick = close;
+  $('#mpPlanSave').onclick = () => {
+    const bad = validate();
+    if (bad) return toast(bad);           // 校验不过就别切，让用户回去改
+    commit(); edit = false; close();
+    window.MerchantProduction.enter();
+  };
+}
 
 function orgConfirm(button) {
   drawer('切换组织', '当前排餐还有未保存的修改',
     '<div class="mp-org-switch-tip">保存后将切换至所选组织；如需继续编辑，请取消切换。</div>',
     '<button class="mp-secondary" id="mpOrgCancel">取消切换</button><span class="mp-spacer"></span><button class="mp-primary" id="mpOrgSave">保存后切换</button>');
   $('#mpOrgCancel').onclick = close;
-  $('#mpOrgSave').onclick = () => { commit(); edit = false; switchBypass = true; close(); button.click(); };
+  $('#mpOrgSave').onclick = () => {
+    const bad = validate();
+    if (bad) return toast(bad);           // 与切页一致：校验不过不提交，也不切
+    commit(); edit = false; switchBypass = true; close(); button.click();
+  };
 }
 
 /* ============================ 14. 对外暴露 ============================ */
 
 window.MerchantPlan = {
-  MEALS, DAYS, OPEN_TIME, BUFFER_MIN, recipes, findRecipe, DEVICES, DEVICE_MODELS, deviceCapacity,
+  MEALS, DAYS, OPEN_TIME, recipes, findRecipe, DEVICES, DEVICE_MODELS, deviceCapacity,
   deviceLabel, deviceMaker, deviceModel,
   today, add, monday, dayIndex, hm, toMin, fmt, fmtKg, fmtKg2, fmtQty, fmtRawQty, trimNum, esc, clone,
   org, allowed, plans, saved, overrides,
   headcountOf, detailOf, statusOf, lockedOf, outputKg, inputTotalKg, potCountOf, potCountFor,
-  effDevices, effDeviceOf, taskDurationSec, mainStep,
+  /* 落盘接口：生产计划改完状态/现场调整后调用 —— 数据要能被另一台设备（手机）看到 */
+  persist, persistPlans, persistOverrides,
+  effDevices, effDeviceOf, potLoadOf, taskDurationSec, mainStep,
   toGram, batchGram, factorOf, derivedPerPerson, usageOf,
   /* 用料换算结果（采购计划的输入）：每行含 食材/原单位/是否计入基准量/占比/本次用量 */
   bomUsageOf: (p, d, m, id) => usageOf(findRecipe(id), inputTotalKg(p, d, m, id)),
   isDeviceRecipe: id => !!findRecipe(id)?.hasDevice,
   hideAll, mealPage, toast, drawer, close,
   enterMealPlan: enter,
+  save,                       // 手机端的排餐调整页也走这一个保存入口（落盘、写记忆、通知生产计划刷新都在里面）
+  mobile,                     // 手机端（车间）的排餐调整接口
   openDetail: key => openDetail(key),
   refresh: () => { if (!mealPage().hidden) { load(week); render(); } },
   onSave: fn => { saveHooks.push(fn); }
@@ -883,27 +1143,36 @@ window.MerchantPlan = {
 
 function install() {
   if ($('#mealPlanNav')) return;
-  $('.sidebar').insertAdjacentHTML('beforeend',
-    `<div class="nav-parent" id="planManagementParent"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 4h14v16H5zM8 2v4M16 2v4M8 10h8M8 14h5"/></svg><span>计划管理</span></div>
-     <div class="nav-child" id="mealPlanNav"><span>排餐计划</span></div>
-     <div class="nav-child" id="productionPlanNav"><span>生产计划</span></div>`);
-  $('#mealPlanNav').onclick = e => { e.stopImmediatePropagation(); enter(); };
-  $('#productionPlanNav').onclick = e => {
-    e.stopImmediatePropagation();
-    window.MerchantProduction ? window.MerchantProduction.enter() : toast('生产计划模块未加载');
-  };
+  /* 手机端页面没有侧边栏、也没有这两个导航项 —— 那边的入口由手机页自己画，
+     但「切换组织时重置」这部分逻辑两端都要，所以下面只把侧边栏那段包起来，不是整个 install 返回 */
+  const sidebar = $('.sidebar');
+  if (sidebar) {
+    sidebar.insertAdjacentHTML('beforeend',
+      `<div class="nav-parent" id="planManagementParent"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 4h14v16H5zM8 2v4M16 2v4M8 10h8M8 14h5"/></svg><span>计划管理</span></div>
+       <div class="nav-child" id="mealPlanNav"><span>排餐计划</span></div>
+       <div class="nav-child" id="productionPlanNav"><span>生产计划</span></div>`);
+    $('#mealPlanNav').onclick = e => { e.stopImmediatePropagation(); enter(); };
+    $('#productionPlanNav').onclick = e => {
+      e.stopImmediatePropagation();
+      if (!window.MerchantProduction) return toast('生产计划模块未加载');
+      if (!mealPage().hidden && dirty()) return planNavConfirm();
+      window.MerchantProduction.enter();
+    };
+  }
   $('#drawerList')?.addEventListener('click', e => {
     const b = e.target.closest('[data-select-org]');
     if (!b) return;
     if (switchBypass) { switchBypass = false; return; }
     if (!mealPage().hidden && dirty()) { e.preventDefault(); e.stopImmediatePropagation(); orgConfirm(b); }
   }, true);
+  const orgEl = $('#currentOrganization');
+  if (!orgEl) return;                       // 没有组织元素就没有「当前是哪个食堂」，两端都靠它取值
   new MutationObserver(() => {
     if (org() === activeOrg) return;
     reset();
     if (!mealPage().hidden) { load(week); render(); }
     if ($('#productionPlanPage') && !$('#productionPlanPage').hidden) window.MerchantProduction?.enter();
-  }).observe($('#currentOrganization'), { childList: true, characterData: true, subtree: true });
+  }).observe(orgEl, { childList: true, characterData: true, subtree: true });
 }
 
 install();

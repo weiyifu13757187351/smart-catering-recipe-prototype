@@ -1,0 +1,174 @@
+/* ============================================================================
+   车间端（手机）样式
+   场景约束：车间里手上可能有油、有手套，光线强，站在设备旁边单手操作 ——
+   所以按钮够大（≥56px）、字号够大、一屏一件事、不依赖精确点击。
+   在桌面浏览器里也按手机宽度居中显示，方便评审时直接看。
+   ============================================================================ */
+:root{
+  --mb-bg:#f2f4f7;
+  --mb-card:#ffffff;
+  --mb-line:#e3e6ec;
+  --mb-ink:#1b1f27;
+  --mb-ink-2:#5b6472;
+  --mb-ink-3:#8b93a1;
+  --mb-brand:#1b57d6;
+  --mb-brand-soft:#eaf0ff;
+  --mb-ok:#0f8a52;
+  --mb-ok-soft:#e8f6ee;
+  --mb-warn:#b3720a;
+  --mb-warn-soft:#fdf3e2;
+  --mb-live:#c2410c;
+  --mb-live-soft:#fdeee5;
+  --mb-r:14px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body.mb-body{
+  background:var(--mb-bg);color:var(--mb-ink);
+  font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+.mb-off{display:none !important}
+
+.mb-app{max-width:520px;margin:0 auto;min-height:100vh;background:var(--mb-bg);position:relative;padding-bottom:28px}
+
+/* ---------------- 顶部 ---------------- */
+.mb-head{position:sticky;top:0;z-index:20;background:var(--mb-card);border-bottom:1px solid var(--mb-line)}
+.mb-head-top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px 12px}
+.mb-org{display:flex;flex-direction:column;align-items:flex-start;gap:2px;background:none;border:0;padding:0;font:inherit;color:inherit;text-align:left}
+.mb-org b{font-size:19px;font-weight:700}
+.mb-org small{font-size:13px;color:var(--mb-brand)}
+.mb-today{text-align:right}
+.mb-today b{display:block;font-size:15px;font-weight:600}
+.mb-today small{font-size:13px;color:var(--mb-ink-3)}
+.mb-tabs{display:flex;gap:6px;padding:0 12px 10px}
+.mb-tab{flex:1;min-height:46px;border:0;border-radius:11px;background:var(--mb-bg);color:var(--mb-ink-2);
+  font:inherit;font-size:16px;font-weight:600}
+.mb-tab.is-on{background:var(--mb-brand);color:#fff}
+
+.mb-main{padding:14px 12px 0}
+
+/* ---------------- 通用卡片 / 按钮 ---------------- */
+.mb-card{background:var(--mb-card);border-radius:var(--mb-r);border:1px solid var(--mb-line);margin-bottom:12px;overflow:hidden}
+.mb-card-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 14px;border-bottom:1px solid var(--mb-line)}
+.mb-card-head h2{margin:0;font-size:16px;font-weight:700}
+.mb-sec-title{margin:18px 4px 8px;font-size:14px;font-weight:700;color:var(--mb-ink-2)}
+.mb-sec-title:first-child{margin-top:2px}
+
+.mb-btn{min-height:56px;border-radius:12px;border:1px solid var(--mb-line);background:var(--mb-card);
+  color:var(--mb-ink);font:inherit;font-size:17px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;padding:0 18px}
+.mb-btn.primary{background:var(--mb-brand);border-color:var(--mb-brand);color:#fff}
+.mb-btn.ok{background:var(--mb-ok);border-color:var(--mb-ok);color:#fff}
+.mb-btn.ghost{background:var(--mb-bg)}
+.mb-btn:disabled{opacity:.45}
+.mb-btn-row{display:flex;gap:10px}
+.mb-btn-row .mb-btn{flex:1}
+
+.mb-pill{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:999px;font-size:13px;font-weight:700;white-space:nowrap}
+.mb-pill.wait{background:var(--mb-bg);color:var(--mb-ink-2)}
+.mb-pill.live{background:var(--mb-live-soft);color:var(--mb-live)}
+.mb-pill.done{background:var(--mb-ok-soft);color:var(--mb-ok)}
+.mb-pill.warn{background:var(--mb-warn-soft);color:var(--mb-warn)}
+
+/* ---------------- 生产：当前该做的 ---------------- */
+.mb-now{background:linear-gradient(160deg,#1b3f9e,#1b57d6);color:#fff;border-radius:var(--mb-r);padding:16px 16px 14px;margin-bottom:14px}
+.mb-now-label{font-size:13px;opacity:.85;margin-bottom:6px}
+.mb-now-name{font-size:24px;font-weight:800;letter-spacing:.5px;margin-bottom:10px}
+.mb-now-meta{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:14px;opacity:.95;margin-bottom:14px}
+.mb-now .mb-btn{width:100%}
+.mb-now .mb-btn.primary{background:#fff;color:#1b3f9e;border-color:#fff}
+.mb-now .mb-btn.ok{background:#0f8a52;border-color:#0f8a52;color:#fff}
+.mb-now-empty{background:var(--mb-card);border:1px dashed var(--mb-line);border-radius:var(--mb-r);
+  padding:22px 16px;text-align:center;color:var(--mb-ink-3);margin-bottom:14px}
+
+/* ---------------- 生产：任务卡 ---------------- */
+.mb-task{padding:14px;display:flex;gap:12px;align-items:flex-start;border-bottom:1px solid var(--mb-line)}
+.mb-task:last-child{border-bottom:0}
+.mb-task-time{min-width:64px;text-align:center;padding-top:2px}
+.mb-task-time b{display:block;font-size:18px;font-weight:800}
+.mb-task-time small{font-size:12px;color:var(--mb-ink-3)}
+.mb-task-body{flex:1;min-width:0}
+.mb-task-body h3{margin:0 0 4px;font-size:18px;font-weight:700;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.mb-task-body p{margin:0 0 3px;font-size:14px;color:var(--mb-ink-2)}
+.mb-task-body p b{color:var(--mb-ink);font-weight:700}
+.mb-task-act{margin-top:11px;display:flex;gap:8px}
+.mb-task-act .mb-btn{min-height:48px;font-size:16px;padding:0 14px;flex:1}
+.mb-dev-group{margin-bottom:6px}
+
+/* ---------------- 排餐调整 ---------------- */
+.mb-meal-card{padding:14px}
+.mb-meal-empty{display:flex;align-items:center;gap:10px;padding:10px 14px}
+.mb-meal-empty b{flex:1;font-size:16px}
+.mb-meal-empty small{color:var(--mb-ink-3);font-size:13px}
+.mb-meal-empty .mb-btn{min-height:44px;padding:0 14px;font-size:15px}
+.mb-meal-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.mb-meal-top b{font-size:17px}
+.mb-stepper{display:flex;align-items:center;gap:0;border:1px solid var(--mb-line);border-radius:11px;overflow:hidden}
+.mb-stepper button{width:52px;height:52px;border:0;background:var(--mb-bg);font-size:24px;font-weight:700;color:var(--mb-brand);line-height:1}
+.mb-stepper input{width:78px;height:52px;border:0;border-left:1px solid var(--mb-line);border-right:1px solid var(--mb-line);
+  text-align:center;font:inherit;font-size:18px;font-weight:700;background:var(--mb-card)}
+.mb-dish{display:flex;align-items:center;gap:10px;padding:11px 0;border-top:1px solid var(--mb-line)}
+.mb-dish-main{flex:1;min-width:0}
+.mb-dish-main b{display:block;font-size:16px;font-weight:700;margin-bottom:2px}
+.mb-dish-main small{font-size:13px;color:var(--mb-ink-2)}
+.mb-dish .mb-pill{font-size:12px}
+.mb-add{width:100%;min-height:52px;margin-top:10px;border:1px dashed var(--mb-brand);background:var(--mb-brand-soft);
+  color:var(--mb-brand);border-radius:11px;font:inherit;font-size:16px;font-weight:700}
+
+.mb-note{margin:0 4px 10px;font-size:13px;color:var(--mb-ink-3);line-height:1.6}
+.mb-footbar{position:sticky;bottom:0;margin:16px -12px 0;padding:12px 12px calc(12px + env(safe-area-inset-bottom));
+  background:var(--mb-bg);border-top:1px solid var(--mb-line);display:flex;gap:10px}
+.mb-footbar .mb-btn{flex:1}
+
+/* ---------------- 底部抽屉 ---------------- */
+.mb-sheet-mask{position:fixed;inset:0;z-index:60;background:rgba(16,20,28,.42);display:flex;align-items:flex-end;justify-content:center}
+/* 必须显式写：作者样式里的 display:flex 会盖掉 [hidden] 的浏览器默认 display:none，
+   结果「隐藏」的抽屉照样铺在页面上 */
+.mb-sheet-mask[hidden]{display:none !important}
+.mb-sheet{width:100%;max-width:520px;max-height:88vh;background:var(--mb-card);border-radius:18px 18px 0 0;
+  display:flex;flex-direction:column;animation:mbUp .18s ease-out}
+@keyframes mbUp{from{transform:translateY(24px);opacity:.6}to{transform:none;opacity:1}}
+.mb-sheet-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px;border-bottom:1px solid var(--mb-line)}
+.mb-sheet-head h2{margin:0;font-size:19px;font-weight:800}
+.mb-sheet-head small{display:block;font-size:13px;color:var(--mb-ink-3);font-weight:400;margin-top:3px}
+.mb-x{min-height:40px;padding:0 12px;border:1px solid var(--mb-line);background:var(--mb-bg);border-radius:10px;font:inherit;font-size:15px;color:var(--mb-ink-2)}
+.mb-sheet-body{padding:14px 16px;overflow:auto;-webkit-overflow-scrolling:touch}
+.mb-sheet-foot{padding:12px 16px calc(14px + env(safe-area-inset-bottom));border-top:1px solid var(--mb-line);display:flex;gap:10px}
+.mb-sheet-foot .mb-btn{flex:1}
+
+.mb-kv{display:flex;justify-content:space-between;gap:14px;padding:9px 0;border-bottom:1px dashed var(--mb-line);font-size:15px}
+.mb-kv:last-child{border-bottom:0}
+.mb-kv span{color:var(--mb-ink-2)}
+.mb-kv b{font-weight:700}
+.mb-field{margin-bottom:14px}
+.mb-field label{display:block;font-size:14px;font-weight:700;color:var(--mb-ink-2);margin-bottom:7px}
+.mb-field input,.mb-field textarea,.mb-field select{width:100%;min-height:54px;padding:12px;border:1px solid var(--mb-line);
+  border-radius:11px;font:inherit;font-size:17px;background:var(--mb-card);color:var(--mb-ink)}
+.mb-field textarea{min-height:92px;resize:vertical;line-height:1.5}
+.mb-field .mb-hint{font-size:13px;color:var(--mb-ink-3);margin-top:6px}
+.mb-times{display:flex;gap:10px}
+.mb-times .mb-btn{flex:1;min-height:50px;font-size:16px}
+
+.mb-bom{width:100%;border-collapse:collapse;font-size:14px}
+.mb-bom th,.mb-bom td{padding:8px 6px;border-bottom:1px solid var(--mb-line);text-align:left}
+.mb-bom th{color:var(--mb-ink-2);font-weight:600;font-size:13px}
+.mb-bom td:last-child,.mb-bom th:last-child{text-align:right;font-weight:700}
+
+.mb-list-item{display:flex;align-items:center;gap:12px;width:100%;min-height:64px;padding:12px 4px;border:0;border-bottom:1px solid var(--mb-line);
+  background:none;font:inherit;text-align:left;color:inherit}
+.mb-list-item:last-child{border-bottom:0}
+.mb-list-item b{flex:1;font-size:17px;font-weight:700}
+.mb-list-item small{color:var(--mb-ink-3);font-size:13px}
+.mb-search{width:100%;min-height:52px;padding:12px;border:1px solid var(--mb-line);border-radius:11px;font:inherit;font-size:16px;margin-bottom:6px}
+
+.mb-adjust{padding:10px 0}
+.mb-adjust article{display:flex;gap:12px;padding:9px 0;border-bottom:1px dashed var(--mb-line)}
+.mb-adjust time{color:var(--mb-ink-3);font-size:13px;min-width:44px}
+.mb-adjust b{font-size:15px}
+.mb-adjust p{margin:2px 0 0;font-size:14px;color:var(--mb-ink-2)}
+.mb-adjust small{font-size:12px;color:var(--mb-ink-3)}
+.mb-empty{padding:26px 16px;text-align:center;color:var(--mb-ink-3);font-size:15px}
+
+.mb-toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:90;
+  max-width:88vw;background:#20262f;color:#fff;padding:12px 18px;border-radius:12px;font-size:15px;font-weight:600;
+  box-shadow:0 8px 24px rgba(0,0,0,.22);animation:mbUp .16s ease-out}
