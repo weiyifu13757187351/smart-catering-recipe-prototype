@@ -1,38 +1,30 @@
 {
-    "publishedAt":  "2026-09-23 13:27",
-    "publishLabel":  "租户端与商户端：新建/修改菜谱的加工步骤，一个步骤仅可关联一台设备（已有设备时「适配设备型号」行置灰不可再添加，删除后恢复）",
+    "publishedAt":  "2026-09-24 11:06",
+    "publishLabel":  "运营端：数据权限「仅本人创建」限制范围覆盖所有功能模块数据（删除公共数据例外）",
     "tenantSourceAt":  "2026-09-23 11:21",
-    "merchantSourceAt":  "2026-09-23 11:52",
-    "opsysSourceAt":  "2026-09-21 13:55",
+    "merchantSourceAt":  "2026-09-24 10:11",
+    "opsysSourceAt":  "2026-09-24 10:59",
     "changes":  {
                     "tenant":  {
                                    "modules":  [
-                                                   "业务标注",
-                                                   "统一菜谱",
-                                                   "入口页",
-                                                   "统一菜谱编辑",
-                                                   "统一菜谱列表"
+
                                                ],
                                    "moreCount":  0,
-                                   "fileCount":  9
+                                   "fileCount":  0
                                },
                     "merchant":  {
                                      "modules":  [
-                                                     "业务标注",
-                                                     "餐次计划",
-                                                     "merchant-production-plan-v1",
-                                                     "菜谱编辑",
-                                                     "统一菜谱"
+
                                                  ],
                                      "moreCount":  0,
-                                     "fileCount":  7
+                                     "fileCount":  0
                                  },
                     "opsys":  {
                                   "modules":  [
-
+                                                  "业务标注"
                                               ],
                                   "moreCount":  0,
-                                  "fileCount":  0
+                                  "fileCount":  3
                               }
                 },
     "site":  "https://weiyifu13757187351.github.io/smart-catering-recipe-prototype/"
