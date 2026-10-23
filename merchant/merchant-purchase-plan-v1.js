@@ -2,7 +2,7 @@
    口径见《商户端采购计划PRD》V1.2 与《商户端采购计划设计方案-讨论稿》V1.5：
 
    【规则】上游是排餐计划：选一段任意周期区间，框定这些天要做的菜（v2 起不再有「餐次」概念，恒取该档口全部餐次）。
-   【规则】用料只取「烹饪投料（计入）」段，过程用料（include:false）不进采购；
+   【规则】用料取「烹饪投料（计入）」与「过程用料」两类，过程用料（include:false）同样计入采购；
            单位恒为克（与租户端菜谱 v2.0 一致），采购侧不做任何克→箱/袋/桶换算。
    【规则】数据分两层：
              items（材料层 = 采购清单）：一行 = 一个映射目标，只决定「这个用料买哪个商品」；
@@ -229,7 +229,7 @@ function previewOf(stallId, from, to) {
   return { hit, blank, dishes, days };
 }
 
-/* 用料派生（材料层）：只取「烹饪投料（计入）」；单位恒为克；按合并键汇总。
+/* 用料派生（材料层）：「烹饪投料（计入）」与「过程用料」均计入；单位恒为克；按合并键汇总。
    返回的 item 只带「系统派生的部分」——skuCode 是直挂商品的初值，ing 行由 buildItems 补。 */
 function deriveItems(plan) {
   const ms = allMeals();
@@ -242,7 +242,7 @@ function deriveItems(plan) {
         const r = findRecipe(id); if (!r) return;
         const pot = potsOf(p, di, m, id); if (!pot) return;
         (r.bom || []).forEach(b => {
-          if (b.include === false) return;                 // 过程用料不进采购
+          // 过程用料（include:false）同样计入用量 —— V3.x 口径：两类均计入
           const g = (toGram(b.qty, b.unit) ?? 0) * pot;
           if (!g) return;
           const bound = !!b.sku;
@@ -1113,7 +1113,7 @@ function basisHtml(plan, key, focusDate) {
   return `<div class="mp-mini-table-wrap"><table class="mp-mini-table">
       <thead><tr><th>日期</th><th>餐次</th><th>菜品</th><th class="pc-num">锅数</th><th class="pc-num">用量（克）</th><th class="pc-num">当日合计</th></tr></thead>
       <tbody>${rows}</tbody></table></div>
-     <p class="pc-hint">【口径】用量 = 该用料行的「投料量（克）」× 锅数，<b>只含「烹饪投料（计入）」</b>；过程用料（腌制 / 焯水重复登记）不计入。
+     <p class="pc-hint">【口径】用量 = 该用料行的「投料量（克）」× 锅数，<b>「烹饪投料（计入）」与「过程用料」均计入</b>。
      ${focusDate ? `<br>当前查看的 <b>${esc(focusDate)}</b> 已高亮。` : ''}
      系统不做克→箱/袋的折算，买多少、按什么规格买，由采购员依据克数判断。</p>`;
 }
