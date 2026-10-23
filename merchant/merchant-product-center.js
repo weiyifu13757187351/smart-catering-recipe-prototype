@@ -12,7 +12,7 @@ const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const NAV=[['pcNavProduct','运营商品','product'],['pcNavSku','SKU中心','sku'],['pcNavPublish','发布记录','publish'],['pcNavBrand','品牌库','brand'],['pcNavCategory','分类库','category']];
 const VIEW_TITLE={product:'运营商品',sku:'SKU中心',publish:'发布记录',brand:'品牌库',category:'分类库'};
-const OTHER_PAGES=['#organizationPage','#rolesPage','#adminsPage','#usersPage','#recipePage','#dishCategoryPage','#deviceRecipePage'];
+const OTHER_PAGES=['#organizationPage','#rolesPage','#adminsPage','#usersPage','#recipePage','#dishCategoryPage','#deviceRecipePage','#productCenterPage','#mealPlanPage','#productionPlanPage','#stallPage'];
 const norm=s=>String(s||'').replace(/\s+/g,' ').trim();
 
 /* ==================== 只读上游数据 ==================== */
@@ -33,7 +33,10 @@ const categoryNodes=[
   {code:'CAT012',name:'菜肴半成品',level:2,parent:'调理半成品',note:'菜肴类半成品',status:'启用'},
   {code:'CAT013',name:'禽类半成品',level:3,parent:'菜肴半成品',note:'禽类半成品',status:'启用'},
   {code:'CAT014',name:'畜类半成品',level:3,parent:'菜肴半成品',note:'畜类半成品',status:'启用'},
-  {code:'CAT015',name:'水产半成品',level:3,parent:'菜肴半成品',note:'水产半成品',status:'启用'}
+  {code:'CAT015',name:'水产半成品',level:3,parent:'菜肴半成品',note:'水产半成品',status:'启用'},
+  {code:'CAT016',name:'调味品',level:1,parent:'',note:'调味品类运营商品',status:'启用'},
+  {code:'CAT017',name:'酱油',level:2,parent:'调味品',note:'酱油类',status:'启用'},
+  {code:'CAT018',name:'生抽类',level:3,parent:'酱油',note:'生抽',status:'启用'}
 ];
 const LEVEL_NAME={1:'一级分类',2:'二级分类',3:'三级分类'};
 const catPath=(b,m,s)=>`${b} / ${m} / ${s}`;
@@ -77,7 +80,8 @@ const tenantSkus=[
   {skuId:'SKU000401',skuCode:'SKU000401',name:'精品胡萝卜 8kg装',productId:'SP000004',productCode:'SP000004',productName:'精品胡萝卜',productType:'毛菜',category:catPath('蔬菜','根茎类','胡萝卜类'),brand:'田园记',spec:'8kg/箱',orderUnit:'箱',stockUnit:'千克',version:'V1',batchNo:'PA20260910001',validTo:'2027-12-31',tenant:'市教育餐饮服务中心',batchStatus:'生效中',productStatus:'已上架',skuStatus:'启用'},
   {skuId:'SKU000402',skuCode:'SKU000402',name:'精品胡萝卜 12kg装',productId:'SP000004',productCode:'SP000004',productName:'精品胡萝卜',productType:'毛菜',category:catPath('蔬菜','根茎类','胡萝卜类'),brand:'田园记',spec:'12kg/箱',orderUnit:'箱',stockUnit:'千克',version:'V1',batchNo:'PA20260910001',validTo:'2027-12-31',tenant:'市教育餐饮服务中心',batchStatus:'生效中',productStatus:'已上架',skuStatus:'停用'},
   {skuId:'SKU000501',skuCode:'SKU000501',name:'香辣鸡丁 2kg装',productId:'SP000005',productCode:'SP000005',productName:'香辣鸡丁',productType:'半成品',category:catPath('调理半成品','菜肴半成品','禽类半成品'),brand:'味来优选',spec:'2kg/袋',orderUnit:'袋',stockUnit:'千克',version:'V1',batchNo:'PA20260910001',validTo:'2027-12-31',tenant:'市教育餐饮服务中心',batchStatus:'生效中',productStatus:'已上架',skuStatus:'启用'},
-  {skuId:'SKU000601',skuCode:'SKU000601',name:'番茄炒蛋料理包 3kg装',productId:'SP000006',productCode:'SP000006',productName:'番茄炒蛋料理包',productType:'半成品',category:catPath('调理半成品','菜肴半成品','禽类半成品'),brand:'鲜达',spec:'3kg/袋',orderUnit:'袋',stockUnit:'千克',version:'V1',batchNo:'PA20260910001',validTo:'2027-12-31',tenant:'市教育餐饮服务中心',batchStatus:'生效中',productStatus:'已上架',skuStatus:'启用'},
+  /* SKU000601 与租户端菜谱用料里引用的「海天生抽 500ml×12」对齐（编码一致才能做菜谱同步前置校验） */
+  {skuId:'SKU000601',skuCode:'SKU000601',name:'海天生抽 500ml×12',productId:'SP000006',productCode:'SP000006',productName:'海天生抽',productType:'调味品',category:catPath('调味品','酱油','生抽类'),brand:'海天',spec:'500ml×12/箱',orderUnit:'箱',stockUnit:'瓶',version:'V1',batchNo:'PA20260910001',validTo:'2027-12-31',tenant:'市教育餐饮服务中心',batchStatus:'生效中',productStatus:'已上架',skuStatus:'启用'},
   {skuId:'SKU000701',skuCode:'SKU000701',name:'土豆烧牛肉 2kg装',productId:'SP000007',productCode:'SP000007',productName:'土豆烧牛肉',productType:'半成品',category:catPath('调理半成品','菜肴半成品','畜类半成品'),brand:'味来优选',spec:'2kg/袋',orderUnit:'袋',stockUnit:'千克',version:'V1',batchNo:'PA20260906002',validTo:'2026-12-31',tenant:'市教育餐饮服务中心',batchStatus:'已撤销',productStatus:'已上架',skuStatus:'启用'}
 ];
 
@@ -127,8 +131,8 @@ let selected=new Set(),syncView='sku',syncCategory='';
 let editor=null;
 
 const org=()=>norm($('#currentOrganization')?.textContent)||'当前组织';
-function ensureOrg(){
-  const key=org();
+/* 按组织初始化私域库：key 由调用方给出，便于其他模块（菜谱同步前置校验）在未进入商品中心时也能取到当前组织的状态 */
+function ensureOrgKey(key){
   if(!products[key]){
     products[key]=seedProducts.map(x=>({...x,ingredients:[...x.ingredients]}));
     skus[key]=seedSkus.map(x=>({...x}));
@@ -137,10 +141,29 @@ function ensureOrg(){
   }
   return key;
 }
+function ensureOrg(){return ensureOrgKey(org())}
 const isSynced=(key,skuId)=>syncedOrgs[key].has(skuId);
 // 可同步范围：授权批次生效中 + 商品已发布且已上架 + SKU启用（其余不进入列表）
 const syncable=()=>tenantSkus.filter(s=>s.batchStatus==='生效中'&&s.productStatus==='已上架'&&s.skuStatus==='启用');
 const pendingList=key=>syncable().filter(s=>!isSynced(key,s.skuId));
+
+/* ===== 给其他模块的只读查询（本文件的私域库口径不外泄写入口）=====
+   菜谱同步前置校验用它判断：当前组织是否已把菜谱用料里的 SKU 商品同步到私域库。
+   未授权 / 上游未上架 / SKU 已停用 / 授权已撤销，都返回各自原因，供页面区分文案。 */
+function skuSyncInfo(){
+  const key=ensureOrgKey(org()),synced=new Set(syncedOrgs[key]);
+  const upstreamSku=id=>tenantSkus.find(s=>s.skuId===id)||null;
+  const upstreamSkuByName=name=>tenantSkus.find(s=>s.name===name)||null;
+  return {
+    org:key,
+    synced,
+    upstreamSku,
+    upstreamSkuByName,
+    isSynced:id=>synced.has(id),
+    isSyncable:id=>{const s=upstreamSku(id);return !!s&&s.batchStatus==='生效中'&&s.productStatus==='已上架'&&s.skuStatus==='启用'},
+    unsyncReason:id=>{const s=upstreamSku(id);if(!s)return '该SKU商品未授权给本商户';if(s.batchStatus!=='生效中')return '上游授权已撤销';if(s.productStatus!=='已上架')return '上游商品未上架';if(s.skuStatus!=='启用')return 'SKU已停用';return '当前不可同步'}
+  };
+}
 
 function toast(msg){const n=document.createElement('div');n.className='um-toast';n.textContent=msg;document.body.appendChild(n);setTimeout(()=>n.remove(),2000)}
 
@@ -174,7 +197,7 @@ function makePage(){
   }
   return p;
 }
-function hidePage(){const p=$('#productCenterPage');if(p)p.hidden=true;$$('.sidebar .nav-child').forEach(x=>{if(NAV.some(([id])=>id===x.id))x.classList.remove('active')})}
+function hidePage(){const p=$('#productCenterPage');if(p)p.hidden=true;document.querySelectorAll('.page-view').forEach(x=>{x.hidden=true});$$('.sidebar .nav-child').forEach(x=>{if(NAV.some(([id])=>id===x.id))x.classList.remove('active')})}
 function hideOthers(){
   OTHER_PAGES.forEach(s=>{const x=$(s);if(x)x.hidden=true});
   $$('.sidebar .nav-child').forEach(x=>x.classList.remove('active'));
@@ -191,6 +214,11 @@ function render(){
   const bc=document.querySelector('.breadcrumb');
   if(bc)bc.innerHTML=`商品中心&nbsp; / &nbsp;<strong id="breadcrumbTitle">${VIEW_TITLE[view]}</strong>`;
   bind();
+  /* 商品中心按「次级组织」定位：标题下面挂统一的范围切换器。
+     品牌库/分类库由租户统一维护、商户端只读引用，跟组织无关，不挂（挂了会让人以为切组织能看到别的品牌） */
+  const ORG_SCOPED_VIEWS=['product','sku','publish'];
+  const head=p.querySelector('.um-head');
+  if(head&&ORG_SCOPED_VIEWS.includes(view))window.MerchantScope?.mount(head,{stall:false});
 }
 
 /* ==================== 通用片段 ==================== */
@@ -215,21 +243,20 @@ function productPage(){
     <button class="um-secondary" id="pcMore">${moreFilters?'收起筛选⌃':'更多筛选⌄'}</button>
     <button class="um-secondary" id="pcReset">重置</button>
   </div>
-  ${moreFilters?`<div class="um-more-filters"><label>更新时间（起）<input type="date" id="pcUpFrom"></label><label>更新时间（止）<input type="date" id="pcUpTo"></label><label>SKU数量<select id="pcSkuCount"><option value="">全部</option><option value="has">有SKU</option><option value="none">无SKU</option></select></label><label>标准食材生成状态<select id="pcGen"><option value="">全部</option><option>生成成功</option><option>生成失败</option><option>待生成</option></select></label></div>`:''}
+  ${moreFilters?`<div class="um-more-filters"><label>更新时间（起）<input type="date" id="pcUpFrom"></label><label>更新时间（止）<input type="date" id="pcUpTo"></label><label>SKU数量<select id="pcSkuCount"><option value="">全部</option><option value="has">有SKU</option><option value="none">无SKU</option></select></label></div>`:''}
   <div class="um-table-wrap"><table class="um-table"><thead><tr>
-    <th>商品信息</th><th>商品形态</th><th>商品分类</th><th>品牌</th><th>SKU</th><th>来源</th><th>状态</th><th>版本</th><th>标准食材生成状态</th><th>更新时间</th><th>操作</th>
-  </tr></thead><tbody id="pcProdBody">${list.map(productRow).join('')||`<tr><td colspan="11"><div class="um-empty">暂无符合条件的商品</div></td></tr>`}</tbody></table></div></section>`;
+    <th>商品信息</th><th>商品形态</th><th>商品分类</th><th>品牌</th><th>SKU</th><th>来源</th><th>状态</th><th>版本</th><th>更新时间</th><th>操作</th>
+  </tr></thead><tbody id="pcProdBody">${list.map(productRow).join('')||`<tr><td colspan="10"><div class="um-empty">暂无符合条件的商品</div></td></tr>`}</tbody></table></div></section>`;
 }
 function productRow(p,index){
   const key=ensureOrg(),mine=skus[key].filter(s=>s.productCode===p.code);
   const enabled=mine.filter(s=>s.enableStatus==='启用').length;
   // 上游版本变化不在商户端做任何提醒：来源商品同步后即为组织私域对象，不追踪上游最新版本
-  return `<tr data-i="${index}" data-kw="${esc((p.name+' '+p.code).toLowerCase())}" data-source="${p.source}" data-status="${p.status}" data-type="${p.type}" data-cat="${esc(p.category)}" data-gen="${esc(p.generateStatus||'')}" data-sku="${mine.length?'has':'none'}" data-updated="${p.updated.slice(0,10)}">
+  return `<tr data-i="${index}" data-kw="${esc((p.name+' '+p.code).toLowerCase())}" data-source="${p.source}" data-status="${p.status}" data-type="${p.type}" data-cat="${esc(p.category)}" data-sku="${mine.length?'has':'none'}" data-updated="${p.updated.slice(0,10)}">
   <td><div class="um-dish"><span class="um-thumb">商品</span><span><b>${esc(p.name)}</b><small>${p.code} · ${esc(p.shortName||'—')}</small></span></div></td>
   <td>${typeTag(p.type)}</td><td>${esc(p.category)}</td><td>${esc(p.brand||'—')}</td>
   <td>${enabled} / ${mine.length}</td>
   <td>${sourceTag(p.source)}</td><td>${tag(p.status)}</td><td><b>${p.version}</b></td>
-  <td>${p.type==='半成品'?tag(p.generateStatus||'待生成'):'—'}</td>
   <td><div class="um-update-cell">${esc(p.updatedBy||'—')}<small>${p.updated}</small></div></td>
   <td><div class="um-ops">
     <button class="um-link" data-act="view" data-code="${p.code}">查看</button>
@@ -332,14 +359,13 @@ function applyFilters(){
   const v=id=>($('#'+id)?.value||'').trim();
   const kw=v('pcKw').toLowerCase(),source=v('pcSource'),status=v('pcStatus'),type=v('pcType'),cat=v('pcCat');
   if(view==='product'){
-    const from=v('pcUpFrom'),to=v('pcUpTo'),skuCount=v('pcSkuCount'),gen=v('pcGen');
+    const from=v('pcUpFrom'),to=v('pcUpTo'),skuCount=v('pcSkuCount');
     $$('#pcProdBody tr[data-i]').forEach(tr=>{
       const d=tr.dataset;
       let ok=(!kw||d.kw.includes(kw))&&(!source||d.source===source)&&(!status||d.status===status)&&(!type||d.type===type)&&(!cat||d.cat===cat);
       if(ok&&from)ok=d.updated>=from;
       if(ok&&to)ok=d.updated<=to;
       if(ok&&skuCount)ok=d.sku===skuCount;
-      if(ok&&gen)ok=d.gen===gen;
       tr.hidden=!ok;
     });
   }else if(view==='sku'){
@@ -888,7 +914,7 @@ function bind(){
     $$('[data-act="rec"]').forEach(b=>b.onclick=()=>openRecord(b.dataset.no));
   }
   if($('#pcKw'))$('#pcKw').oninput=applyFilters;
-  ['pcSource','pcStatus','pcType','pcCat','pcProd','pcPub','pcEn','pcUpFrom','pcUpTo','pcSkuCount','pcGen',
+  ['pcSource','pcStatus','pcType','pcCat','pcProd','pcPub','pcEn','pcUpFrom','pcUpTo','pcSkuCount',
    'pcRecFrom','pcRecTo','pcRecType','pcRecBy','pcBrandStatus','pcCatLevel','pcCatStatus']
     .forEach(id=>{const el=$('#'+id);if(el)el.onchange=applyFilters});
   if($('#pcMore'))$('#pcMore').onclick=()=>{moreFilters=!moreFilters;const vals={};['pcKw','pcSource','pcStatus','pcType','pcCat'].forEach(i=>vals[i]=$('#'+i)?.value||'');render();Object.entries(vals).forEach(([i,v])=>{const el=$('#'+i);if(el)el.value=v});applyFilters()};
@@ -896,7 +922,12 @@ function bind(){
 }
 
 /* ==================== 启动 ==================== */
-function boot(){mountNav();ensureOrg();}
+function boot(){
+  mountNav();ensureOrg();
+  /* 切换器改动 #currentOrganization 后，商品中心跟着换一份组织私域数据（商品/SKU/发布记录都按组织隔离） */
+  const orgNode=$('#currentOrganization');
+  if(orgNode)new MutationObserver(()=>{const p=$('#productCenterPage');if(p&&!p.hidden)render()}).observe(orgNode,{childList:true,characterData:true,subtree:true});
+}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
-window.merchantProductCenter={enter,openSync,state:()=>({products,skus,records,syncedOrgs})};
+window.merchantProductCenter={enter,openSync,state:()=>({products,skus,records,syncedOrgs}),skuSyncInfo};
 })();

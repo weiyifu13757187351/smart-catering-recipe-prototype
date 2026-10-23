@@ -1,0 +1,447 @@
+{
+  "version": 1,
+  "title": "商户端采购计划 · 业务标注",
+  "scope": "merchant-purchase-plan",
+  "sourceBase": "../..",
+  "output": "../../annotation-kit/annotation.bundle.json",
+  "coverage": "coverage.md",
+  "mermaid": {
+    "enabled": false,
+    "src": "",
+    "options": {}
+  },
+  "sourceRequirements": [
+    {"id": "PLAN-03-CARD", "source": "商户端采购计划PRD-V3.0.md#3.2 档口卡片", "page": "采购计划总览"},
+    {"id": "PLAN-03-SWITCH", "source": "商户端采购计划PRD-V3.0.md#3.3 切换动作与结果", "page": "采购计划总览"},
+    {"id": "PLAN-04-LIST", "source": "商户端采购计划PRD-V3.0.md#4.3 表格列", "page": "采购计划列表"},
+    {"id": "PLAN-04-DEL", "source": "商户端采购计划PRD-V3.0.md#4.5 删除计划", "page": "采购计划列表"},
+    {"id": "PLAN-05-NEW", "source": "商户端采购计划PRD-V3.0.md#5.1 入口与填写项", "page": "新建采购计划"},
+    {"id": "PLAN-05-CHECK", "source": "商户端采购计划PRD-V3.0.md#5.2 校验", "page": "新建采购计划"},
+    {"id": "PLAN-05-PREVIEW", "source": "商户端采购计划PRD-V3.0.md#5.3 范围预览", "page": "新建采购计划"},
+    {"id": "PLAN-05-OVERLAP", "source": "商户端采购计划PRD-V3.0.md#5.4 重复与交集", "page": "新建采购计划"},
+    {"id": "PLAN-05-SEQ", "source": "商户端采购计划PRD-V3.0.md#5.5 同期第 X 份", "page": "采购计划列表"},
+    {"id": "PLAN-06-HEAD", "source": "商户端采购计划PRD-V3.0.md#6.1 页头与统计", "page": "采购计划详情"},
+    {"id": "PLAN-06-STATE", "source": "商户端采购计划PRD-V3.0.md#6.2.2 状态对交互的影响", "page": "采购计划详情"},
+    {"id": "PLAN-06-MAPPING", "source": "商户端采购计划PRD-V3.0.md#6.3.3 候选商品规则", "page": "商品映射"},
+    {"id": "PLAN-06-PICK", "source": "商户端采购计划PRD-V3.0.md#6.3.4 选商品抽屉", "page": "选商品"},
+    {"id": "PLAN-06-BASIS", "source": "商户端采购计划PRD-V3.0.md#6.3.1 这是什么", "page": "用料依据"},
+    {"id": "PLAN-06-IGNORE", "source": "商户端采购计划PRD-V3.0.md#6.3.6 整段忽略是新增按钮", "page": "商品映射"},
+    {"id": "PLAN-06-REGEN", "source": "商户端采购计划PRD-V3.0.md#6.3.7 重新生成", "page": "商品映射"},
+    {"id": "PLAN-06-DAYS", "source": "商户端采购计划PRD-V3.0.md#6.4.3 按天覆盖与填量规则", "page": "采购明细"},
+    {"id": "PLAN-06-LAUNCH", "source": "商户端采购计划PRD-V3.0.md#6.5.1 发起询价", "page": "发起询价"},
+    {"id": "PLAN-06-INQ", "source": "商户端采购计划PRD-V3.0.md#6.5.2 询价单内容", "page": "询价单"},
+    {"id": "PLAN-06-CMP", "source": "商户端采购计划PRD-V3.0.md#6.5.3 报价比较", "page": "报价比较"},
+    {"id": "PLAN-06-AWARD", "source": "商户端采购计划PRD-V3.0.md#6.5.4 定标", "page": "定标"},
+    {"id": "PLAN-07-COPY", "source": "商户端采购计划PRD-V3.0.md#7 文案与提示汇总", "page": "采购计划详情"},
+    {"id": "PLAN-08-EDGE", "source": "商户端采购计划PRD-V3.0.md#8.2 边界与异常", "page": "采购计划详情"}
+  ],
+  "annotations": [
+    {
+      "id": "pp-overview-rules",
+      "type": "page-global",
+      "page": "*",
+      "viewScope": ["purchase-overview"],
+      "moduleName": "本页规则",
+      "markdownFile": "annotations/purchase/merchant-purchase-plan.md",
+      "blockId": "pp-overview-rules",
+      "sourceRefs": ["PLAN-03-SWITCH", "PLAN-08-EDGE"],
+      "order": 1
+    },
+    {
+      "id": "pp-overview-card",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["purchase-overview"],
+      "moduleName": "档口卡片",
+      "target": {
+        "selector": ".mp-so-grid",
+        "fallbackSelectors": [".mp-stall-overview"],
+        "activationHint": "组织下有档口时出现网格；无档口时是空态文案"
+      },
+      "markdownFile": "annotations/purchase/merchant-purchase-plan.md",
+      "blockId": "pp-overview-card",
+      "sourceRefs": ["PLAN-03-CARD"],
+      "order": 2
+    },
+
+    {
+      "id": "pp-list-rules",
+      "type": "page-global",
+      "page": "*",
+      "viewScope": ["purchase-list"],
+      "moduleName": "本页规则",
+      "markdownFile": "annotations/purchase/merchant-purchase-plan.md",
+      "blockId": "pp-list-rules",
+      "sourceRefs": ["PLAN-04-DEL", "PLAN-06-STATE", "PLAN-05-SEQ"],
+      "order": 1
+    },
+    {
+      "id": "pp-list-new",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["purchase-list"],
+      "moduleName": "新建采购计划",
+      "target": {"selector": "#pcNew"},
+      "markdownFile": "annotations/purchase/merchant-purchase-plan.md",
+      "blockId": "pp-list-new",
+      "sourceRefs": ["PLAN-05-NEW", "PLAN-05-PREVIEW"],
+      "order": 2
+    },
+    {
+      "id": "pp-list-filters",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["purchase-list"],
+      "moduleName": "状态筛选",
+      "target": {"selector": ".pp-filters"},
+      "markdownFile": "annotations/purchase/merchant-purchase-plan.md",
+      "blockId": "pp-list-filters",
+      "sourceRefs": ["PLAN-04-LIST", "PLAN-03-SWITCH"],
+      "order": 3
+    },
+    {
+      "id": "pp-list-table",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["purchase-list"],
+      "moduleName": "列表列口径",
+      "target": {
+        "selector": ".pp-workspace .pp-table-wrap",
+        "activationHint": "该档口已有采购计划时出现；空态时显示「暂无采购计划」"
+      },
+      "markdownFile": "annotations/purchase/merchant-purchase-plan.md",
+      "blockId": "pp-list-table",
+      "sourceRefs": ["PLAN-04-LIST", "PLAN-05-SEQ", "PLAN-06-STATE"],
+      "order": 4
+    },
+
+    {
+      "id": "pp-mapping-rules",
+      "type": "page-global",
+      "page": "*",
+      "viewScope": ["purchase-mapping"],
+      "moduleName": "本页规则",
+      "markdownFile": "annotations/purchase/merchant-purchase-plan.md",
+      "blockId": "pp-mapping-rules",
+      "sourceRefs": ["PLAN-06-MAPPING", "PLAN-06-IGNORE", "PLAN-06-REGEN", "PLAN-06-STATE", "PLAN-08-EDGE"],
+      "order": 1
+    },
+    {
+      "id": "pp-mapping-head",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["purchase-mapping", "purchase-days", "purchase-inquiry"],
+      "moduleName": "页头与统计",
+      "target": {"selector": ".pc-detail-bar"},
+      "markdownFile": "annotations/purchase/merchant-purchase-plan.md",
+      "blockId": "pp-mapping-head",
+      "sourceRefs": ["PLAN-06-HEAD", "PLAN-07-COPY"],
+      "order": 2
+    },
+    {
+      "id": "pp-mapping-tabs",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["purchase-mapping", "purchase-days", "purchase-inquiry"],
+      "moduleName": "三个页签的分工",
+      "target": {"selector": ".pc-tabs"},
+      "markdownFile": "annotations/purchase/merchant-purchase-plan.md",
+      "blockId": "pp-mapping-tabs",
+      "sourceRefs": ["PLAN-06-STATE"],
+      "order": 3
+    },
+    {
+      "id": "pp-mapping-table",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["purchase-mapping"],
+      "moduleName": "映射表",
+      "target": {
+        "selector": ".pc-card",
+        "activationHint": "这段区间没有任何用料时不渲染卡片"
+      },
+      "markdownFile": "annotations/purchase/merchant-purchase-plan.md",
+      "blockId": "pp-mapping-table",
+      "sourceRefs": ["PLAN-06-MAPPING", "PLAN-06-IGNORE", "PLAN-06-PICK"],
+      "order": 4
+    },
+
+    {
+      "id": "pp-pick-rules",
+      "type": "page-global",
+      "page": "*",
+      "viewScope": ["purchase-pick", "purchase-pick-sku"],
+      "moduleName": "本页规则",
+      "markdownFile": "annotations/purchase/merchant-purchase-plan.md",
+      "blockId": "pp-pick-rules",
+      "sourceRefs": ["PLAN-06-PICK", "PLAN-06-MAPPING"],
+      "order": 1
+    },
+    {
+      "id": "pp-pick-body",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["purchase-pick", "purchase-pick-sku"],
+      "moduleName": "商品选择器",
+      "target": {"selector": "#mpDrawerBody"},
+      "markdownFile": "annotations/purchase/merchant-purchase-plan.md",
+      "blockId": "pp-pick-body",
+      "sourceRefs": ["PLAN-06-PICK", "PLAN-06-LAUNCH"],
+      "order": 2
+    },
+    {
+      "id": "pp-basis-body",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["purchase-basis"],
+      "moduleName": "用料依据",
+      "target": {"selector": "#mpDrawerBody"},
+      "markdownFile": "annotations/purchase/merchant-purchase-plan.md",
+      "blockId": "pp-basis-body",
+      "sourceRefs": ["PLAN-06-BASIS", "PLAN-06-DAYS"],
+      "order": 1
+    },
+
+    {
+      "id": "pp-days-rules",
+      "type": "page-global",
+      "page": "*",
+      "viewScope": ["purchase-days"],
+      "moduleName": "本页规则",
+      "markdownFile": "annotations/purchase/merchant-purchase-plan.md",
+      "blockId": "pp-days-rules",
+      "sourceRefs": ["PLAN-06-DAYS", "PLAN-08-EDGE"],
+      "order": 1
+    },
+    {
+      "id": "pp-days-bar",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["purchase-days"],
+      "moduleName": "日期切换与添加商品",
+      "target": {
+        "selector": ".pc-day-bar",
+        "activationHint": "区间内没有任何用料时整页是空态，没有日期条"
+      },
+      "markdownFile": "annotations/purchase/merchant-purchase-plan.md",
+      "blockId": "pp-days-bar",
+      "sourceRefs": ["PLAN-06-DAYS"],
+      "order": 2
+    },
+    {
+      "id": "pp-days-table",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["purchase-days"],
+      "moduleName": "明细表口径",
+      "target": {
+        "selector": ".pc-day-bar + .pp-table-wrap",
+        "fallbackSelectors": [".pc-day-table"],
+        "activationHint": "当天行数主表；下方「当日已忽略」是另一张表"
+      },
+      "markdownFile": "annotations/purchase/merchant-purchase-plan.md",
+      "blockId": "pp-days-table",
+      "sourceRefs": ["PLAN-06-DAYS"],
+      "order": 3
+    },
+    {
+      "id": "pp-days-ignored",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["purchase-days"],
+      "moduleName": "当日已忽略",
+      "target": {
+        "selector": ".pc-day-ignored",
+        "activationHint": "只有当天存在被忽略的行时才渲染"
+      },
+      "markdownFile": "annotations/purchase/merchant-purchase-plan.md",
+      "blockId": "pp-days-ignored",
+      "sourceRefs": ["PLAN-06-DAYS", "PLAN-06-IGNORE"],
+      "order": 4
+    },
+    {
+      "id": "pp-add-goods-body",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["purchase-add-goods"],
+      "moduleName": "添加手工商品",
+      "target": {"selector": "#mpDrawerBody"},
+      "markdownFile": "annotations/purchase/merchant-purchase-plan.md",
+      "blockId": "pp-add-goods-body",
+      "sourceRefs": ["PLAN-06-DAYS", "PLAN-06-PICK"],
+      "order": 1
+    },
+
+    {
+      "id": "pp-inquiry-rules",
+      "type": "page-global",
+      "page": "*",
+      "viewScope": ["purchase-inquiry"],
+      "moduleName": "本页规则",
+      "markdownFile": "annotations/purchase/merchant-purchase-plan.md",
+      "blockId": "pp-inquiry-rules",
+      "sourceRefs": ["PLAN-06-STATE", "PLAN-06-LAUNCH", "PLAN-06-INQ", "PLAN-08-EDGE"],
+      "order": 1
+    },
+    {
+      "id": "pp-inquiry-head",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["purchase-inquiry"],
+      "moduleName": "询价单页头与操作",
+      "target": {
+        "selector": ".pc-inq-head",
+        "activationHint": "还没发起询价时是空态，页头不存在"
+      },
+      "markdownFile": "annotations/purchase/merchant-purchase-plan.md",
+      "blockId": "pp-inquiry-head",
+      "sourceRefs": ["PLAN-06-INQ", "PLAN-06-CMP"],
+      "order": 2
+    },
+    {
+      "id": "pp-inquiry-summary",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["purchase-inquiry"],
+      "moduleName": "四个汇总数字",
+      "target": {"selector": ".pc-inq-summary"},
+      "markdownFile": "annotations/purchase/merchant-purchase-plan.md",
+      "blockId": "pp-inquiry-summary",
+      "sourceRefs": ["PLAN-06-INQ"],
+      "order": 3
+    },
+    {
+      "id": "pp-inquiry-board",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["purchase-inquiry"],
+      "moduleName": "供应商看板",
+      "target": {"selector": ".pc-sup-board"},
+      "markdownFile": "annotations/purchase/merchant-purchase-plan.md",
+      "blockId": "pp-inquiry-board",
+      "sourceRefs": ["PLAN-06-INQ", "PLAN-06-CMP"],
+      "order": 4
+    },
+
+    {
+      "id": "pp-launch-rules",
+      "type": "page-global",
+      "page": "*",
+      "viewScope": ["purchase-launch"],
+      "moduleName": "本页规则",
+      "markdownFile": "annotations/purchase/merchant-purchase-plan.md",
+      "blockId": "pp-launch-rules",
+      "sourceRefs": ["PLAN-06-LAUNCH", "PLAN-06-STATE", "PLAN-07-COPY"],
+      "order": 1
+    },
+    {
+      "id": "pp-launch-body",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["purchase-launch"],
+      "moduleName": "发起询价抽屉",
+      "target": {"selector": "#mpDrawerBody"},
+      "markdownFile": "annotations/purchase/merchant-purchase-plan.md",
+      "blockId": "pp-launch-body",
+      "sourceRefs": ["PLAN-06-LAUNCH"],
+      "order": 2
+    },
+
+    {
+      "id": "pp-compare-rules",
+      "type": "page-global",
+      "page": "*",
+      "viewScope": ["purchase-compare", "purchase-line-quote"],
+      "moduleName": "本页规则",
+      "markdownFile": "annotations/purchase/merchant-purchase-plan.md",
+      "blockId": "pp-compare-rules",
+      "sourceRefs": ["PLAN-06-CMP", "PLAN-07-COPY"],
+      "order": 1
+    },
+    {
+      "id": "pp-line-quote-body",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["purchase-line-quote"],
+      "moduleName": "单行报价明细",
+      "target": {"selector": ".pc-cmp"},
+      "markdownFile": "annotations/purchase/merchant-purchase-plan.md",
+      "blockId": "pp-line-quote-body",
+      "sourceRefs": ["PLAN-06-CMP"],
+      "order": 2
+    },
+
+    {
+      "id": "pp-award-rules",
+      "type": "page-global",
+      "page": "*",
+      "viewScope": ["purchase-award"],
+      "moduleName": "本页规则",
+      "markdownFile": "annotations/purchase/merchant-purchase-plan.md",
+      "blockId": "pp-award-rules",
+      "sourceRefs": ["PLAN-06-AWARD", "PLAN-06-STATE", "PLAN-07-COPY"],
+      "order": 1
+    },
+    {
+      "id": "pp-award-body",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["purchase-award"],
+      "moduleName": "定标抽屉",
+      "target": {"selector": ".pc-award-table"},
+      "markdownFile": "annotations/purchase/merchant-purchase-plan.md",
+      "blockId": "pp-award-body",
+      "sourceRefs": ["PLAN-06-AWARD"],
+      "order": 2
+    },
+    {
+      "id": "pp-award-confirm",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["purchase-award-confirm"],
+      "moduleName": "定标确认弹窗",
+      "target": {"selector": "#pcAwardMask"},
+      "markdownFile": "annotations/purchase/merchant-purchase-plan.md",
+      "blockId": "pp-award-confirm",
+      "sourceRefs": ["PLAN-06-AWARD", "PLAN-07-COPY"],
+      "order": 1
+    },
+
+    {
+      "id": "pp-overlap",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["purchase-overlap"],
+      "moduleName": "交集提醒",
+      "target": {"selector": "#pcOverlapMask"},
+      "markdownFile": "annotations/purchase/merchant-purchase-plan.md",
+      "blockId": "pp-overlap",
+      "sourceRefs": ["PLAN-05-OVERLAP", "PLAN-05-SEQ"],
+      "order": 1
+    },
+
+    {
+      "id": "pp-new-rules",
+      "type": "page-global",
+      "page": "*",
+      "viewScope": ["purchase-new"],
+      "moduleName": "本页规则",
+      "markdownFile": "annotations/purchase/merchant-purchase-plan.md",
+      "blockId": "pp-new-rules",
+      "sourceRefs": ["PLAN-05-CHECK", "PLAN-05-PREVIEW", "PLAN-05-OVERLAP"],
+      "order": 1
+    },
+    {
+      "id": "pp-new-body",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["purchase-new"],
+      "moduleName": "新建抽屉",
+      "target": {"selector": "#mpDrawerBody"},
+      "markdownFile": "annotations/purchase/merchant-purchase-plan.md",
+      "blockId": "pp-new-body",
+      "sourceRefs": ["PLAN-05-NEW", "PLAN-07-COPY"],
+      "order": 2
+    }
+  ]
+}

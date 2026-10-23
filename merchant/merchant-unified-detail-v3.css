@@ -1,1 +1,128 @@
 .umt-version-tabs{display:flex;gap:12px;padding:0 0 10px;background:#fff}.umt-version-tabs button{height:44px;padding:0 20px;border:1px solid #d9e2ed;border-radius:8px;color:#65778d;background:#fff;font-size:14px;cursor:pointer}.umt-version-tabs button.active{color:#2879f5;border-color:#76a7ff;background:#f2f7ff;font-weight:600}.umt-version-tabs span{display:inline-flex;margin-left:7px;padding:2px 7px;border-radius:10px;color:#fff;background:#ff6258;font-size:10px}.umt-version-tabs+.umt-detail-tabs{margin:0 -24px;padding-left:24px;padding-right:24px}.umt-detail-content{margin:0 -24px -20px;padding:20px 24px;min-height:560px;background:#f5f7fb}.umt-detail-content>.umt-detail-identity,.umt-detail-content>.um-section{background:#fff}.um-detail-field.full{grid-column:1/-1}
+/* 查看（菜谱详情）：数据真实化后的派生视图（用料明细两段 / 步骤卡设备时间轴 / 营养分组 / 详情宽度） */
+.umt-kind{display:inline-block;margin-left:6px;padding:1px 6px;border-radius:9px;background:#eef4ff;color:#3672d6;font-size:11px;font-style:normal}
+.umt-kind.liquid{background:#eaf7f1;color:#1f8a63}
+.umt-kind.sku{background:#fff3e2;color:#c07a15}
+.umt-process-card>header em.umt-cook-flag{margin-left:6px;padding:1px 8px;border:1px solid #f0dcb0;border-radius:9px;background:#fffaf0;color:#a8801f;font-size:11px;font-style:normal;font-weight:600}
+.umt-manual-detail p.full{grid-column:1/-1}
+.umt-model-tabs button small{display:block;margin-top:3px;color:#8d9cae;font-size:11px}
+.umt-model-tabs button.active small{color:#4b7fd6}
+.umt-derive-note{margin:10px 0 0;padding:9px 12px;border-radius:7px;background:#f7f9ff;color:#6b7891;font-size:12.5px}
+.umt-balance{display:flex;gap:12px;margin-top:12px}
+.umt-balance span{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border:1px solid #cdeada;border-radius:16px;background:#f3fbf6;color:#2f6b45;font-size:12.5px}
+.umt-balance span.proc{border-color:#eee4cf;background:#fdfbf6;color:#8a7040}
+.umt-balance b{font-weight:600}
+.umt-balance em{color:#5c7a68;font-style:normal}
+.umt-balance span.proc em{color:#8a7040}
+.umt-dup-hint{margin-top:10px;padding:9px 12px;border:1px solid #f3d9a5;border-radius:7px;background:#fff9ec;color:#96631a;font-size:12.5px}
+.umt-cook-block{margin-top:14px;border:1px solid #e2e9f2;border-radius:9px;overflow:hidden}
+.umt-cook-block>header{display:flex;align-items:center;gap:10px;padding:12px 16px;background:#f7f9fc}
+.umt-cook-block>header span{color:#8a98aa;font-size:12px}
+.umt-proc-block{margin-top:14px;border:1px solid #e7e0d2;border-radius:9px;background:#fdfbf6;overflow:hidden}
+.umt-proc-block>summary{padding:12px 16px;color:#8a7040;font-size:13px;cursor:pointer}
+.umt-proc-block>summary b{margin-left:8px}
+.umt-proc-block .umt-derive-note{background:transparent;margin:0}
+.umt-table-empty{margin-top:10px;padding:26px;border:1px dashed #d8e2ee;border-radius:8px;color:#93a2b4;text-align:center}
+.umt-dup-row td{padding:8px 12px;background:#fffaf0;color:#96631a;font-size:12px}
+.umt-nutrition .um-section{background:#fff;border:1px solid #e3eaf2;border-radius:8px;margin-top:12px;padding:16px}
+.umt-nutrition-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:10px}
+.umt-nutrition-grid div{padding:10px 12px;border-radius:7px;background:#f7f9fc}
+.umt-nutrition-grid span,.umt-nutrition-grid b{display:block}
+.umt-nutrition-grid span{color:#8293a6;font-size:12px}
+.umt-nutrition-grid b{margin-top:5px;color:#294867;font-size:14px}
+/* 详情抽屉宽度按租户端口径 min(1180px,96vw)；编辑/同步抽屉仍用 .tenant-wide 的 min(1180px,calc(100vw - 230px)) */
+.um-drawer.tenant-wide.tenant-detail{width:min(1180px,96vw)}
+@media(max-width:1000px){.um-drawer.tenant-wide.tenant-detail{width:96vw}}
+
+
+/* ===== 阶段 3：查看（菜谱详情）抽屉内部样式对齐租户端（20261010，追加区块，不改动上方既有规则） =====
+   基准来源（租户端，只读参考；数值为 1600×1000 两端同屏实测）：
+     unified-recipe-list-v2.css  .unified-version-tabs{display:flex;gap:10px;padding:14px 22px 0;background:#fff}
+                                 .unified-version-tabs button{padding:10px 16px;border:1px solid #dbe2ed;border-radius:8px;color:#617087}
+                                 .unified-version-tabs button.active{color:#2e67d5;border-color:#8fb2ff;background:#f0f5ff;font-weight:700}
+                                 .unified-version-tabs span{background:#ff685e;margin-left:6px;padding:2px 6px;border-radius:10px;font-size:10px}
+                                 .unified-detail-identity{padding:16px;gap:14px;border-radius:10px}
+                                 .unified-detail-device-config{padding:15px 17px}
+                                 .unified-detail-model-tabs{margin-top:14px;border-bottom:1px solid #dfe6ef}
+                                 .unified-detail-model-tabs button{padding:9px 13px;border:1px solid #dbe3ef;border-radius:7px 7px 0 0;color:#53637a}
+                                 .unified-detail-model-tabs button.active{color:#2868dc;border-color:#78a4f8;background:#edf4ff}
+     tenant-device-tabs.css      .device-detail-tabs{padding:0 18px;gap:8px}（按钮 padding:15px 22px）
+                                 .device-detail-section{padding:17px;border:1px solid #e1e7ef;border-radius:10px;background:#fff}
+                                 .device-detail-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}（≤900px 收 1 列）
+                                 .device-detail-field{padding:10px 12px;border-radius:7px;background:#f7f9fc}
+                                 .device-detail-field span{color:#8794a7;font-size:12px} / b{margin-top:6px;color:#29364b;font-size:13px}
+                                 .device-detail-process{gap:12px}
+                                 .device-detail-process-step{border:1px solid #e1e7ef;border-radius:10px;background:#fff}
+                                 .device-detail-process-step>header{grid-template-columns:34px 1fr auto auto;gap:10px;padding:13px 15px;border-bottom:1px solid #edf0f5}
+                                 .device-detail-manual{padding:12px 16px} / p{margin:7px 0;color:#59677b;font-size:12px;line-height:1.6}
+     ingredient-flow.css         .rif-cook-flag{display:inline-block;margin-left:8px;padding:1px 8px;border:1px solid #f0dcb0;border-radius:9px;
+                                                background:#fffaf0;color:#a8801f;font-size:11px;font-style:normal;font-weight:600;line-height:17px}
+                                 .rif-cook-flag{flex:0 0 auto;white-space:nowrap}
+                                 .rif-ro-action{padding:9px 12px;border:1px solid #eef1f7;border-radius:8px;background:#fbfcfe}
+   作用域：规则限定在 `.umt-detail-content` 内，避免误改商品中心复用的 .um-detail-grid / .um-detail-field
+   与编辑态复用的 .umt-timeline / .umt-model-tabs。 */
+.umt-version-tabs{gap:10px;padding:14px 22px 0;background:#fff}
+/* 版本切换按钮：租户端实测高 41px（padding 10px 16px + 行盒 19 + 上下描边 2）。
+   用显式 height + border-box 锁定，避免商户端字体行盒（20px）带来的 1px 偏差。 */
+.umt-version-tabs button{box-sizing:border-box;height:41px;padding:10px 16px;border:1px solid #dbe2ed;border-radius:8px;color:#617087;font-size:14px}
+.umt-version-tabs button.active{color:#2e67d5;border-color:#8fb2ff;background:#f0f5ff;font-weight:700}
+.umt-version-tabs span{display:inline-block;margin-left:6px;padding:2px 6px;border-radius:10px;color:#fff;background:#ff685e;font-size:10px}
+.umt-version-tabs+.umt-detail-tabs{margin:0;padding-left:18px;padding-right:18px}
+.umt-detail-tabs{padding:0 18px;gap:8px;border-bottom:1px solid #e4e9f1}
+.um-drawer.tenant-wide .umt-detail-tabs button{min-width:0;padding:15px 22px;color:#718096;font-size:14px;line-height:normal;white-space:nowrap}
+.um-drawer.tenant-wide .umt-detail-tabs button.active{color:#2867e8;border-bottom-color:#2867e8;font-weight:700}
+.umt-detail-content{margin:0;padding:22px;min-height:0;background:#f6f8fc}
+.umt-detail-content .um-section{margin-bottom:14px;padding:17px;border:1px solid #e1e7ef;border-radius:10px;background:#fff}
+.umt-detail-content .um-section h3{margin:0 0 14px;color:#17233a;font-size:16px}
+.umt-detail-identity{margin-bottom:14px;padding:16px;border:1px solid #dfe6f0;border-radius:10px}
+.umt-detail-identity>span{border-radius:9px;background:linear-gradient(135deg,#e6a34f,#da7d2e);color:#fff;font-size:20px;font-weight:700}
+.umt-detail-identity h3{color:#17233a;font-size:16px}
+.umt-detail-identity p{margin-top:7px;color:#8290a3;font-size:12px}
+.umt-detail-content .um-detail-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.umt-detail-content .um-detail-field{display:block;padding:10px 12px;border-radius:7px;background:#f7f9fc}
+.umt-detail-content .um-detail-field span{display:block;color:#8794a7;font-size:12px}
+.umt-detail-content .um-detail-field b{display:block;margin-top:6px;color:#29364b;font-size:13px;line-height:1.5}
+.umt-detail-process{gap:12px}
+.umt-process-card{border:1px solid #e1e7ef;border-radius:10px;background:#fff}
+.umt-process-card>header{display:grid;grid-template-columns:34px 1fr auto auto;gap:10px;align-items:center;padding:13px 15px;border-bottom:1px solid #edf0f5;background:#fff}
+.umt-process-card>header>i{color:#3475ed;background:#edf3ff}
+.umt-process-card>header span{color:#8995a7}
+.umt-process-card>header em.umt-mode{justify-self:start;margin-left:0;padding:0 8px;border-radius:999px;color:#287a55;background:#e8f7ef;font-size:11px;line-height:20px;font-weight:600}
+.umt-process-card>header em.umt-mode.device{color:#7550bd;background:#f1ebff}
+.umt-process-card>header em.umt-cook-flag{margin-left:8px;padding:1px 8px;border:1px solid #f0dcb0;border-radius:9px;background:#fffaf0;color:#a8801f;font-size:11px;font-weight:600;line-height:17px;flex:0 0 auto;white-space:nowrap}
+.umt-manual-detail{grid-template-columns:1fr;gap:0;padding:12px 16px}
+.umt-manual-detail p{margin:7px 0;color:#59677b;font-size:12px;line-height:1.6}
+.umt-model-box{padding:15px 17px}
+.umt-detail-content .umt-model-tabs{margin-top:14px;gap:0;border-bottom:1px solid #dfe6ef}
+.umt-detail-content .umt-model-tabs button{padding:9px 13px;border:1px solid #dbe3ef;border-radius:7px 7px 0 0;color:#53637a}
+.umt-detail-content .umt-model-tabs button.active{color:#2868dc;border-color:#78a4f8;background:#edf4ff}
+.umt-detail-content .umt-timeline{gap:8px}
+.umt-detail-content .umt-timeline article{padding:9px 12px;border:1px solid #eef1f7;border-radius:8px;background:#fbfcfe}
+.umt-detail-content .umt-timeline article>i{width:18px;height:18px;background:#eef3ff;color:#4f6df5;font-size:11px}
+.umt-detail-content .umt-timeline article span{color:#7b88a5;font-size:12.5px}
+.umt-detail-content .umt-timeline article p{margin:8px 0 0;color:#64738a;font-size:12px}
+@media(max-width:900px){
+  .umt-detail-content .um-detail-grid{grid-template-columns:1fr}
+}
+/* ---- 抽屉宽度：必须写在最后加载的本文件，才能压过 editor-v2.css 里的 `98vw` 回退 ----
+   租户端 6 档视口实测（1600 / 1280 / 1000 / 950 / 900 / 650）：
+     查看 = min(1180px,96vw)           → 1180 / 1180 / 960 / 912 / 864 / 624
+     编辑 = min(1180px,100vw - 230px)  → 1180 / 1050 / 770 / 720 / 670 / 420
+   注意两个已知坑（实测踩到过）：
+   1) 原商户端 `@media(max-width:1000px){.um-drawer.tenant-wide{width:98vw}}` 在 ≤1210px 时比租户端宽约 210px
+      （1000 视口：商户 980 / 租户 770），此处按实测值改写；
+   2) 本文件原有的 `.um-drawer.tenant-wide.tenant-detail{width:min(1180px,96vw)}` 优先级是 (0,3,0)，
+      而 JS 给「查看」抽屉加的 tenant-detail 类关闭后不会摘掉、会残留到「编辑」抽屉上（未改 JS），
+      于是「查看 → 关闭 → 新建」这条路径下编辑抽屉会被这条规则顶成 96vw（1280 视口实测 1180，应为 1050）。
+      所以这里用 :has() 的内容判别（查看含 .umt-detail-content、编辑含 .umt-editor-root）+ 显式
+      `.tenant-detail:not(:has(.umt-detail-content))` 兜底，三档都给出 (0,3,0) 以上优先级且写在最后。 */
+.um-drawer.tenant-wide{width:min(1180px,calc(100vw - 230px))}
+.um-drawer.tenant-wide:has(.umt-detail-content){width:min(1180px,96vw)}
+.um-drawer.tenant-wide.tenant-detail:not(:has(.umt-detail-content)){width:min(1180px,calc(100vw - 230px))}
+.um-drawer.tenant-wide:has(.umt-editor-root){width:min(1180px,calc(100vw - 230px))}
+@media(max-width:1000px){
+  .um-drawer.tenant-wide{width:min(1180px,calc(100vw - 230px))}
+  .um-drawer.tenant-wide:has(.umt-detail-content){width:min(1180px,96vw)}
+  .um-drawer.tenant-wide.tenant-detail:not(:has(.umt-detail-content)){width:min(1180px,calc(100vw - 230px))}
+  .um-drawer.tenant-wide:has(.umt-editor-root){width:min(1180px,calc(100vw - 230px))}
+}

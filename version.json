@@ -1,23 +1,33 @@
 {
-    "publishedAt":  "2026-09-24 14:41",
-    "publishLabel":  "租户端与商户端：菜谱标签与字典去掉「字典编码」列与工艺名称下方编号（刷新静态资源版本号，避免浏览器继续用缓存里的旧脚本）",
-    "tenantSourceAt":  "2026-09-24 14:41",
-    "merchantSourceAt":  "2026-09-24 14:41",
+    "publishedAt":  "2026-10-23 10:17",
+    "publishLabel":  "商户端：新增采购计划、档口管理与供应商管理，更新排餐/生产计划；租户端：新增供应商管理，更新统一菜谱用料流程",
+    "tenantSourceAt":  "2026-10-22 15:21",
+    "merchantSourceAt":  "2026-10-23 09:08",
     "opsysSourceAt":  "2026-09-24 10:59",
     "changes":  {
                     "tenant":  {
                                    "modules":  [
-                                                   "入口页"
+                                                   "业务标注",
+                                                   "统一菜谱",
+                                                   "前端构建产物",
+                                                   "商品中心",
+                                                   "供应商管理",
+                                                   "统一菜谱编辑"
                                                ],
-                                   "moreCount":  0,
-                                   "fileCount":  1
+                                   "moreCount":  4,
+                                   "fileCount":  25
                                },
                     "merchant":  {
                                      "modules":  [
-
+                                                     "业务标注",
+                                                     "merchant-mobile",
+                                                     "档口管理",
+                                                     "餐次计划",
+                                                     "组织范围切换",
+                                                     "采购计划"
                                                  ],
-                                     "moreCount":  0,
-                                     "fileCount":  0
+                                     "moreCount":  9,
+                                     "fileCount":  44
                                  },
                     "opsys":  {
                                   "modules":  [

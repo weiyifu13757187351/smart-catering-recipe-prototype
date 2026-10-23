@@ -1,1 +1,75 @@
 .unified-merchant-page{padding:24px 28px}.um-card{background:#fff;border:1px solid #e4eaf2;border-radius:12px;box-shadow:0 4px 18px rgba(39,70,108,.05)}.um-head{display:flex;align-items:flex-start;padding:24px 26px 18px}.um-head h1{margin:0;color:#17385f;font-size:24px}.um-head p{margin:7px 0 0;color:#8393a7;font-size:13px}.um-actions{display:flex;gap:10px;margin-left:auto}.um-primary,.um-secondary{height:38px;padding:0 16px;border-radius:6px;cursor:pointer}.um-primary{border:1px solid #2879f5;color:#fff;background:#2879f5}.um-secondary{border:1px solid #dbe4ef;color:#536b86;background:#fff}.um-sync{position:relative}.um-bubble{display:inline-grid;place-items:center;min-width:18px;height:18px;margin-left:6px;padding:0 5px;border-radius:9px;color:#fff;background:#ff5b5b;font-size:11px}.um-org-note{margin:0 26px 16px;padding:11px 14px;border:1px solid #d9e8fc;border-radius:6px;color:#537090;background:#f4f8fe;font-size:13px}.um-filters{display:flex;flex-wrap:wrap;gap:10px;padding:0 26px 16px}.um-filters input,.um-filters select,.um-more-filters input,.um-more-filters select{box-sizing:border-box;height:38px;padding:0 11px;border:1px solid #dce5ef;border-radius:6px;color:#53677f;background:#fff}.um-filters input{width:290px}.um-more-filters{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:0 26px 16px;padding:14px;border-radius:8px;background:#f7f9fc}.um-more-filters label{display:grid;gap:6px;color:#75879b;font-size:12px}.um-table-wrap{overflow-x:auto;padding:0 26px 24px}.um-table{width:100%;min-width:1320px;border-collapse:collapse}.um-table th{padding:12px 10px;color:#71849b;background:#f7f9fc;text-align:left;font-size:12px;font-weight:500}.um-table td{padding:12px 10px;border-bottom:1px solid #edf1f6;color:#425a75;font-size:13px;vertical-align:middle}.um-dish{display:flex;align-items:center;gap:10px}.um-thumb{display:grid;place-items:center;width:44px;height:44px;border-radius:9px;color:#2879f5;background:#eaf3ff;font-size:12px}.um-dish b,.um-dish small,.um-update-cell small{display:block}.um-dish b{color:#274666;font-size:14px}.um-dish small,.um-update-cell small{margin-top:5px;color:#96a4b4}.um-tag,.um-status,.um-process{display:inline-flex;padding:4px 9px;border-radius:12px;font-size:12px}.um-tag.tenant{color:#7650d5;background:#f0eaff}.um-tag.self{color:#2479cf;background:#e8f4ff}.um-process.device{color:#7960d5;background:#f0ebff}.um-process.manual{color:#4f718f;background:#eef3f7}.um-status.up{color:#15855e;background:#e6f7ef}.um-status.draft{color:#2879f5;background:#e9f2ff}.um-status.down{color:#b36b13;background:#fff2dc}.um-label-count{color:#2879f5;border-bottom:1px dashed #2879f5;cursor:help}.um-version-alert{display:inline-block;margin-top:5px;padding:2px 6px;border-radius:9px;color:#df7a19;background:#fff0dc;font-size:11px}.um-ops{display:flex;gap:9px;white-space:nowrap}.um-link{padding:0;border:0;color:#2879f5;background:none;cursor:pointer}.um-link.danger{color:#e75b5b}.um-empty{padding:70px;text-align:center;color:#94a3b5}.um-hub{padding:26px}.um-hub-banner{display:flex;align-items:center;margin-top:18px;padding:22px;border-radius:9px;color:#fff;background:linear-gradient(120deg,#246fe5,#5798ff)}.um-hub-banner h2{margin:0 0 7px;font-size:19px}.um-hub-banner p{margin:0;opacity:.88}.um-hub-banner i{margin-left:auto;font-size:36px;font-style:normal}.um-hub-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px}.um-hub-entry{display:flex;align-items:center;gap:14px;padding:22px;border:1px solid #e2e9f2;border-radius:9px;text-align:left;background:#fff;cursor:pointer}.um-hub-entry:hover{border-color:#86b2ff;box-shadow:0 6px 18px rgba(42,103,189,.1)}.um-hub-entry>i{display:grid;place-items:center;width:46px;height:46px;border-radius:10px;color:#2678ff;background:#eaf3ff;font-size:22px;font-style:normal}.um-hub-entry b,.um-hub-entry small{display:block}.um-hub-entry b{color:#314967;font-size:16px}.um-hub-entry small{margin-top:6px;color:#8494a8}.um-hub-entry em{margin-left:auto;color:#2678ff;font-size:12px;font-style:normal}.um-back{margin-bottom:14px}.um-mask{position:fixed;inset:0;z-index:2200;display:none;background:rgba(18,35,55,.42)}.um-mask.show{display:block}.um-drawer{position:absolute;top:0;right:0;display:flex;flex-direction:column;width:min(960px,92vw);height:100%;background:#fff;box-shadow:-10px 0 28px rgba(16,39,66,.14)}.um-drawer-head{display:flex;padding:20px 24px;border-bottom:1px solid #e8edf4}.um-drawer-head h2{margin:0;color:#193b62}.um-drawer-head p{margin:6px 0 0;color:#8696aa}.um-close{margin-left:auto;border:0;color:#71849b;background:none;font-size:26px;cursor:pointer}.um-drawer-body{overflow:auto;flex:1;padding:20px 24px}.um-drawer-foot{display:flex;align-items:center;gap:10px;padding:14px 24px;border-top:1px solid #e8edf4}.um-spacer{flex:1}.um-sync-layout{display:grid;grid-template-columns:190px 1fr;gap:18px}.um-category-side{padding:12px;border:1px solid #e2e9f2;border-radius:8px}.um-category-side h3{margin:4px 6px 12px;color:#385571;font-size:14px}.um-category-side button{display:block;width:100%;padding:9px;border:0;border-radius:5px;text-align:left;color:#60758c;background:none;cursor:pointer}.um-category-side button.active{color:#2879f5;background:#eaf3ff}.um-sync-tools{display:flex;gap:9px;margin-bottom:12px}.um-sync-tools input,.um-sync-tools select{height:38px;padding:0 10px;border:1px solid #dce5ef;border-radius:6px}.um-sync-tools input{flex:1}.um-select-summary{margin-bottom:10px;color:#71849b}.um-select-summary b{color:#2879f5}.um-sync-row{display:grid;grid-template-columns:30px 1.5fr 1fr 100px 1.2fr 54px;gap:10px;align-items:center;padding:12px;border-bottom:1px solid #edf1f6;color:#526980;font-size:12px}.um-sync-row.head{color:#71849b;background:#f7f9fc}.um-sync-row strong{display:block;color:#294965}.um-sync-row small{display:block;margin-top:4px;color:#95a3b3}.um-section{margin-bottom:18px;padding:17px;border:1px solid #e3e9f1;border-radius:8px}.um-section h3{margin:0 0 14px;color:#294967}.um-detail-grid,.um-edit-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}.um-detail-field,.um-edit-grid label{display:grid;gap:6px}.um-detail-field span,.um-edit-grid label{color:#8292a5;font-size:12px}.um-detail-field b{color:#354f6b}.um-edit-grid input,.um-edit-grid select,.um-edit-grid textarea{box-sizing:border-box;width:100%;padding:9px;border:1px solid #dce5ef;border-radius:5px;color:#3f5872;background:#fff}.um-edit-grid .full{grid-column:1/-1}.um-category-layout{display:grid;grid-template-columns:220px 1fr;gap:18px;padding:24px}.um-category-tree{border-right:1px solid #e7edf4}.um-category-tree h3{margin:0 0 16px}.um-category-parent{margin-top:12px;color:#294967;font-weight:600}.um-category-child{padding:8px 18px;color:#708299}.um-readonly-note{padding:12px 14px;border:1px solid #d9e8fc;border-radius:6px;color:#537090;background:#f4f8fe}.um-category-main table{width:100%;margin-top:15px;border-collapse:collapse}.um-category-main th,.um-category-main td{padding:12px;border-bottom:1px solid #edf1f6;text-align:left;color:#536a82;font-size:13px}.um-category-main th{background:#f7f9fc;color:#71849b}.um-toast{position:fixed;z-index:3000;left:50%;bottom:36px;transform:translateX(-50%);padding:11px 20px;border-radius:6px;color:#fff;background:#263b54;box-shadow:0 8px 24px rgba(0,0,0,.2)}@media(max-width:900px){.um-more-filters{grid-template-columns:1fr 1fr}.um-hub-grid,.um-sync-layout,.um-category-layout{grid-template-columns:1fr}.um-category-tree{border-right:0;border-bottom:1px solid #e7edf4;padding-bottom:12px}}
+
+/* ===== 菜谱分类：计入就餐人数开关 ===== */
+.um-category-main table th:last-child,.um-category-main table td:last-child{width:150px;white-space:nowrap}
+.um-switch{display:inline-flex;align-items:center;gap:7px;padding:0;border:0;background:none;cursor:pointer;color:#8b9bad;font-size:12px}
+.um-switch i{position:relative;width:36px;height:20px;border-radius:10px;background:#d6dfeb;transition:background .18s}
+.um-switch i:after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(28,50,80,.2);transition:left .18s}
+.um-switch.on{color:#1f7a52}
+.um-switch.on i{background:#38b183}
+.um-switch.on i:after{left:18px}
+.um-switch:hover i{filter:brightness(1.04)}
+.um-cat-sum{color:#7b8ba0;font-size:12px}
+.um-cat-sum.all{color:#1f7a52}
+.um-cat-sum.none{color:#b57a1f}
+.um-cat-foot{margin:12px 0 0;color:#8797aa;font-size:12px}
+.um-cat-foot b{color:#536a85}
+.um-cat-off{margin-left:6px;padding:1px 6px;border-radius:8px;background:#fff4e0;color:#b57a1f;font-size:10px;font-style:normal}
+
+/* ===== 阶段 3：查看 / 编辑 抽屉壳层样式对齐租户端（20261010，追加区块，不改动上方既有规则） =====
+   基准来源（租户端，只读参考，实测 1600×1000 两端同屏）：
+     styles.css                          .modal-card{padding:0 25px} / .modal-head{height:82px}
+     editor.css                          .editor-footer{padding:15px 24px}
+     tenant-device-center.css            .recipe-modal{height:100vh} / .recipe-modal-body{min-height:0;flex:1}
+     unified-recipe-ingredient-flow.css  #unifiedRecipeDetail .recipe-modal-head{height:82px;padding:0 25px}
+                                         #unifiedRecipeDetail .recipe-modal-foot{height:72px;padding:15px 24px}
+   实测：租户端「查看」与「新建 / 编辑」两态头部均 82px、底部均 72px、左右内边距 25px / 24px；
+        抽屉高度 = 100vh（1000 视口下 1000px），商户端原为 .um-drawer{height:100%} 的 985px（视口扣除滚动条，差 15px）。
+   作用域限定 `.um-drawer.tenant-wide`：只有菜谱「查看」与「新建 / 编辑」两个抽屉加该类，
+   不影响菜谱「同步」抽屉、选择用料 / 外语菜谱名 / 设备操作步骤子抽屉，也不影响商品中心 `#pcMask` 抽屉。 */
+.um-drawer.tenant-wide{box-sizing:border-box;height:100vh}
+/* 商户端列表页本身带页面滚动条，`#umMask{position:fixed;inset:0}` 会被扣掉 15px（实测 1585×985），
+   导致抽屉右侧留 15px 缝、底部超出一截；租户端同视口下无此差（1600×1000）。
+   这里把遮罩按视口尺寸撑满，抽屉即可与租户端一样贴右、通高。只影响 #umMask，不影响其它 .um-mask。 */
+#umMask{width:100vw;height:100vh}
+/* 抽屉内基准文字色：租户端 styles.css `:root{--text:#17233d}`，抽屉内所有未显式指定颜色的文字
+   （头部 / 页签条 / 底部 / 版本页签条）都继承 rgb(23,35,61)；其 border-bottom-color 未另设时取 currentColor。
+   商户端原继承色是 rgb(36,59,97)，此处按租户端基准色对齐，一次同时修正 .color 与 .borderBottomColor。 */
+.um-drawer.tenant-wide{color:#17233d}
+/* 表单控件字体：租户端 styles.css 有全局 `button,input,select{font:inherit}`，商户端缺这一行，
+   于是抽屉内的 button/input/select 全部回落到 Chrome UA 默认的 Arial 13.3333px，而不是像租户端那样继承页面字体
+   （"Microsoft YaHei","PingFang SC",Arial,sans-serif / 13px）。直接造成两处实测差：
+   页签行盒 20px（租户端 19px）、基础信息输入框高 35px（租户端 37px）。这里按同一口径补回；
+   用 :where() 只保留 .um-drawer.tenant-wide 的 (0,2,0) 优先级，任何带类名的既有规则
+   （如 .um-close 的 24px、各 .umt-* 输入框规则）依旧优先，不会顶掉既有字号 / 字色。 */
+.um-drawer.tenant-wide :where(button,input,select,textarea){font:inherit}
+.um-drawer.tenant-wide .um-drawer-head{box-sizing:border-box;height:82px;padding:0 25px;align-items:center;border-bottom-color:#e7ebf3}
+.um-drawer.tenant-wide .um-drawer-head h2{margin:0 0 6px;color:#17233a;font-size:16.4px;font-weight:700}
+.um-drawer.tenant-wide .um-drawer-head p{margin:0;color:#7b88a5;font-size:12px}
+.um-drawer.tenant-wide .um-drawer-head .um-close{font-size:24px;line-height:1;color:#718096}
+.um-drawer.tenant-wide .um-drawer-body{padding:0}
+.um-drawer.tenant-wide .um-drawer-foot{box-sizing:border-box;height:72px;padding:15px 24px;border-top-color:#e7ebf3}
+/* 查看态头部/底部描边用租户端详情覆盖值 #e6ebf3（编辑态用 var(--line)=#e7ebf3） */
+.um-drawer.tenant-wide:has(.umt-detail-content) .um-drawer-head{border-bottom-color:#e6ebf3}
+.um-drawer.tenant-wide:has(.umt-detail-content) .um-drawer-foot{border-top-color:#e6ebf3}
+/* 只读 / 失效提示横幅：数值照搬租户端 dishes.css `.readonly-banner`。
+   说明：租户端「查看 / 新建 / 编辑」统一流程里并不渲染 .readonly-banner（探针实测命中 0 个），
+   商户端抽屉内同用途的是 .umt-invalid-note，其数值与租户端 unified-recipe-editor-v2.css
+   `.dict-invalid-note` 已逐项一致，故此处只对抽屉作用域做口径兜底，当前无元素命中。 */
+.um-drawer.tenant-wide .readonly-banner{padding:12px 14px;background:#fff8e9;border:1px solid #f1e1bd;border-radius:8px;color:#96713c;font-size:11px;margin-bottom:15px}
+/* 抽屉宽（租户端 6 档视口实测 1600 / 1280 / 1000 / 950 / 900 / 650）：
+     查看 = min(1180px,96vw)              → 1180 / 1180 / 960 / 912 / 864 / 624
+     编辑 = min(1180px,100vw - 230px)     → 1180 / 1050 / 770 / 720 / 670 / 420
+   说明：租户端 dishes.css `@media(max-width:950px){.dish-drawer{width:100%}}` 会被
+   `.dish-drawer:has(.unified-recipe-editor-root){width:min(1180px,calc(100vw - 230px))}`（优先级更高）
+   与 `#unifiedRecipeDetail .device-detail-drawer{width:min(1180px,96vw)}`（含 id 选择器）压过，
+   实测 950 / 900 / 650 三档都不会变成 100%；因此这里照搬「实测行为」，用 :has() 按内容区分查看态。
+   注意：宽度规则**不能**写在本文件（recipe-v1.css 先加载），否则会被 editor-v2.css 里原有的
+   `@media(max-width:1000px){.um-drawer.tenant-wide{width:98vw}}` 覆盖；实际写在最后加载的
+   merchant-unified-detail-v3.css 末尾，并在那里改写该 98vw 回退（原回退在 ≤1210px 时比租户端宽约 210px）。 */
+
+/* 同步菜谱前置校验（SKU 商品未同步时拦截）：命中菜谱行置灰 + 行内原因行。
+   抽屉顶部不再放汇总提示条（篇幅过大）；SKU 未就绪只在对应菜谱行内说明。 */
+.um-sync-row.is-blocked{color:#93a1b1;background:#fafbfd}
+.um-sync-row.is-blocked strong{color:#93a1b1}
+.um-sync-block{grid-column:1/-1;margin-top:9px;padding:7px 10px;border-radius:5px;color:#a8562a;background:#fff4ee;font-size:12px;line-height:1.6}

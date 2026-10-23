@@ -22,11 +22,11 @@
   const statusMap={development:['开发中','dev'],archived:['已存档',''],disabled:['已停用','off']};
   function ensurePage(){
     if(!$('deviceRecipeNav'))$('dishCategoryNav').insertAdjacentHTML('afterend','<div class="nav-child" id="deviceRecipeNav"><span>设备菜谱</span></div>');
-    if(!$('deviceRecipePage')){const page=document.createElement('section');page.id='deviceRecipePage';page.hidden=true;document.querySelector('main').appendChild(page)}
+    if(!$('deviceRecipePage')){const page=document.createElement('section');page.id='deviceRecipePage';page.className='page-view';page.hidden=true;document.querySelector('main').appendChild(page)}
     $('deviceRecipeNav').addEventListener('click',event=>{event.stopImmediatePropagation();show()},true);
     document.querySelectorAll('.nav-child').forEach(nav=>{if(nav!==$('deviceRecipeNav'))nav.addEventListener('click',()=>{$('deviceRecipePage').hidden=true},true)});
   }
-  function hideOthers(){['organizationPage','rolesPage','adminsPage','usersPage','recipePage','dishCategoryPage'].forEach(id=>{if($(id))$(id).hidden=true});document.querySelectorAll('.nav-child').forEach(item=>item.classList.toggle('active',item===$('deviceRecipeNav')))}
+  function hideOthers(){document.querySelectorAll('.page-view').forEach(x=>{x.hidden=true});['organizationPage','rolesPage','adminsPage','usersPage','recipePage','dishCategoryPage'].forEach(id=>{if($(id))$(id).hidden=true});document.querySelectorAll('.nav-child').forEach(item=>item.classList.toggle('active',item===$('deviceRecipeNav')))}
   function show(){hideOthers();$('deviceRecipePage').hidden=false;render();document.querySelector('.breadcrumb').innerHTML='菜谱中心&nbsp; / &nbsp;<strong>设备菜谱</strong>'}
   function shell(){return `<section class="card device-page"><div class="device-head"><div><h1>设备菜谱</h1><p>查看租户授权设备菜谱，维护商户自建设备菜谱</p></div><div class="device-head-actions"><button id="createDeviceRecipe" class="device-primary">+ 新建设备菜谱</button></div></div><div class="device-banner">商户可使用租户授权设备菜谱，也可基于有效标准菜谱、有效设备型号和租户设备菜谱字典自建。</div><div id="devicePanel" class="device-panel"></div></section>`}
   function render(){const page=$('deviceRecipePage');page.innerHTML=shell();renderLibrary();$('createDeviceRecipe').onclick=()=>window.openMerchantNativeDeviceEditor()}

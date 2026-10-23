@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "title": "租户端菜谱管理与授权业务标注",
+  "title": "租户端菜谱管理与供应商管理业务标注",
   "scope": "tenant-recipe-management",
   "sourceBase": "..",
   "output": "../annotation-kit/annotation.bundle.json",
@@ -33,7 +33,12 @@
       "recipe-auth-create-2": "新建授权 / 选择商户",
       "recipe-auth-create-3": "新建授权 / 授权确认",
       "recipe-auth-preview": "新建授权 / 菜谱预览",
-      "recipe-auth-detail": "授权详情"
+      "recipe-auth-detail": "授权详情",
+      "supplier-list": "供应商管理",
+      "supplier-create": "新建供应商",
+      "supplier-edit": "编辑供应商",
+      "supplier-coop": "建立供应商合作",
+      "supplier-detail": "供应商详情"
     }
   },
   "mermaid": {
@@ -67,7 +72,24 @@
     {"id": "REQ-23-BOUNDARY", "source": "../租户端菜谱管理与授权PRD.md#14. 第一期不包含", "page": "租户端菜谱管理"},
     {"id": "REQ-24-DICT-CODE", "source": "../租户端菜谱管理与授权PRD.md#10.7 字典编码规则", "page": "菜谱标签与字典"},
     {"id": "REQ-25-DICT-CASCADE", "source": "../租户端菜谱管理与授权PRD.md#10.6 停用与删除", "page": "菜谱标签与字典"},
-    {"id": "REQ-26-DICT-IMPACT", "source": "../租户端菜谱管理与授权PRD.md#10.6 停用与删除", "page": "租户端菜谱管理"}
+    {"id": "REQ-26-DICT-IMPACT", "source": "../租户端菜谱管理与授权PRD.md#10.6 停用与删除", "page": "租户端菜谱管理"},
+    {"id": "REQ-27-V2-PROCESS", "source": "../租户端菜谱管理-加工步骤与用料明细变更说明PRD.md#3 加工步骤变更", "page": "租户端菜谱编辑"},
+    {"id": "REQ-28-V2-INGREDIENT", "source": "../租户端菜谱管理-加工步骤与用料明细变更说明PRD.md#4 用料明细变更", "page": "租户端菜谱编辑"},
+    {"id": "REQ-29-V2-VALIDATE", "source": "../租户端菜谱管理-加工步骤与用料明细变更说明PRD.md#5 校验与提交变更", "page": "租户端菜谱编辑"},
+    {"id": "REQ-30-V2-READONLY", "source": "../租户端菜谱管理-加工步骤与用料明细变更说明PRD.md#7 影响与联动", "page": "菜谱详情"},
+    {"id": "SUP-01-LIST", "source": "租户端供应商管理PRD.md#6. 列表页", "page": "供应商管理"},
+    {"id": "SUP-02-PRINCIPLE", "source": "租户端供应商管理PRD.md#1. 背景与目标", "page": "供应商管理"},
+    {"id": "SUP-03-FILTER", "source": "租户端供应商管理PRD.md#6. 列表页", "page": "供应商管理"},
+    {"id": "SUP-04-ROWS", "source": "租户端供应商管理PRD.md#6. 列表页", "page": "供应商管理"},
+    {"id": "SUP-05-CREATE", "source": "租户端供应商管理PRD.md#7. 新建供应商", "page": "新建供应商"},
+    {"id": "SUP-06-LIC", "source": "租户端供应商管理PRD.md#5. 关键规则", "page": "新建供应商"},
+    {"id": "SUP-07-ACCOUNT", "source": "租户端供应商管理PRD.md#5. 关键规则", "page": "供应商管理"},
+    {"id": "SUP-08-TYPES", "source": "租户端供应商管理PRD.md#5. 关键规则", "page": "供应商管理"},
+    {"id": "SUP-09-MERCHANTS", "source": "租户端供应商管理PRD.md#5. 关键规则", "page": "供应商管理"},
+    {"id": "SUP-10-DETAIL", "source": "租户端供应商管理PRD.md#8. 详情抽屉（可编辑性矩阵）", "page": "供应商详情"},
+    {"id": "SUP-11-CROSS", "source": "租户端供应商管理PRD.md#10. 跨租户口径", "page": "供应商管理"},
+    {"id": "SUP-12-SCOPE", "source": "租户端供应商管理PRD.md#附录A 与商户端供应商管理的关系", "page": "供应商管理"},
+    {"id": "SUP-13-OPEN", "source": "租户端供应商管理PRD.md#13. 待确认", "page": "供应商管理"}
   ],
   "annotations": [
     {"id": "hub-scope", "type": "page-global", "page": "*", "viewScope": ["recipe-hub"], "moduleName": "菜谱管理工作台", "markdownFile": "annotations/tenant-recipe-management.md", "sourceRefs": ["REQ-02-HUB", "REQ-01-SCOPE"]},
@@ -78,17 +100,17 @@
     {"id": "list-table", "type": "element", "page": "*", "viewScope": ["recipe-list"], "moduleName": "列表字段与特殊标记", "target": {"selector": ".unified-recipe-table-scroll"}, "markdownFile": "annotations/tenant-recipe-management.md", "sourceRefs": ["REQ-05-LIST-TABLE", "REQ-26-DICT-IMPACT"]},
     {"id": "list-actions", "type": "element", "page": "*", "viewScope": ["recipe-list"], "moduleName": "行操作与状态机", "target": {"selector": "#myDishBody"}, "markdownFile": "annotations/tenant-recipe-management.md", "sourceRefs": ["REQ-06-LIST-ACTION", "REQ-01-SCOPE"]},
 
-    {"id": "editor-submit", "type": "page-global", "page": "*", "viewScope": ["recipe-create-basic", "recipe-create-ingredients", "recipe-create-process", "recipe-edit-basic", "recipe-edit-ingredients", "recipe-edit-process"], "moduleName": "新建与编辑：抽屉、提交与版本", "markdownFile": "annotations/tenant-recipe-management.md", "sourceRefs": ["REQ-09-EDITOR", "REQ-14-SUBMIT", "REQ-26-DICT-IMPACT"]},
+    {"id": "editor-submit", "type": "page-global", "page": "*", "viewScope": ["recipe-create-basic", "recipe-create-ingredients", "recipe-create-process", "recipe-edit-basic", "recipe-edit-ingredients", "recipe-edit-process"], "moduleName": "新建与编辑：抽屉、提交与版本", "markdownFile": "annotations/tenant-recipe-management.md", "sourceRefs": ["REQ-09-EDITOR", "REQ-14-SUBMIT", "REQ-26-DICT-IMPACT", "REQ-29-V2-VALIDATE"]},
     {"id": "editor-basic", "type": "element", "page": "*", "viewScope": ["recipe-create-basic", "recipe-edit-basic"], "moduleName": "基础信息字段", "target": {"selector": "#dishDrawerMask .device-basic-section"}, "markdownFile": "annotations/tenant-recipe-management.md", "sourceRefs": ["REQ-10-EDITOR-BASIC", "REQ-26-DICT-IMPACT"]},
-    {"id": "editor-ingredients", "type": "element", "page": "*", "viewScope": ["recipe-create-ingredients", "recipe-edit-ingredients"], "moduleName": "用料明细字段", "target": {"selector": "#dishDrawerMask .device-ingredient-section"}, "markdownFile": "annotations/tenant-recipe-management.md", "sourceRefs": ["REQ-11-EDITOR-INGREDIENT"]},
-    {"id": "editor-process", "type": "element", "page": "*", "viewScope": ["recipe-create-process", "recipe-edit-process"], "moduleName": "加工步骤：人工处理与设备加工", "target": {"selector": "#dishDrawerMask .recipe-process-workspace"}, "markdownFile": "annotations/tenant-recipe-management.md", "sourceRefs": ["REQ-12-EDITOR-PROCESS"]},
+    {"id": "editor-ingredients", "type": "element", "page": "*", "viewScope": ["recipe-create-ingredients", "recipe-edit-ingredients"], "moduleName": "用料明细（由加工步骤自动汇总）", "target": {"selector": "#dishDrawerMask .device-ingredient-section"}, "markdownFile": "annotations/tenant-recipe-management.md", "sourceRefs": ["REQ-11-EDITOR-INGREDIENT", "REQ-28-V2-INGREDIENT"]},
+    {"id": "editor-process", "type": "element", "page": "*", "viewScope": ["recipe-create-process", "recipe-edit-process"], "moduleName": "加工步骤：人工处理与设备加工", "target": {"selector": "#dishDrawerMask .recipe-process-workspace"}, "markdownFile": "annotations/tenant-recipe-management.md", "sourceRefs": ["REQ-12-EDITOR-PROCESS", "REQ-27-V2-PROCESS", "REQ-28-V2-INGREDIENT"]},
     {"id": "editor-actions", "type": "element", "page": "*", "viewScope": ["recipe-create-basic", "recipe-create-ingredients", "recipe-create-process", "recipe-edit-basic", "recipe-edit-ingredients", "recipe-edit-process"], "moduleName": "保存草稿与提交", "target": {"selector": "#dishDrawerMask .editor-footer"}, "markdownFile": "annotations/tenant-recipe-management.md", "sourceRefs": ["REQ-14-SUBMIT", "REQ-09-EDITOR"]},
-    {"id": "editor-operation", "type": "element", "page": "*", "viewScope": ["editor-operation"], "moduleName": "设备操作步骤编辑抽屉", "target": {"selector": "#unifiedOperationMask"}, "markdownFile": "annotations/tenant-recipe-management.md", "sourceRefs": ["REQ-13-EDITOR-OPERATION"]},
+    {"id": "editor-operation", "type": "element", "page": "*", "viewScope": ["editor-operation"], "moduleName": "设备操作步骤编辑抽屉", "target": {"selector": "#unifiedOperationMask"}, "markdownFile": "annotations/tenant-recipe-management.md", "sourceRefs": ["REQ-13-EDITOR-OPERATION", "REQ-27-V2-PROCESS"]},
 
-    {"id": "detail-rules", "type": "page-global", "page": "*", "viewScope": ["recipe-detail-basic", "recipe-detail-ingredients", "recipe-detail-process", "recipe-detail-nutrition"], "moduleName": "菜谱详情：结构与版本处理", "markdownFile": "annotations/tenant-recipe-management.md", "sourceRefs": ["REQ-15-DETAIL", "REQ-16-VERSION"]},
+    {"id": "detail-rules", "type": "page-global", "page": "*", "viewScope": ["recipe-detail-basic", "recipe-detail-ingredients", "recipe-detail-process", "recipe-detail-nutrition"], "moduleName": "菜谱详情：结构与版本处理", "markdownFile": "annotations/tenant-recipe-management.md", "sourceRefs": ["REQ-15-DETAIL", "REQ-16-VERSION", "REQ-30-V2-READONLY"]},
     {"id": "detail-basic", "type": "element", "page": "*", "viewScope": ["recipe-detail-basic"], "moduleName": "基础信息（详情）", "target": {"selector": "#unifiedDetailContent"}, "markdownFile": "annotations/tenant-recipe-management.md", "sourceRefs": ["REQ-15-DETAIL", "REQ-26-DICT-IMPACT"]},
-    {"id": "detail-ingredients", "type": "element", "page": "*", "viewScope": ["recipe-detail-ingredients"], "moduleName": "用料明细（详情）", "target": {"selector": "#unifiedDetailContent"}, "markdownFile": "annotations/tenant-recipe-management.md", "sourceRefs": ["REQ-15-DETAIL"]},
-    {"id": "detail-process", "type": "element", "page": "*", "viewScope": ["recipe-detail-process"], "moduleName": "加工步骤（详情）", "target": {"selector": "#unifiedDetailContent"}, "markdownFile": "annotations/tenant-recipe-management.md", "sourceRefs": ["REQ-15-DETAIL"]},
+    {"id": "detail-ingredients", "type": "element", "page": "*", "viewScope": ["recipe-detail-ingredients"], "moduleName": "用料明细（详情）", "target": {"selector": "#unifiedDetailContent"}, "markdownFile": "annotations/tenant-recipe-management.md", "sourceRefs": ["REQ-15-DETAIL", "REQ-28-V2-INGREDIENT", "REQ-30-V2-READONLY"]},
+    {"id": "detail-process", "type": "element", "page": "*", "viewScope": ["recipe-detail-process"], "moduleName": "加工步骤（详情）", "target": {"selector": "#unifiedDetailContent"}, "markdownFile": "annotations/tenant-recipe-management.md", "sourceRefs": ["REQ-15-DETAIL", "REQ-30-V2-READONLY"]},
     {"id": "detail-nutrition", "type": "element", "page": "*", "viewScope": ["recipe-detail-nutrition"], "moduleName": "营养预览（详情）", "target": {"selector": "#unifiedDetailContent"}, "markdownFile": "annotations/tenant-recipe-management.md", "sourceRefs": ["REQ-15-DETAIL", "REQ-22-EDGE"]},
 
     {"id": "category-rules", "type": "page-global", "page": "*", "viewScope": ["recipe-categories"], "moduleName": "分类管理本页规则", "markdownFile": "annotations/tenant-recipe-management.md", "sourceRefs": ["REQ-17-CATEGORY", "REQ-22-EDGE"]},
@@ -111,6 +133,20 @@
     {"id": "auth-detail-rules", "type": "page-global", "page": "*", "viewScope": ["recipe-auth-detail"], "moduleName": "授权详情本页规则", "markdownFile": "annotations/tenant-recipe-management.md", "sourceRefs": ["REQ-21-AUTH-DETAIL"]},
     {"id": "auth-detail", "type": "element", "page": "*", "viewScope": ["recipe-auth-detail"], "moduleName": "授权详情内容", "target": {"selector": "#unifiedAuthDetail .unified-auth-detail-body"}, "markdownFile": "annotations/tenant-recipe-management.md", "sourceRefs": ["REQ-21-AUTH-DETAIL", "REQ-22-EDGE"]},
 
-    {"id": "scope-boundary", "type": "global", "page": "*", "viewScope": ["recipe-hub", "recipe-list", "recipe-categories", "recipe-dictionary", "recipe-dictionary-editor", "recipe-create-basic", "recipe-create-ingredients", "recipe-create-process", "editor-operation", "recipe-edit-basic", "recipe-edit-ingredients", "recipe-edit-process", "recipe-detail-basic", "recipe-detail-ingredients", "recipe-detail-process", "recipe-detail-nutrition", "recipe-auth-list", "recipe-auth-create-1", "recipe-auth-create-2", "recipe-auth-create-3", "recipe-auth-preview", "recipe-auth-detail"], "moduleName": "第一期范围边界", "markdownFile": "annotations/tenant-recipe-management.md", "sourceRefs": ["REQ-23-BOUNDARY"]}
+    {"id": "scope-boundary", "type": "global", "page": "*", "viewScope": ["recipe-hub", "recipe-list", "recipe-categories", "recipe-dictionary", "recipe-dictionary-editor", "recipe-create-basic", "recipe-create-ingredients", "recipe-create-process", "editor-operation", "recipe-edit-basic", "recipe-edit-ingredients", "recipe-edit-process", "recipe-detail-basic", "recipe-detail-ingredients", "recipe-detail-process", "recipe-detail-nutrition", "recipe-auth-list", "recipe-auth-create-1", "recipe-auth-create-2", "recipe-auth-create-3", "recipe-auth-preview", "recipe-auth-detail"], "moduleName": "第一期范围边界", "markdownFile": "annotations/tenant-recipe-management.md", "sourceRefs": ["REQ-23-BOUNDARY"]},
+
+    {"id": "sup-list-rules", "type": "page-global", "page": "*", "viewScope": ["supplier-list"], "moduleName": "供应商管理本页规则", "markdownFile": "annotations/tenant-supplier-management.md", "sourceRefs": ["SUP-01-LIST", "SUP-07-ACCOUNT", "SUP-11-CROSS"]},
+    {"id": "sup-list-note", "type": "element", "page": "*", "viewScope": ["supplier-list"], "moduleName": "顶部说明条：三条全局前提", "target": {"selector": ".sup-page .sup-note"}, "markdownFile": "annotations/tenant-supplier-management.md", "sourceRefs": ["SUP-02-PRINCIPLE", "SUP-11-CROSS"]},
+    {"id": "sup-list-filters", "type": "element", "page": "*", "viewScope": ["supplier-list"], "moduleName": "筛选与搜索语义", "target": {"selector": ".sup-page .table-card > .filters"}, "markdownFile": "annotations/tenant-supplier-management.md", "sourceRefs": ["SUP-03-FILTER"]},
+    {"id": "sup-list-rows", "type": "element", "page": "*", "viewScope": ["supplier-list"], "moduleName": "列口径与行操作后果", "target": {"selector": "#supBody"}, "markdownFile": "annotations/tenant-supplier-management.md", "sourceRefs": ["SUP-04-ROWS", "SUP-07-ACCOUNT"]},
+    {"id": "sup-create-rules", "type": "page-global", "page": "*", "viewScope": ["supplier-create", "supplier-edit", "supplier-coop"], "moduleName": "新建与建立合作：核验分支与提交校验", "markdownFile": "annotations/tenant-supplier-management.md", "sourceRefs": ["SUP-05-CREATE", "SUP-11-CROSS"]},
+    {"id": "sup-lic", "type": "element", "page": "*", "viewScope": ["supplier-create", "supplier-edit", "supplier-coop"], "moduleName": "资质证照与合作协议", "target": {"selector": "[data-anno='sup-lic']"}, "markdownFile": "annotations/tenant-supplier-management.md", "sourceRefs": ["SUP-06-LIC"]},
+    {"id": "sup-account", "type": "element", "page": "*", "viewScope": ["supplier-create", "supplier-edit", "supplier-coop"], "moduleName": "超管账号（唯一、不可改、无有效期）", "target": {"selector": "[data-anno='sup-account']"}, "markdownFile": "annotations/tenant-supplier-management.md", "sourceRefs": ["SUP-07-ACCOUNT"]},
+    {"id": "sup-types", "type": "element", "page": "*", "viewScope": ["supplier-create", "supplier-edit", "supplier-coop"], "moduleName": "供应类型", "target": {"selector": "[data-anno='sup-types']"}, "markdownFile": "annotations/tenant-supplier-management.md", "sourceRefs": ["SUP-08-TYPES"]},
+    {"id": "sup-merchants", "type": "element", "page": "*", "viewScope": ["supplier-create", "supplier-edit", "supplier-coop"], "moduleName": "商户供货范围（编辑）", "target": {"selector": "[data-anno='sup-merchants']"}, "markdownFile": "annotations/tenant-supplier-management.md", "sourceRefs": ["SUP-09-MERCHANTS"]},
+    {"id": "sup-detail-rules", "type": "page-global", "page": "*", "viewScope": ["supplier-detail"], "moduleName": "详情：可编辑性矩阵", "markdownFile": "annotations/tenant-supplier-management.md", "sourceRefs": ["SUP-10-DETAIL", "SUP-11-CROSS"]},
+    {"id": "sup-detail-account", "type": "element", "page": "*", "viewScope": ["supplier-detail"], "moduleName": "详情 · 超管账号卡", "target": {"selector": "[data-anno='sup-detail-account']"}, "markdownFile": "annotations/tenant-supplier-management.md", "sourceRefs": ["SUP-07-ACCOUNT"]},
+    {"id": "sup-detail-merchants", "type": "element", "page": "*", "viewScope": ["supplier-detail"], "moduleName": "详情 · 商户供货范围", "target": {"selector": "[data-anno='sup-detail-merchants']"}, "markdownFile": "annotations/tenant-supplier-management.md", "sourceRefs": ["SUP-09-MERCHANTS"]},
+    {"id": "sup-global", "type": "global", "page": "*", "viewScope": ["supplier-list", "supplier-create", "supplier-edit", "supplier-coop", "supplier-detail"], "moduleName": "跨页共享规则与边界", "markdownFile": "annotations/tenant-supplier-management.md", "sourceRefs": ["SUP-11-CROSS", "SUP-12-SCOPE", "SUP-13-OPEN"]}
   ]
 }

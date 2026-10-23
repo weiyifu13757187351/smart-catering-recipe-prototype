@@ -1,0 +1,314 @@
+/* 商户端 · 计划管理 —— 采购计划 V2
+   复用 merchant-meal-plan-v1.css + merchant-plan-v2.css 的 mp-/pp- 原子类，
+   这里只补采购计划自己的 pc- 类。视觉口径与生产计划保持一致（#245fbd 主蓝、12px 正文）。
+
+   V2 结构：详情页三个并列页签 = 采购清单（只映射）/ 采购明细（按天填量）/ 询价单
+   —— 旧的「视图切换」样式（.pc-viewbar/.pc-seg）、统计条（.pc-summary）、
+      拟询价供应商条（.pc-suppliers/.pc-sup）、按天分组表头（.pc-day-head）、
+      参考价列（.pc-ref-none）与折算标记（.pc-cand-sku em）已一并删除。 */
+
+.pc-page { max-width: 1480px; }
+
+/* —— 列表页 —— */
+.pc-actions { display: flex; justify-content: flex-end; margin: 12px 22px 0; }
+.pc-actions .mp-primary { height: 38px; padding: 0 18px; font-size: 14px; }
+.pc-chip { height: 32px; padding: 0 13px; border: 1px solid #dce5ef; border-radius: 16px; color: #53677f; background: #fff; font: 13px inherit; cursor: pointer; }
+.pc-chip:hover { border-color: #a9c7ff; color: #245fbd; }
+.pc-chip.on { border-color: #2678ff; color: #fff; background: #2678ff; }
+
+.pc-table { min-width: 720px; }
+.pc-table th.pc-num, .pc-table td.pc-num { text-align: right; }
+.pc-table td.pc-op { white-space: nowrap; }
+.pc-table td.pc-op .mp-secondary { height: 30px; padding: 0 12px; font-size: 13px; }
+.pc-dim { color: #adb7c3; font-size: 12px; font-style: normal; }
+.pc-gram { color: #245fbd; font-weight: 600; }
+/* 当日用料：名称 + 克数拼接，名称用弱一档的颜色，克数保持蓝色加粗 */
+.pc-gram-name { margin-right: 7px; color: #53677f; font-style: normal; font-weight: 500; }
+/* 采购明细的「当日用料（克）」列整体左对齐（内容贴着左边开始），
+   食材名给一个最小宽度 → 克数仍然能竖向对齐，不至于参差不齐 */
+.pc-gram-cell { text-align: left; }
+.pc-gram-cell .pc-gram-name { display: inline-block; min-width: 62px; }
+.pc-days { margin-left: 7px; color: #9aa9ba; font-size: 11px; font-style: normal; }
+/* 同一区间存在多份计划时，标出这是第几份 */
+.pc-dup { margin-left: 7px; padding: 1px 7px; border-radius: 9px; color: #a4670f; background: #fdf4e3; font-size: 11px; font-style: normal; white-space: nowrap; }
+
+/* 新建计划时的区间交集强提醒：要压在新建抽屉（.mp-mask，z-index:40）之上 */
+#pcOverlapMask { z-index: 60; }
+/* 定标提交前的强提醒：同样压在定标抽屉（.mp-mask，z-index:40）之上 */
+#pcAwardMask { z-index: 60; }
+.pc-overlap-modal { width: min(560px, calc(100vw - 38px)) !important; }
+.pc-ov-head { display: flex; gap: 12px; align-items: flex-start; }
+.pc-ov-head > i { flex: none; display: grid; place-items: center; width: 22px; height: 22px; margin-top: 2px; border-radius: 50%; color: #fff; background: #e8a838; font-style: normal; font-size: 13px; }
+.pc-ov-head h3 { margin: 0 0 8px !important; color: #26374d; font-size: 17px; }
+.pc-ov-head p { margin: 0 !important; color: #5f7189; font-size: 13px; line-height: 1.75; }
+.pc-ov-head p b { color: #22364e; }
+.pc-ov-list { margin: 14px 0 0; padding: 0; list-style: none; border: 1px solid #f0e3c8; border-radius: 8px; background: #fffbf2; }
+.pc-ov-list li { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 9px 13px; color: #46586f; font-size: 13px; }
+.pc-ov-list li + li { border-top: 1px dashed #f2e6cd; }
+.pc-ov-list li b { color: #22364e; font-weight: 600; }
+.pc-ov-days { color: #9aa9ba; font-size: 11px; font-style: normal; }
+.pc-ov-status { padding: 1px 8px; border-radius: 9px; color: #7b8ca1; background: #eef2f7; font-size: 11px; font-style: normal; }
+.pc-ov-inq { margin-left: auto; color: #31495f; font-size: 12px; }
+.pc-ov-inq.dim { color: #adb7c3; }
+.pc-ov-note { margin: 12px 0 0 !important; color: #8b9aab; font-size: 12px; line-height: 1.75; }
+.pc-empty-line { padding: 18px 12px; color: #9aa9ba; font-size: 12px; text-align: center; }
+
+.pc-inq-no { color: #31495f; font-size: 12px; }
+.pc-deadline { display: block; margin-top: 3px; color: #d98217; font-size: 11px; font-style: normal; }
+
+.pc-status { display: inline-flex; align-items: center; height: 21px; padding: 0 9px; border-radius: 11px; font-size: 11px; font-style: normal; white-space: nowrap; }
+.pc-status.draft { color: #7b8ca1; background: #eef2f7; }
+.pc-status.inquiry { color: #245fbd; background: #eaf3ff; }
+.pc-status.closed { color: #d98217; background: #fff6e8; }
+.pc-status.awarded { color: #1c9a70; background: #eaf8f2; }
+.pc-status.failed { color: #b23c3c; background: #fdeeee; }
+
+.pc-link { padding: 0 4px; border: 0; color: #2678ff; background: none; font: 12px inherit; cursor: pointer; }
+.pc-link:hover { text-decoration: underline; }
+.pc-link.danger { color: #e65c5c; }
+.pc-link:disabled { color: #b3bfcd; cursor: not-allowed; }
+
+/* —— 新建抽屉 / 通用提示 —— */
+.pc-hint { margin: 12px 0 0; color: #8797aa; font-size: 12px; line-height: 1.85; }
+.pc-hint b { color: #5b7391; }
+.pc-warn { margin: 10px 0 0; padding: 9px 12px; border-radius: 6px; color: #a9761b; background: #fff9ef; font-size: 12px; line-height: 1.75; }
+.pc-warn-text { color: #e08b2d; }
+
+/* —— 详情页头 + 页签 —— */
+.pc-back { margin-bottom: 6px; padding: 0; border: 0; color: #7b8ca1; background: none; font: 13px inherit; cursor: pointer; }
+.pc-back:hover { color: #245fbd; }
+.pc-tabs { display: flex; gap: 4px; margin: 4px 22px 0; border-bottom: 1px solid #e6ecf4; }
+.pc-tab { height: 38px; padding: 0 16px; border: 0; border-bottom: 2px solid transparent; color: #6c7f96; background: none; font: 14px inherit; cursor: pointer; }
+.pc-tab:hover { color: #245fbd; }
+.pc-tab.on { border-bottom-color: #2678ff; color: #245fbd; font-weight: 600; }
+
+/* —— 页签旁的圆形问号：说明收进 tooltip，鼠标移上去才出现，不占正文版面 —— */
+.pc-q { position: relative; display: inline-grid; place-items: center; width: 15px; height: 15px;
+  margin-left: 5px; border: 1px solid #b9c6d6; border-radius: 50%; color: #7b8ca1;
+  font-size: 10px; font-style: normal; font-weight: 600; line-height: 1; vertical-align: 1px; cursor: help; }
+.pc-q:hover { border-color: #2678ff; color: #245fbd; }
+.pc-q::after { content: attr(data-tip); position: absolute; top: 100%; left: -8px; z-index: 70;
+  display: none; width: 336px; max-width: 60vw; padding: 10px 12px; border: 1px solid #d7e3f4;
+  border-radius: 8px; background: #fff; box-shadow: 0 6px 20px rgba(24, 47, 78, .14);
+  color: #46586f; font-size: 12px; font-style: normal; font-weight: 400; line-height: 1.7;
+  text-align: left; white-space: normal; }
+.pc-q:hover::after { display: block; }
+
+/* —— 详情页顶部操作栏（三个页签共用） —— */
+.pc-detail-bar { display: flex; align-items: center; gap: 10px; margin: 14px 22px 0; padding: 10px 14px; border: 1px solid #e5ebf3; border-radius: 8px; background: #fafcff; }
+.pc-detail-bar .mp-secondary, .pc-detail-bar .mp-primary { height: 34px; padding: 0 16px; font-size: 13px; }
+.pc-detail-bar .mp-secondary:disabled, .pc-detail-bar .mp-primary:disabled { color: #b3bfcd; background: #f0f3f7; cursor: not-allowed; }
+.pc-detail-note { color: #6c7f96; font-size: 12px; }
+
+/* —— 采购清单：一张表内的分组行 / 类型标记 —— */
+.pc-group-row td { padding: 9px 15px; border-top: 2px solid #eef2f7; color: #53677f; background: #f7fafd; font-size: 12px; }
+.pc-group-row b { margin-right: 8px; color: #31495f; }
+.pc-group-row span { color: #8797aa; }
+.pc-group-row i { float: right; color: #9aa9ba; font-style: normal; }
+.pc-tag-kind { margin-left: 6px; padding: 0 6px; border-radius: 3px; color: #245fbd; background: #eaf2ff; font-size: 11px; font-style: normal; }
+.pc-tag-kind.muted { color: #8b7bd0; background: #f2effb; }
+
+/* —— 依据抽屉：当前日期高亮 —— */
+.pc-basis-on td { background: #f2f8ff; }
+.pc-basis-on td:first-child b { color: #245fbd; }
+
+/* —— 采购清单页签的两块卡片 —— */
+.pc-card { margin: 16px 22px 0; border: 1px solid #e5ebf3; border-radius: 9px; background: #fff; }
+/* 锁定提示（只读/已定标）与下方 .pc-card 左右对齐，不再顶到工作区边缘 */
+/* 内边距对齐 .pc-card 表格首列（15px），让文字也落在同一条竖线上 */
+.pc-lock-note { margin: 16px 22px 0; padding: 11px 15px; }
+.pc-card-head { display: flex; align-items: center; gap: 10px; padding: 12px 15px; border-bottom: 1px solid #eef2f7; }
+.pc-card-head h3 { margin: 0; color: #243b61; font-size: 14px; }
+.pc-count { padding: 1px 9px; border-radius: 10px; color: #7b8ca1; background: #eef2f7; font-size: 11px; }
+.pc-count.warn { color: #b57212; background: #fff6e8; }
+.pc-count.ok { color: #1c9a70; background: #eaf8f2; }
+.pc-card .pp-table-wrap { margin: 0; border: 0; border-radius: 0; }
+.pc-card .pp-table th:first-child, .pc-card .pp-table td:first-child { padding-left: 15px; }
+.pc-card .pp-table th:last-child, .pc-card .pp-table td:last-child { padding-right: 15px; }
+.pc-card .pp-table-note { margin: 0; padding: 9px 15px; border-top: 1px solid #f2f5f9; }
+/* —— 采购明细：当天已忽略（只影响当天，可逐行恢复） —— */
+.pc-day-ignored { margin: 14px 22px 0; border: 1px dashed #dfe6ef; border-radius: 9px; background: #fbfcfd; }
+.pc-day-ignored-head { display: flex; align-items: baseline; gap: 10px; padding: 12px 15px 0; }
+.pc-day-ignored-head b { color: #7b8ca1; font-size: 13px; font-weight: 600; }
+.pc-day-ignored-head span { color: #9aa9ba; font-size: 12px; }
+.pc-day-ignored .pp-table-wrap { margin: 9px 0 0; border: 0; border-radius: 0; }
+.pc-day-ignored .pp-table th { background: transparent; }
+.pc-day-ignored .pp-table tbody td { color: #8b9aab; }
+.pc-day-ignored .pp-table tbody td b { color: #7b8ca1; }
+.pc-day-ignored .pp-table tbody tr:last-child td { padding-bottom: 12px; }
+
+.pc-sku-name { display: block; margin-top: 2px; color: #9aa9ba; font-size: 11px; font-style: normal; }
+/* 清单行内的小标记：某几天被单独指定 / 明细行内：当日指定 / 未映射 */
+.pc-tag-exc, .pc-tag-day, .pc-tag-map { margin-left: 7px; padding: 1px 7px; border-radius: 9px; font-size: 11px; font-style: normal; white-space: nowrap; }
+.pc-tag-exc { color: #7b8ca1; background: #eef2f7; }
+.pc-tag-day { color: #245fbd; background: #eaf3ff; }
+.pc-tag-map { color: #d98217; background: #fff6e8; }
+
+/* —— 采购明细页签：日期二级 tab —— */
+.pc-line-note { margin: 14px 22px 0; color: #8797aa; font-size: 12px; }
+/* 日期 tab 与「添加商品」同一行：tab 左、按钮右 */
+.pc-day-bar { display: flex; align-items: flex-start; gap: 10px; margin: 10px 22px 0; }
+.pc-day-tabs { display: flex; flex: 1 1 auto; gap: 6px; min-width: 0; padding-bottom: 8px; overflow-x: auto; }
+.pc-add-goods { flex: 0 0 auto; height: 32px; padding: 0 14px; font-size: 13px; white-space: nowrap; }
+.pc-day-tabs::-webkit-scrollbar { height: 6px; }
+.pc-day-tabs::-webkit-scrollbar-thumb { border-radius: 3px; background: #dfe7f0; }
+.pc-day-tab { display: inline-flex; align-items: center; gap: 6px; flex: 0 0 auto; height: 32px; padding: 0 13px; border: 1px solid #dce5ef; border-radius: 6px; color: #53677f; background: #fff; font: 13px inherit; cursor: pointer; }
+/* 这一天还有几项没填量 */
+.pc-day-dot { display: inline-block; min-width: 16px; padding: 0 4px; border-radius: 8px; color: #b57212; background: #fff2df; font-size: 11px; font-style: normal; text-align: center; }
+.pc-day-tab.on .pc-day-dot { color: #b57212; background: #fff; }
+.pc-day-tab:hover { border-color: #a9c7ff; color: #245fbd; }
+.pc-day-tab.on { border-color: #2678ff; color: #fff; background: #2678ff; }
+
+.pc-day-table { min-width: 900px; }
+.pc-day-table tfoot td { border-top: 2px solid #e9eef5; background: #f8fafd; font-size: 13px; }
+.pc-total-label { color: #31495f; font-weight: 600; }
+/* 必填没填满：表尾计数转橙，提醒这一天的量还没齐 */
+.pc-foot-warn { color: #d98217 !important; }
+
+.pc-qty { box-sizing: border-box; width: 108px; height: 32px; padding: 0 8px; border: 1px solid #dce5ef; border-radius: 5px; color: #24405f; background: #fff; font: 13px inherit; text-align: right; outline: 0; }
+/* 必填未填：空着的输入框给一层浅红，扫一眼就知道还差哪些 */
+.pc-qty:placeholder-shown { border-color: #f0cfcf; background: #fffafa; }
+.pc-qty:focus { border-color: #80adfb; box-shadow: 0 0 0 3px #edf5ff; }
+.pc-qty:disabled { background: #f5f7fa; cursor: not-allowed; }
+.pc-req { margin-left: 2px; color: #e05353; font-weight: 600; }
+
+/* —— 底栏 —— */
+.pc-footbar { display: flex; align-items: center; gap: 10px; margin: 16px 22px 0; padding: 13px 16px; border: 1px solid #e5ebf3; border-radius: 8px; background: #fafcff; }
+.pc-footbar .mp-secondary, .pc-footbar .mp-primary { height: 36px; padding: 0 16px; font-size: 13px; }
+.pc-footbar .mp-secondary:disabled, .pc-footbar .mp-primary:disabled { color: #b3bfcd; background: #f0f3f7; cursor: not-allowed; }
+.pc-foot-note { color: #8797aa; font-size: 12px; }
+
+/* —— 询价单页签 —— */
+.pc-inq-head { display: flex; align-items: flex-start; gap: 16px; margin: 16px 22px 0; padding: 14px 16px; border: 1px solid #e5ebf3; border-radius: 8px; background: #fafcff; }
+.pc-inq-title h3 { display: flex; align-items: center; gap: 9px; margin: 0; color: #243b61; font-size: 16px; }
+.pc-inq-title p { margin: 7px 0 0; color: #7b8ca1; font-size: 12px; }
+.pc-inq-title p b { color: #31495f; }
+.pc-inq-acts { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+.pc-inq-acts .mp-secondary, .pc-inq-acts .mp-primary, .pc-inq-acts .mp-danger { height: 34px; padding: 0 14px; font-size: 13px; }
+.pc-inq-acts .mp-primary:disabled { color: #fff; background: #c5cfdb; cursor: not-allowed; }
+.pc-inq-summary { display: flex; flex-wrap: wrap; gap: 10px; margin: 12px 22px 0; }
+.pc-inq-summary > div { display: flex; align-items: baseline; gap: 6px; min-width: 104px; padding: 9px 12px; border: 1px solid #e5ebf3; border-radius: 7px; background: #fff; }
+.pc-inq-summary span { color: #8b9bad; font-size: 12px; }
+.pc-inq-summary b { margin-left: auto; color: #2f4a6b; font-size: 16px; }
+.pc-inq-summary i { color: #9aa9ba; font-size: 11px; font-style: normal; }
+
+/* 询价行的「按天需求」小字 */
+.pc-byday { display: block; margin-top: 3px; color: #9aa9ba; font-size: 11px; font-style: normal; }
+/* 明细行「N 家已报」：长得像链接、保持报价回收那一列的绿色语义 */
+.pc-ref-link { color: #1c9a70; font-size: 12px; }
+.pc-ref-link:hover { text-decoration: underline; }
+
+.pc-sup-board { display: flex; flex-wrap: wrap; gap: 10px; margin: 12px 22px 0; }
+.pc-sup-card { display: flex; flex-direction: column; gap: 3px; min-width: 190px; padding: 11px 13px; border: 1px solid #e5ebf3; border-left: 3px solid #dce5ef; border-radius: 7px; background: #fff; }
+.pc-sup-card b { color: #31495f; font-size: 12px; }
+.pc-sup-card i { font-size: 12px; font-style: normal; }
+.pc-sup-card em { color: #9aa9ba; font-size: 11px; font-style: normal; }
+.pc-sup-card.pending { border-left-color: #c5cfdb; }
+.pc-sup-card.pending i { color: #7b8ca1; }
+.pc-sup-card.quoted { border-left-color: #1c9a70; }
+.pc-sup-card.quoted i { color: #1c9a70; }
+.pc-sup-card.timeout { border-left-color: #d98217; }
+.pc-sup-card.timeout i { color: #d98217; }
+.pc-sup-card.void { border-left-color: #c9d2dd; opacity: .72; }
+.pc-sup-card.void i { color: #99a6b5; }
+
+
+/* —— 报价比较矩阵 —— */
+.pc-cmp-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; padding: 11px 14px; border: 1px solid #e5ebf3; border-radius: 8px; background: #fafcff; }
+.pc-cmp-head b { color: #243b61; font-size: 14px; }
+.pc-cmp-head em { margin-left: auto; color: #7b8ca1; font-size: 12px; font-style: normal; }
+.pc-cmp-tag { padding: 1px 8px; border-radius: 9px; color: #99a6b5; background: #f3f5f8; font-size: 11px; }
+.pc-cmp { min-width: 720px; }
+.pc-cmp th, .pc-cmp td { white-space: nowrap; }
+.pc-cmp-sup { display: flex; flex-direction: column; gap: 2px; }
+.pc-cmp-sup b { color: #31495f; font-size: 12px; }
+.pc-cmp-sup i { color: #9aa9ba; font-size: 11px; font-style: normal; }
+.pc-cmp td.pc-price { text-align: right; color: #31495f; }
+/* 最低价高亮：只在「至少一家有报价」时才加，同价并列都高亮 */
+.pc-cmp td.pc-low { color: #17845e; background: #eefaf4; font-weight: 600; }
+/* 未报价 / 超时未报价 / 未提交：统一弱化成 - */
+.pc-cmp td.pc-none { color: #c3ccd8; }
+.pc-unit { color: #9aa9ba; font-size: 11px; font-style: normal; }
+
+/* —— 选商品 / 加行抽屉 —— */
+.pc-cand { margin-bottom: 12px; padding: 12px 14px; border: 1px solid #e5ebf3; border-radius: 8px; background: #fff; }
+.pc-cand-head { display: flex; align-items: center; gap: 8px; margin-bottom: 9px; }
+.pc-cand-head b { color: #243b61; font-size: 14px; }
+.pc-cand-sku { display: flex; align-items: center; gap: 9px; padding: 8px 10px; border: 1px solid #eef2f7; border-radius: 6px; color: #455d79; font-size: 12px; cursor: pointer; }
+.pc-cand-sku + .pc-cand-sku { margin-top: 7px; }
+.pc-cand-sku:hover { border-color: #a9c7ff; background: #fafcff; }
+.pc-cand-sku input { accent-color: #2678ff; }
+.pc-cand-sku i { color: #9aa9ba; font-size: 11px; font-style: normal; }
+
+.mp-mini-table-wrap { margin-bottom: 12px; overflow: auto; }
+
+/* —— 发起询价抽屉的供应商行 —— */
+.pc-sup-list { display: grid; gap: 8px; }
+.pc-sup-line { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border: 1px solid #eef2f7; border-radius: 7px; color: #455d79; font-size: 12px; cursor: pointer; }
+.pc-sup-line.on { border-color: #2678ff; background: #f7fbff; }
+.pc-sup-line input { accent-color: #2678ff; }
+
+@media (max-width: 1200px) {
+  .pc-inq-summary > div { min-width: 96px; }
+  .pc-sup-board .pc-sup-card { min-width: 150px; }
+}
+
+/* —— 添加商品抽屉：筛选 + 商品列表 + SKU 卡片 —— */
+.pc-add-filter { display: flex; align-items: center; gap: 10px; margin: 0 0 12px; }
+.pc-add-search { flex: 1 1 auto; min-width: 140px; height: 34px; padding: 0 12px; border: 1px solid #dce5ef;
+  border-radius: 6px; color: #2b3a4d; font: 13px inherit; }
+.pc-add-search:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, .12); }
+.pc-add-filter select { flex: 0 0 auto; height: 34px; padding: 0 10px; border: 1px solid #dce5ef;
+  border-radius: 6px; background: #fff; color: #2b3a4d; font: 13px inherit; }
+.pc-add-count { flex: 0 0 auto; color: #8296ab; font-size: 12px; }
+.pc-add-table th { white-space: nowrap; }
+.pc-add-table td { vertical-align: middle; }
+
+/* 商品图 / SKU 图：没有真实图片，用与名称稳定对应的色块 + 首字（SKU 卡片用下单单位字） */
+.pc-thumb { display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px;
+  border-radius: 8px; background: hsl(var(--h) 52% 95%); color: hsl(var(--h) 42% 40%);
+  font-size: 15px; font-weight: 600; }
+.pc-thumb.lg { width: 52px; height: 52px; border-radius: 10px; font-size: 18px; }
+
+/* 加工形态标签 */
+.pc-form-tag { display: inline-block; padding: 1px 7px; border-radius: 9px; background: #eef4fd; color: #3f74c6; font-size: 12px; }
+/* 商品名后面的形态小标：列表里比抽屉里再小一号，不抢商品名的视觉重量 */
+.pc-form-tag.sm { margin-left: 6px; padding: 0 6px; border-radius: 8px; font-size: 11px; font-weight: 500; vertical-align: 1px; }
+.pc-form-tag.f-毛菜 { background: #eaf6ec; color: #3f8c4e; }
+.pc-form-tag.f-半成品 { background: #fdf2e6; color: #a9762a; }
+
+/* 第二步：SKU 卡片 */
+.pc-add-back { margin-bottom: 12px; }
+.pc-add-prod { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; padding: 12px 14px;
+  border: 1px solid #e5ebf3; border-radius: 9px; background: #fafcff; }
+.pc-add-prod b { display: block; color: #1f2d3d; font-size: 14px; }
+.pc-add-prod-meta { color: #8296ab; font-size: 12px; }
+.pc-pick-note { margin: 0 0 12px; color: #8296ab; font-size: 12px; }
+.pc-sku-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; }
+.pc-sku-card { display: flex; align-items: flex-start; gap: 12px; padding: 14px; border: 1px solid #e0e8f2;
+  border-radius: 10px; background: #fff; text-align: left; font: 13px inherit; cursor: pointer; }
+.pc-sku-card:hover { border-color: #8fb4ec; box-shadow: 0 2px 10px rgba(59, 130, 246, .1); }
+.pc-sku-card-main { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.pc-sku-card-main b { color: #1f2d3d; font-size: 13px; }
+.pc-sku-card-meta { color: #6b7f96; font-size: 12px; }
+.pc-sku-card-meta em { margin-right: 6px; padding: 0 5px; border-radius: 4px; background: #f2f5f9;
+  color: #8296ab; font-style: normal; font-size: 11px; }
+/* 三级分类：路径用浅色分隔符连起来，不换行 */
+.pc-cat-path { white-space: nowrap; color: #6b7f96; font-size: 12px; }
+.pc-cat-sep { margin: 0 4px; color: #c3cfdd; font-style: normal; }
+/* 当前正在用的 SKU */
+.pc-sku-card.on { border-color: #2678ff; background: #f7faff; }
+.pc-sku-cur { margin-left: 6px; padding: 0 6px; border-radius: 8px; background: #2678ff; color: #fff;
+  font-size: 11px; font-style: normal; font-weight: 500; }
+/* —— 定标抽屉：一键选最低价 + 逐商品下拉 —— */
+.pc-award-bar { display: flex; align-items: center; gap: 10px; margin: 0 0 12px; }
+.pc-award-bar .mp-secondary, .pc-award-bar .mp-primary { height: 32px; padding: 0 14px; font-size: 13px; }
+.pc-award-sum { color: #53677f; font-size: 12px; }
+.pc-award-table td.pc-price { text-align: right; }
+.pc-award-sel { max-width: 210px; height: 30px; padding: 0 8px; border: 1px solid #dce5ef; border-radius: 6px;
+  background: #fff; color: #31495f; font: 12px inherit; }
+.pc-award-sel:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, .12); }
+.pc-award-bare td { color: #93a3b5; }
+.pc-award-tag { display: inline-block; margin-left: 8px; padding: 0 6px; border-radius: 8px;
+  background: #eaf7f0; color: #1c9a70; font-size: 11px; font-style: normal; }/* 询价单行内「已定标 · 供应商名」标记 */
+

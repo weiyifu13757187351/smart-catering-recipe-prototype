@@ -1,0 +1,66 @@
+/* ============================================================================
+   商户端 · 档口管理（档口列表）
+   只放本页专用样式：表格、筛选条、抽屉里的餐次与时间行。
+   表格/表单/抽屉的基础样式复用外壳已有的 .card / .filters / .table-wrap /
+   .modal-mask.side-drawer-mask / .drawer-form-grid，这里不重复定义。
+   ========================================================================== */
+
+/* ------------------------------------------------------------------ 列表页 */
+.stall-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:18px 20px 14px}
+.stall-head h1{margin:0;color:#263f5e;font-size:19px}
+.stall-head p{margin:6px 0 0;color:#8494a8;font-size:12px}
+.stall-head .primary{height:35px;margin-left:0;padding:0 16px;border:0;border-radius:5px;color:#fff;background:var(--blue);cursor:pointer;font:14px inherit}
+.stall-head .primary:disabled{opacity:.5;cursor:not-allowed}
+
+.stall-filters{gap:10px}
+.stall-filters input{box-sizing:border-box;width:220px;height:35px;padding:0 11px;border:1px solid #dfe7f1;border-radius:5px;outline:0;color:#334b68;background:#fff;font:14px inherit}
+.stall-filters select{box-sizing:border-box;width:220px;height:35px;padding:0 11px;border:1px solid #dfe7f1;border-radius:5px;outline:0;color:#334b68;background:#fff;font:14px inherit;cursor:pointer}
+.stall-filters select:focus{border-color:#86b2ff;box-shadow:0 0 0 3px #edf5ff}
+.stall-filters input:focus{border-color:#86b2ff;box-shadow:0 0 0 3px #edf5ff}
+.stall-filters .secondary{height:35px;padding:0 16px;border:0;border-radius:5px;color:#5e718b;background:#f1f5f9;cursor:pointer;font:14px inherit}
+
+.stall-table{min-width:1040px}
+.stall-table th{white-space:nowrap}
+.stall-table td{vertical-align:middle}
+.stall-name{color:#22364e;font-weight:600}
+.stall-owner{display:block;color:#22364e;font-weight:600}
+.stall-owner-phone{display:block;margin-top:2px;color:#8494a8;font-size:12px}
+.stall-owner-empty{color:#9aa9bc}
+.stall-meal-chips{display:flex;flex-wrap:wrap;gap:6px;padding:9px 0}
+.stall-meal-chip{padding:3px 9px;border-radius:11px;color:#2678ff;background:#eef5ff;font-size:12px;white-space:nowrap}
+
+/* -------------------------------------------------------------------- 抽屉 */
+.stall-drawer-sub{margin:-8px 0 18px;color:#8494a8;font-size:12px;line-height:1.7}
+.stall-owner-hint{margin:7px 0 0;color:#9aa9bc;font-size:12px}
+.stall-meals{margin-top:4px}
+.stall-meals label{display:inline-flex;align-items:center;gap:6px;margin:0 14px 8px 0;color:#4c607a;cursor:pointer}
+.stall-meals input{width:14px;height:14px;margin:0}
+
+.stall-meal-times{margin-top:6px;padding:10px 14px;border:1px solid #eef2f8;border-radius:8px;background:#fafcff}
+.stall-time-row{display:flex;align-items:center;gap:10px;padding:7px 0;flex-wrap:wrap}
+.stall-time-row+.stall-time-row{border-top:1px dashed #e8eef7}
+.stall-time-row b{width:44px;color:#304967;font-size:13px;font-weight:600}
+.stall-time-row input{box-sizing:border-box;width:132px;height:34px;padding:0 9px;border:1px solid #dce5ef;border-radius:5px;outline:0;color:#334b68;background:#fff;font:13px inherit}
+.stall-time-row input:focus{border-color:#86b2ff;box-shadow:0 0 0 3px #edf5ff}
+.stall-time-row span{color:#9aa9ba;font-size:12px}
+.stall-times-empty{margin:2px 0;color:#9aa9bc;font-size:12px}
+.stall-rule{margin:8px 0 0;color:#9aa9bc;font-size:11px;line-height:1.6}
+
+/* 预计人均用餐量（克/人，选填）：跟在结束时间后面，虚线框提示「可留空」。
+   输入框与单位绑成一组，行内放不下时整组换行，不会把「克/人」单独甩到下一行 */
+.stall-time-row input[type="time"]{width:118px}
+.stall-gram-wrap{display:inline-flex;align-items:center;gap:6px;margin-left:4px;white-space:nowrap}
+.stall-time-row .stall-gram{width:122px;border-style:dashed}
+.stall-time-row .stall-gram::placeholder{color:#a9b6c6}
+.stall-time-row .stall-gram-unit{color:#9aa9ba;font-size:12px;white-space:nowrap}
+
+/* 时间重叠：命中的两行标红，配合 toast 一起定位 */
+.stall-time-row.is-conflict{background:#fff4f4;border-radius:6px;box-shadow:inset 0 0 0 1px #ffd9d9}
+.stall-time-row.is-conflict b{color:#e65c5c}
+.stall-time-row.is-conflict input{border-color:#f3b0b0}
+
+@media(max-width:900px){
+  .stall-head{flex-direction:column}
+  .stall-filters input,
+  .stall-filters select{width:100%}
+}

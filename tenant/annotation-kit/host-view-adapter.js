@@ -5,6 +5,14 @@
 
   function resolveView() {
     // 叠加在最上层的抽屉先判定，避免被底层页面视图吞掉。
+    // 供应商管理：详情抽屉（.sup-drawer.narrow）/ 新建·编辑·建立合作抽屉（含 .sup-form）
+    if (document.querySelector("#supMask .sup-drawer.narrow")) return "supplier-detail";
+    if (document.querySelector("#supMask .sup-form")) {
+      const supTitle = activeText("#supHeadTitle");
+      if (supTitle.includes("建立")) return "supplier-coop";
+      return supTitle.includes("新建") ? "supplier-create" : "supplier-edit";
+    }
+
     if (document.querySelector("#unifiedOperationMask")) return "editor-operation";
     if (document.querySelector("#dictionaryModal")) return "recipe-dictionary-editor";
 
@@ -31,6 +39,7 @@
 
     const content = document.querySelector("#content");
     if (!content) return "other";
+    if (content.querySelector(".sup-page")) return "supplier-list";
     if (content.querySelector(".dictionary-page")) return "recipe-dictionary";
     if (content.querySelector(".category-layout-v2")) return "recipe-categories";
     if (content.querySelector(".unified-recipe-list-page")) return "recipe-list";

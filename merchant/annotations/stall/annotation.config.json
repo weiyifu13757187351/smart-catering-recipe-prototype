@@ -1,0 +1,197 @@
+{
+  "version": 1,
+  "title": "商户端档口管理 · 业务标注",
+  "scope": "merchant-stall-management",
+  "sourceBase": "../..",
+  "output": "../../annotation-kit/annotation.bundle.json",
+  "coverage": "coverage.md",
+  "mermaid": {
+    "enabled": false,
+    "src": "",
+    "options": {}
+  },
+  "sourceRequirements": [
+    {"id": "STALL-01-PAGE", "source": "商户端档口列表与组织切换器PRD.md#5.1 入口与布局", "page": "档口列表"},
+    {"id": "STALL-02-LIST-FIELD", "source": "商户端档口列表与组织切换器PRD.md#5.2 列表字段", "page": "档口列表"},
+    {"id": "STALL-03-SORT", "source": "商户端档口列表与组织切换器PRD.md#5.3 排序与分页", "page": "档口列表"},
+    {"id": "STALL-04-EMPTY", "source": "商户端档口列表与组织切换器PRD.md#5.4 空态", "page": "档口列表"},
+    {"id": "STALL-05-QUERY", "source": "商户端档口列表与组织切换器PRD.md#6 查询与重置", "page": "档口列表"},
+    {"id": "STALL-06-FORM", "source": "商户端档口列表与组织切换器PRD.md#7.2 字段与校验", "page": "新增与编辑档口"},
+    {"id": "STALL-07-MEAL", "source": "商户端档口列表与组织切换器PRD.md#7.3 经营餐次与营业时间规则", "page": "新增与编辑档口"},
+    {"id": "STALL-08-GRAM", "source": "商户端档口列表与组织切换器PRD.md#7.4 预计人均用餐量", "page": "新增与编辑档口"},
+    {"id": "STALL-09-SAVE", "source": "商户端档口列表与组织切换器PRD.md#7.5 保存后置", "page": "新增与编辑档口"},
+    {"id": "STALL-10-DELETE", "source": "商户端档口列表与组织切换器PRD.md#8 删除档口", "page": "删除档口确认"},
+    {"id": "STALL-11-DATA", "source": "商户端档口列表与组织切换器PRD.md#4.2 档口字段", "page": "档口列表"},
+    {"id": "STALL-12-CONDUCT", "source": "商户端档口列表与组织切换器PRD.md#4.3 变动传导", "page": "档口列表"},
+    {"id": "STALL-13-VALID", "source": "商户端档口列表与组织切换器PRD.md#13.1 校验清单", "page": "新增与编辑档口"},
+    {"id": "STALL-14-EXCEPTION", "source": "商户端档口列表与组织切换器PRD.md#12 异常与边界", "page": "档口列表"},
+    {"id": "STALL-15-DECISION", "source": "商户端档口列表与组织切换器PRD.md#3.4 已确认决策", "page": "档口列表"},
+    {"id": "STALL-16-DIFF", "source": "商户端档口列表与组织切换器PRD.md#13.4 原型差异（研发需调整）", "page": "新增与编辑档口"}
+  ],
+  "annotations": [
+    {
+      "id": "stall-list-rules",
+      "type": "page-global",
+      "page": "*",
+      "viewScope": ["stall-list"],
+      "moduleName": "本页规则",
+      "markdownFile": "annotations/stall/merchant-stall-management.md",
+      "blockId": "stall-list-rules",
+      "sourceRefs": ["STALL-01-PAGE", "STALL-03-SORT", "STALL-14-EXCEPTION", "STALL-15-DECISION"],
+      "order": 1
+    },
+    {
+      "id": "stall-list-filter",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["stall-list"],
+      "moduleName": "筛选行",
+      "target": {"selector": ".stall-filters"},
+      "markdownFile": "annotations/stall/merchant-stall-management.md",
+      "blockId": "stall-list-filter",
+      "sourceRefs": ["STALL-05-QUERY"],
+      "order": 2
+    },
+    {
+      "id": "stall-list-add",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["stall-list"],
+      "moduleName": "新增档口入口",
+      "target": {"selector": "#stallAdd"},
+      "markdownFile": "annotations/stall/merchant-stall-management.md",
+      "blockId": "stall-list-add",
+      "sourceRefs": ["STALL-01-PAGE"],
+      "order": 3
+    },
+    {
+      "id": "stall-list-table",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["stall-list"],
+      "moduleName": "列表字段",
+      "target": {"selector": "table.stall-table"},
+      "markdownFile": "annotations/stall/merchant-stall-management.md",
+      "blockId": "stall-list-table",
+      "sourceRefs": ["STALL-02-LIST-FIELD", "STALL-11-DATA", "STALL-12-CONDUCT"],
+      "order": 4
+    },
+    {
+      "id": "stall-list-empty",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["stall-list"],
+      "moduleName": "空态与反馈",
+      "target": {
+        "selector": "#stallEmpty",
+        "fallbackSelectors": [".stall-card .table-wrap"],
+        "activationHint": "清空筛选或删掉全部档口后可见"
+      },
+      "markdownFile": "annotations/stall/merchant-stall-management.md",
+      "blockId": "stall-list-empty",
+      "sourceRefs": ["STALL-04-EMPTY"],
+      "order": 5
+    },
+    {
+      "id": "stall-list-ops",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["stall-list"],
+      "moduleName": "行操作",
+      "target": {
+        "selector": "#stallBody .ops",
+        "fallbackSelectors": ["table.stall-table thead th:last-child"]
+      },
+      "markdownFile": "annotations/stall/merchant-stall-management.md",
+      "blockId": "stall-list-ops",
+      "sourceRefs": ["STALL-10-DELETE"],
+      "order": 6
+    },
+    {
+      "id": "stall-data-downstream",
+      "type": "global",
+      "page": "*",
+      "viewScope": ["stall-list"],
+      "moduleName": "档口主数据与下游消费",
+      "markdownFile": "annotations/stall/merchant-stall-management.md",
+      "blockId": "stall-data-downstream",
+      "sourceRefs": ["STALL-08-GRAM", "STALL-12-CONDUCT", "STALL-15-DECISION"],
+      "order": 7
+    },
+
+    {
+      "id": "stall-editor-rules",
+      "type": "page-global",
+      "page": "*",
+      "viewScope": ["stall-editor"],
+      "moduleName": "本页规则",
+      "markdownFile": "annotations/stall/merchant-stall-management.md",
+      "blockId": "stall-editor-rules",
+      "sourceRefs": ["STALL-06-FORM", "STALL-09-SAVE", "STALL-13-VALID", "STALL-14-EXCEPTION", "STALL-16-DIFF"],
+      "order": 1
+    },
+    {
+      "id": "stall-editor-field",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["stall-editor"],
+      "moduleName": "字段与校验",
+      "target": {"selector": "#stallFormBody"},
+      "markdownFile": "annotations/stall/merchant-stall-management.md",
+      "blockId": "stall-editor-field",
+      "sourceRefs": ["STALL-06-FORM", "STALL-11-DATA"],
+      "order": 2
+    },
+    {
+      "id": "stall-editor-owner",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["stall-editor"],
+      "moduleName": "负责人",
+      "target": {"selector": "#stallOwner"},
+      "markdownFile": "annotations/stall/merchant-stall-management.md",
+      "blockId": "stall-editor-owner",
+      "sourceRefs": ["STALL-12-CONDUCT", "STALL-15-DECISION"],
+      "order": 3
+    },
+    {
+      "id": "stall-editor-meals",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["stall-editor"],
+      "moduleName": "经营餐次与营业时间",
+      "target": {
+        "selector": "#stallMealTimes",
+        "fallbackSelectors": [".stall-meals"]
+      },
+      "markdownFile": "annotations/stall/merchant-stall-management.md",
+      "blockId": "stall-editor-meals",
+      "sourceRefs": ["STALL-07-MEAL", "STALL-08-GRAM", "STALL-13-VALID", "STALL-16-DIFF"],
+      "order": 4
+    },
+    {
+      "id": "stall-editor-actions",
+      "type": "element",
+      "page": "*",
+      "viewScope": ["stall-editor"],
+      "moduleName": "取消与保存",
+      "target": {"selector": "#stallDrawerMask .modal-foot"},
+      "markdownFile": "annotations/stall/merchant-stall-management.md",
+      "blockId": "stall-editor-actions",
+      "sourceRefs": ["STALL-09-SAVE"],
+      "order": 5
+    },
+
+    {
+      "id": "stall-delete-rules",
+      "type": "page-global",
+      "page": "*",
+      "viewScope": ["stall-delete"],
+      "moduleName": "本页规则",
+      "markdownFile": "annotations/stall/merchant-stall-management.md",
+      "blockId": "stall-delete-rules",
+      "sourceRefs": ["STALL-10-DELETE", "STALL-12-CONDUCT", "STALL-15-DECISION"],
+      "order": 1
+    }
+  ]
+}

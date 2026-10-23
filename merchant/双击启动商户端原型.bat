@@ -1,4 +1,5 @@
 @echo off
-chcp 65001 >nul
 cd /d "%~dp0"
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0启动原型.ps1"
+start "merchant-prototype-server" powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0start-prototype.ps1"
+timeout /t 3 >nul
+start "" "http://localhost:4174/"

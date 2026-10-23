@@ -30,3 +30,20 @@
 | tenant-recipe-management | `REQ-24-DICT-CODE` | ../租户端菜谱管理与授权PRD.md#10.7 字典编码规则 | 菜谱标签与字典 | `tenant-recipe-management:dictionary-rules` | 已映射 |
 | tenant-recipe-management | `REQ-25-DICT-CASCADE` | ../租户端菜谱管理与授权PRD.md#10.6 停用与删除 | 菜谱标签与字典 | `tenant-recipe-management:dictionary-rules`, `tenant-recipe-management:dictionary-table` | 已映射 |
 | tenant-recipe-management | `REQ-26-DICT-IMPACT` | ../租户端菜谱管理与授权PRD.md#10.6 停用与删除 | 租户端菜谱管理 | `tenant-recipe-management:dictionary-rules`, `tenant-recipe-management:editor-submit`, `tenant-recipe-management:auth-select-recipes`, `tenant-recipe-management:detail-basic`, `tenant-recipe-management:dictionary-table`, `tenant-recipe-management:editor-basic`, `tenant-recipe-management:list-table` | 已映射 |
+| tenant-recipe-management | `REQ-27-V2-PROCESS` | ../租户端菜谱管理-加工步骤与用料明细变更说明PRD.md#3 加工步骤变更 | 租户端菜谱编辑 | `tenant-recipe-management:editor-operation`, `tenant-recipe-management:editor-process` | 已映射 |
+| tenant-recipe-management | `REQ-28-V2-INGREDIENT` | ../租户端菜谱管理-加工步骤与用料明细变更说明PRD.md#4 用料明细变更 | 租户端菜谱编辑 | `tenant-recipe-management:detail-ingredients`, `tenant-recipe-management:editor-ingredients`, `tenant-recipe-management:editor-process` | 已映射 |
+| tenant-recipe-management | `REQ-29-V2-VALIDATE` | ../租户端菜谱管理-加工步骤与用料明细变更说明PRD.md#5 校验与提交变更 | 租户端菜谱编辑 | `tenant-recipe-management:editor-submit` | 已映射 |
+| tenant-recipe-management | `REQ-30-V2-READONLY` | ../租户端菜谱管理-加工步骤与用料明细变更说明PRD.md#7 影响与联动 | 菜谱详情 | `tenant-recipe-management:detail-rules`, `tenant-recipe-management:detail-ingredients`, `tenant-recipe-management:detail-process` | 已映射 |
+| tenant-recipe-management | `SUP-01-LIST` | 租户端供应商管理PRD.md#6. 列表页 | 供应商管理 | `tenant-recipe-management:sup-list-rules` | 已映射 |
+| tenant-recipe-management | `SUP-02-PRINCIPLE` | 租户端供应商管理PRD.md#1. 背景与目标 | 供应商管理 | `tenant-recipe-management:sup-list-note` | 已映射 |
+| tenant-recipe-management | `SUP-03-FILTER` | 租户端供应商管理PRD.md#6. 列表页 | 供应商管理 | `tenant-recipe-management:sup-list-filters` | 已映射 |
+| tenant-recipe-management | `SUP-04-ROWS` | 租户端供应商管理PRD.md#6. 列表页 | 供应商管理 | `tenant-recipe-management:sup-list-rows` | 已映射 |
+| tenant-recipe-management | `SUP-05-CREATE` | 租户端供应商管理PRD.md#7. 新建供应商 | 新建供应商 | `tenant-recipe-management:sup-create-rules` | 已映射 |
+| tenant-recipe-management | `SUP-06-LIC` | 租户端供应商管理PRD.md#5. 关键规则 | 新建供应商 | `tenant-recipe-management:sup-lic` | 已映射 |
+| tenant-recipe-management | `SUP-07-ACCOUNT` | 租户端供应商管理PRD.md#5. 关键规则 | 供应商管理 | `tenant-recipe-management:sup-list-rules`, `tenant-recipe-management:sup-account`, `tenant-recipe-management:sup-detail-account`, `tenant-recipe-management:sup-list-rows` | 已映射 |
+| tenant-recipe-management | `SUP-08-TYPES` | 租户端供应商管理PRD.md#5. 关键规则 | 供应商管理 | `tenant-recipe-management:sup-types` | 已映射 |
+| tenant-recipe-management | `SUP-09-MERCHANTS` | 租户端供应商管理PRD.md#5. 关键规则 | 供应商管理 | `tenant-recipe-management:sup-detail-merchants`, `tenant-recipe-management:sup-merchants` | 已映射 |
+| tenant-recipe-management | `SUP-10-DETAIL` | 租户端供应商管理PRD.md#8. 详情抽屉（可编辑性矩阵） | 供应商详情 | `tenant-recipe-management:sup-detail-rules` | 已映射 |
+| tenant-recipe-management | `SUP-11-CROSS` | 租户端供应商管理PRD.md#10. 跨租户口径 | 供应商管理 | `tenant-recipe-management:sup-create-rules`, `tenant-recipe-management:sup-detail-rules`, `tenant-recipe-management:sup-list-rules`, `tenant-recipe-management:sup-global`, `tenant-recipe-management:sup-list-note` | 已映射 |
+| tenant-recipe-management | `SUP-12-SCOPE` | 租户端供应商管理PRD.md#附录A 与商户端供应商管理的关系 | 供应商管理 | `tenant-recipe-management:sup-global` | 已映射 |
+| tenant-recipe-management | `SUP-13-OPEN` | 租户端供应商管理PRD.md#13. 待确认 | 供应商管理 | `tenant-recipe-management:sup-global` | 已映射 |

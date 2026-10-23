@@ -1,0 +1,50 @@
+/* ============================================================================
+   商户端 · 组织 / 档口 切换器样式（配合 merchant-org-scope-switcher.js）
+   挂在各业务页面**标题行下面单独一行**，跟随页面既有的卡片/表格视觉。
+   注意：不要放进标题行里 —— 那里右侧是页面原有的功能按钮（同步菜谱、新建菜谱、
+   编辑…），切换器一进去就会把按钮挤到中间。
+   ========================================================================== */
+
+.mos-bar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:flex-start;margin:0 0 14px}
+.mos-field{display:inline-flex;align-items:center;gap:7px;min-width:0}
+.mos-field>i{font-style:normal;color:#8494a8;font-size:12.5px;white-space:nowrap}
+.mos-field>select{
+  height:34px;min-width:150px;max-width:230px;padding:0 28px 0 10px;border:1px solid #dfe7f1;border-radius:5px;
+  outline:0;color:#26364d;background:#fff;font:13.5px inherit;cursor:pointer;
+  appearance:none;-webkit-appearance:none;
+  background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238494a8' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 8px center;background-size:14px;
+}
+.mos-field>select:hover{border-color:#c7d7ea}
+.mos-field>select:focus{border-color:#86b2ff;box-shadow:0 0 0 3px #edf5ff}
+.mos-field>select:disabled{color:#9aa9bc;background-color:#f7f9fc;cursor:not-allowed}
+.mos-link{padding:0;border:0;background:transparent;color:#2678ff;font:12.5px inherit;cursor:pointer;text-decoration:underline}
+.mos-link:hover{color:#0f5fd8}
+/* 锁定态（排餐计划编辑中）：下拉不可改，右侧给一句话说明为什么 */
+.mos-lock{display:inline-flex;align-items:center;gap:5px;font-style:normal;color:#8494a8;font-size:12.5px;white-space:nowrap}
+.mos-lock:before{content:'🔒';font-size:11px;line-height:1}
+.mos-bar[data-mos-locked] .mos-field>select{color:#5b6b80;background-color:#f7f9fc;cursor:not-allowed}
+
+/* 独立一行：左右留白跟标题行对齐（各页卡片的标题行内边距不同，按容器分别给） */
+.mp-workspace-head+.mos-bar{margin:0 22px 16px}
+.um-head+.mos-bar{margin:0 26px 16px}
+/* 菜谱管理 hub 的标题行自身 padding:0（内边距在卡片 .um-hub 上），这里不能再加一遍 */
+.um-hub>.mos-bar{margin:0 0 16px}
+
+/* 排餐/生产计划：组织层（未选档口）的档口总览 */
+.mp-stall-overview{padding:4px 0 2px}
+.mp-stall-overview>p.mp-so-tip{margin:0 0 12px;color:#8494a8;font-size:12.5px}
+.mp-so-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(258px,1fr));gap:12px}
+/* 卡片刻意做成等高 + 底部那一行固定在卡片底部：
+   餐次标签行数不同时（1 餐 vs 6 餐），「本周未排餐 / 进入排餐」也不会上下跳 */
+.mp-so-card{display:flex;flex-direction:column;border:1px solid #e6ecf5;border-radius:9px;background:#fff;padding:14px 15px;cursor:pointer;transition:border-color .12s,box-shadow .12s}
+.mp-so-card:hover{border-color:#9fc0ff;box-shadow:0 4px 14px rgba(38,103,255,.09)}
+.mp-so-card h4{margin:0;color:#22364e;font-size:14.5px}
+.mp-so-card .mp-so-owner{margin:6px 0 0;color:#8494a8;font-size:12px}
+.mp-so-meals{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+.mp-so-meals span{padding:2px 8px;border-radius:11px;background:#eef5ff;color:#2678ff;font-size:12px;white-space:nowrap}
+.mp-so-foot{display:flex;align-items:center;justify-content:space-between;margin-top:auto;padding-top:10px;border-top:1px dashed #eef2f8}
+.mp-so-foot b{color:#22364e;font-size:13px}
+.mp-so-foot b i{font-style:normal;color:#10a37f}
+.mp-so-foot .mp-so-enter{color:#2678ff;font-size:12.5px}
+.mp-so-empty{margin:0;padding:16px;border:1px dashed #dfe7f1;border-radius:8px;background:#fbfcfe;color:#8494a8;font-size:13px;text-align:center}

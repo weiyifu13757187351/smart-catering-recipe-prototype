@@ -96,6 +96,7 @@ body.mb-body{
 .mb-dev-group{margin-bottom:6px}
 
 /* ---------------- 排餐调整 ---------------- */
+.mb-note.inherit{margin:0 0 12px;padding:10px 12px;border-radius:10px;background:#eef4ff;color:var(--mb-brand);font-size:14px;line-height:1.5}
 .mb-meal-card{padding:14px}
 .mb-meal-empty{display:flex;align-items:center;gap:10px;padding:10px 14px}
 .mb-meal-empty b{flex:1;font-size:16px}
@@ -159,6 +160,11 @@ body.mb-body{
 .mb-list-item:last-child{border-bottom:0}
 .mb-list-item b{flex:1;font-size:17px;font-weight:700}
 .mb-list-item small{color:var(--mb-ink-3);font-size:13px}
+/* 切换食堂/档口：食堂列表与档口列表同屏，档口区给个小标题分隔 */
+.mb-sheet-note{margin:14px 0 2px;padding-top:12px;border-top:1px solid var(--mb-line);color:var(--mb-ink-3);font-size:13px}
+#mbStallList .mb-list-item{min-height:56px}
+#mbStallList .mb-list-item b{font-size:16px}
+.mb-list-item[data-open="1"]{background:#f2f7ff}
 .mb-search{width:100%;min-height:52px;padding:12px;border:1px solid var(--mb-line);border-radius:11px;font:inherit;font-size:16px;margin-bottom:6px}
 
 .mb-adjust{padding:10px 0}
@@ -172,3 +178,11 @@ body.mb-body{
 .mb-toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:90;
   max-width:88vw;background:#20262f;color:#fff;padding:12px 18px;border-radius:12px;font-size:15px;font-weight:600;
   box-shadow:0 8px 24px rgba(0,0,0,.22);animation:mbUp .16s ease-out}
+/* ===== V3：餐次人均用餐量与预计就餐人数 ===== */
+.mb-meal-sum{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;margin:-4px 0 12px;padding:9px 12px;border-radius:10px;background:var(--mb-ok-soft);color:var(--mb-ok)}
+.mb-meal-sum b{font-size:15px}
+.mb-meal-sum span{color:var(--mb-ink-2);font-size:13px}
+.mb-meal-sum .mb-tally{margin-left:auto;font-weight:700}
+
+/* ===== 手机端：不计入就餐人数的分类说明 ===== */
+.mb-skip-note{color:#b57a1f}

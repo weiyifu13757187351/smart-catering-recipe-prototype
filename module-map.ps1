@@ -13,6 +13,8 @@ $ModuleRules = @(
   @{ Pattern = '(^|/)\.';                                  Label = $null }
   @{ Pattern = '^_anno-verify';                            Label = $null }
   @{ Pattern = 'readme|\.ps1$|\.bat$|使用说明';             Label = $null }
+  @{ Pattern = '\.docx$';                                  Label = $null }
+  @{ Pattern = 'prd-shots';                                Label = $null }
   @{ Pattern = '_next|/chunks?/|/static/';                 Label = '前端构建产物' }
 
   # ---- 标注与文档 ----
@@ -62,6 +64,11 @@ $ModuleRules = @(
 
   # ---- 组织 / 权限 / 其他 ----
   @{ Pattern = 'merchant-meal-plan';                       Label = '餐次计划' }
+  @{ Pattern = 'production-plan';                          Label = '生产计划' }
+  @{ Pattern = 'purchase-plan';                            Label = '采购计划' }
+  @{ Pattern = 'supplier';                                 Label = '供应商管理' }
+  @{ Pattern = 'stall';                                    Label = '档口管理' }
+  @{ Pattern = 'org-scope';                                Label = '组织范围切换' }
   @{ Pattern = 'product-reference';                        Label = '商品中心引用' }
   @{ Pattern = 'product-center';                           Label = '商品中心' }
   @{ Pattern = 'roles';                                    Label = '角色权限' }

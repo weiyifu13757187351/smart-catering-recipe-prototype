@@ -1,0 +1,169 @@
+/* ============================================================================
+   租户端菜谱管理 · 用料流改造（V3）样式
+   配套 unified-recipe-ingredient-flow.js：
+   加工步骤里自行添加的用料行 / 设备投料明细行 / 选择器 / 派生的用料明细表
+   ========================================================================== */
+
+/* ------------------------------------------------ 人工处理：关联用料 */
+.rif-assoc{border:1px solid #dce4f0;border-radius:8px;background:#f8faff;padding:12px 13px}
+.rif-assoc-head{display:flex;align-items:center;gap:14px;margin-bottom:10px}
+.rif-assoc-head>span{font-weight:600;color:#17233d}
+.rif-assoc-head>span::after{content:' *';color:#e05252;font-weight:400}
+.rif-assoc-head .rif-add{margin-left:auto}
+.rif-add{margin-left:auto;height:30px;padding:0 12px;font-size:13px}
+.rif-assoc-list{display:flex;flex-direction:column;gap:8px}
+.rif-assoc-row{display:grid;grid-template-columns:minmax(0,1fr) 190px 30px;align-items:center;gap:10px;padding:9px 11px;border:1px solid #e2e8f1;border-radius:8px;background:#fff}
+.rif-name{display:flex;align-items:center;gap:8px;min-width:0;flex-wrap:wrap}
+.rif-name>b{color:#17233d;font-weight:600}
+.rif-name>small{flex-basis:100%;color:#8a93a8;font-size:12px}
+.rif-amount{display:flex;align-items:center;gap:6px}
+.rif-amount input{width:100%;height:34px;padding:0 10px;border:1px solid #dfe5ef;border-radius:7px;background:#fff;font-size:13px;color:#17233d}
+.rif-amount input:focus{outline:none;border-color:#4f6df5;box-shadow:0 0 0 2px rgba(79,109,245,.12)}
+.rif-amount i{font-style:normal;color:#7b88a5;font-size:13px}
+.rif-del{width:26px;height:26px;border:1px solid #e6ebf4;border-radius:50%;background:#fff;color:#9aa5bb;font-size:15px;line-height:1;cursor:pointer}
+.rif-del:hover{border-color:#f2c3c3;background:#fdf4f4;color:#e05252}
+.rif-empty{margin:0;color:#8a93a8;font-size:13px}
+.rif-tag{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:9px;font-size:11px;font-style:normal;line-height:17px}
+.rif-tag.food{background:#eef3ff;color:#4f6df5;border:1px solid #dbe5ff}
+.rif-tag.sku{background:#eefaf5;color:#12a077;border:1px solid #cdeee2}
+.rif-tag.liquid{background:#eef7ff;color:#1f7ae0;border:1px solid #d5e8ff}
+.rif-tag.powder{background:#fdf5e9;color:#c07a12;border:1px solid #f6e3c4}
+
+/* ------------------------------------------------ 设备加工：投料明细 */
+.uo-material-head .rif-uo-add{margin-left:auto;height:28px;padding:0 10px;font-size:12px}
+.uo-material-head b{margin-right:8px;white-space:nowrap;flex:none}
+.uo-material-head>span{flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.uo-material-head .rif-uo-add{flex:none;white-space:nowrap;margin-left:10px}
+.unified-operation-form .rif-uo-row{display:grid;grid-template-columns:minmax(0,1fr) 132px 22px 26px;align-items:center;gap:9px;margin:0 0 7px;padding:10px 11px;border-radius:7px;background:#fff}
+.unified-operation-form .rif-uo-row:last-child{margin-bottom:0}
+.rif-uo-row>span{display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-width:0}
+.rif-uo-row>span>b{color:#17233d;font-weight:600}
+.rif-uo-row>span>small{flex-basis:100%;min-width:0;color:#8a93a8;font-size:12px;word-break:break-all}
+.unified-operation-form .rif-uo-row input[type="number"]{width:100%;height:34px;margin:0;padding:0 9px;border:1px solid #dfe5ef;border-radius:7px;background:#fff;font-size:13px}
+.rif-uo-row em{font-style:normal;color:#7b88a5;font-size:13px;text-align:left}
+.rif-uo-row .rif-del{width:26px;height:26px}
+.rif-derived-note{margin:4px 0 0;color:#7b88a5;font-size:12px}
+
+/* 液体 / 粉末：三方接口返回的固定清单（搜索名称后选择，可多选） */
+.rif-tp-select{margin-bottom:9px}
+.rif-tp-field{position:relative}
+.rif-tp-input{width:100%;height:36px;padding:0 32px 0 12px;border:1px solid #dfe5ef;border-radius:7px;background:#fff;font-size:13px;color:#17233d}
+.rif-tp-input:focus{outline:none;border-color:#4f6df5;box-shadow:0 0 0 2px rgba(79,109,245,.12)}
+.rif-tp-input::placeholder{color:#a7b0c2}
+.rif-tp-arrow{position:absolute;top:0;right:12px;height:36px;display:flex;align-items:center;color:#9aa5bb;font-size:15px;pointer-events:none}
+.rif-tp-options{max-height:216px;overflow:auto;margin-top:6px;padding:5px;border:1px solid #dfe5ef;border-radius:9px;background:#fff}
+.rif-tp-option{display:block;width:100%;padding:9px 11px;border:none;border-radius:7px;background:transparent;color:#17233d;font-size:13px;text-align:left;cursor:pointer}
+.rif-tp-option:hover{background:#f4f7ff;color:#4f6df5}
+.rif-tp-none{padding:10px 11px;color:#9aa5bb;font-size:12.5px}
+.rif-tp-empty{margin:0;padding:12px;border:1px dashed #dfe5ef;border-radius:7px;background:#fbfcfe;color:#8a93a8;font-size:12.5px;text-align:center}
+.unified-operation-form .rif-tp-row{grid-template-columns:minmax(0,1fr) 132px 22px 26px}
+.rif-tp-row>span>b{font-weight:600}
+
+/* ------------------------------------------------ 派生的用料明细表 */
+.rif-note{margin:0 0 10px;padding:8px 12px;border:1px solid #e6ecf8;border-radius:7px;background:#f7f9ff;color:#6b7891;font-size:12.5px}
+.rif-table-wrap{border:1px solid #e3e8f1;border-radius:10px;overflow:hidden;background:#fff}
+.rif-table{width:100%;border-collapse:collapse}
+.rif-table th{padding:11px 14px;background:#f7f9fd;border-bottom:1px solid #e6ebf4;color:#6b7891;font-size:12.5px;font-weight:600;text-align:left}
+.rif-table td{padding:12px 14px;border-bottom:1px solid #eef1f7;vertical-align:middle;font-size:13px;color:#17233d}
+.rif-table tr:last-child td{border-bottom:none}
+.rif-table td>b{font-weight:600}
+.rif-sub{display:block;margin-top:3px;color:#8a93a8;font-size:12px}
+.rif-total b{font-size:15px;color:#17233d}
+.rif-uses{display:flex;flex-wrap:wrap;gap:8px}
+.rif-use{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border:1px solid #e2e8f1;border-radius:15px;background:#f8faff;color:#4a566e;font-size:12.5px}
+.rif-use i{display:inline-grid;place-items:center;width:16px;height:16px;border-radius:50%;background:#4f6df5;color:#fff;font-size:11px;font-style:normal}
+.rif-use b{color:#17233d}
+.rif-table-empty{padding:26px;border:1px dashed #dfe5ef;border-radius:10px;background:#fbfcfe;color:#8a93a8;font-size:13px;text-align:center}
+
+/* ------------------------------------------------ 用料选择器（双页签） */
+.rif-picker-mask{position:fixed;inset:0;z-index:1500;display:none;align-items:center;justify-content:center;background:rgba(18,31,55,.46)}
+.rif-picker-mask.show{display:flex}
+.rif-picker{display:flex;flex-direction:column;width:min(680px,94vw);max-height:82vh;border-radius:14px;background:#fff;box-shadow:0 24px 60px rgba(16,28,52,.28);overflow:hidden}
+.rif-picker-head{display:flex;align-items:flex-start;justify-content:space-between;padding:16px 20px 12px;border-bottom:1px solid #eef1f7}
+.rif-picker-head h3{margin:0 0 4px;font-size:16px;color:#17233d}
+.rif-picker-head p{margin:0;color:#7b88a5;font-size:12.5px}
+.rif-picker-head button{width:28px;height:28px;border:none;background:transparent;color:#9aa5bb;font-size:20px;cursor:pointer}
+.rif-tabs{display:flex;gap:22px;padding:0 20px;border-bottom:1px solid #eef1f7}
+.rif-tabs button{position:relative;padding:11px 2px;border:none;background:transparent;color:#6b7891;font-size:13.5px;cursor:pointer}
+.rif-tabs button.active{color:#4f6df5;font-weight:600}
+.rif-tabs button.active::after{content:'';position:absolute;left:0;right:0;bottom:-1px;height:2px;background:#4f6df5}
+.rif-search{display:flex;gap:10px;padding:14px 20px 10px}
+.rif-search input{flex:1;height:36px;padding:0 12px;border:1px solid #dfe5ef;border-radius:8px;font-size:13px}
+.rif-search select{width:170px;height:36px;border:1px solid #dfe5ef;border-radius:8px;font-size:13px;color:#4a566e}
+.rif-list{flex:1;overflow:auto;padding:0 20px 12px}
+.rif-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(140px,auto) 62px;align-items:center;gap:12px;width:100%;margin-bottom:8px;padding:11px 13px;border:1px solid #e3e8f1;border-radius:9px;background:#fff;text-align:left;cursor:pointer}
+.rif-row:hover{border-color:#c9d8ff;background:#f8faff}
+.rif-row.is-disabled{cursor:not-allowed;background:#f7f8fa;opacity:.72}
+.rif-row span{display:flex;flex-direction:column;gap:3px;min-width:0}
+.rif-row span b{color:#17233d;font-size:13.5px}
+.rif-row span small{color:#8a93a8;font-size:12px}
+.rif-row>em{font-style:normal;color:#6b7891;font-size:12px}
+.rif-row .rif-go,.rif-row .rif-picked{font-style:normal;font-size:12px;text-align:right;color:#4f6df5}
+.rif-row .rif-picked{color:#9aa5bb}
+.rif-list-empty{margin:22px 0;color:#8a93a8;font-size:13px;text-align:center}
+.rif-picker-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 20px 16px;border-top:1px solid #eef1f7;background:#fbfcfe;color:#8a93a8;font-size:12.5px}
+
+/* ------------------------------------------------ 只读详情：加工步骤 */
+.rif-ro-steps{display:flex;flex-direction:column;gap:12px}
+.rif-ro-step{padding:14px 16px;border:1px solid #e3e8f1;border-radius:10px;background:#fff}
+.rif-ro-step>header{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.rif-ro-step>header i{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:#eef3ff;color:#4f6df5;font-size:12px;font-style:normal}
+.rif-ro-step>header b{color:#17233d;font-size:14px}
+.rif-ro-step p{margin:0 0 6px;color:#4a566e;font-size:13px;line-height:1.7}
+.rif-ro-step p b{color:#6b7891;font-weight:600}
+.rif-ro-assoc{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.rif-ro-assoc>b{color:#6b7891;font-size:13px;font-weight:600}
+.rif-ro-item{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border:1px solid #e2e8f1;border-radius:15px;background:#f8faff}
+.rif-ro-item b{color:#17233d;font-size:12.5px}
+.rif-ro-item em{font-style:normal;color:#4f6df5;font-size:12.5px}
+.rif-ro-device{margin-top:6px;padding-top:10px;border-top:1px dashed #e6ebf4}
+.rif-ro-actions{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.rif-ro-action{display:flex;align-items:center;gap:10px;padding:9px 12px;border:1px solid #eef1f7;border-radius:8px;background:#fbfcfe}
+.rif-ro-action i{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:50%;background:#eef3ff;color:#4f6df5;font-size:11px;font-style:normal}
+.rif-ro-action b{color:#17233d;font-size:13px}
+.rif-ro-action span{color:#7b88a5;font-size:12.5px}
+.rif-ro-action small{color:#12a077;font-size:12.5px}
+
+/* 只读详情里的用料明细表跟随详情区宽度 */
+.device-detail-content .rif-table-wrap,.device-detail-content .rif-note{margin-top:10px}
+/* ---------------------------------- 用料明细：烹饪投料（计入） / 过程用料（不计入） */
+.rif-split{display:flex;flex-direction:column;gap:12px}
+.rif-balance{display:flex;flex-wrap:wrap;gap:10px}
+.rif-balance-item{display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border:1px solid #cdeada;border-radius:9px;background:#f3fbf6;color:#2f6b45;font-size:12.5px}
+.rif-balance-item b{font-size:14px;color:#1f7a4d}
+.rif-balance-item em{color:#4d7f61;font-style:normal}
+.rif-balance-item.proc{border-color:#eee4cf;background:#fdfbf6;color:#8a7040}
+.rif-balance-item.proc b{color:#a8801f}
+.rif-balance-item.proc em{color:#9b8a62}
+.rif-dup-hint{padding:9px 12px;border:1px solid #ffe2b8;border-radius:7px;background:#fffaf0;color:#8a6d3b;font-size:12.5px;line-height:1.6}
+.rif-cook-block>header{display:flex;align-items:baseline;gap:10px;margin-bottom:9px}
+.rif-cook-block>header b{color:#17233d;font-size:14px}
+.rif-cook-block>header span{color:#8a93a8;font-size:12px}
+.rif-dup{margin-top:7px;padding:6px 10px;border-radius:6px;background:#fffaf0;color:#8a6d3b;font-size:12px;line-height:1.6}
+.rif-use.off{background:#f7f5f0;border-color:#e8e2d5;color:#8a7c60}
+.rif-use.off i{background:#b8a67e}
+.rif-proc-block{padding:12px 13px;border:1px solid #eee4cf;border-radius:10px;background:#fdfbf6}
+.rif-proc-block>summary{display:flex;align-items:center;gap:10px;color:#8a7040;font-size:13px;font-weight:600;cursor:pointer;list-style:none}
+.rif-proc-block>summary::-webkit-details-marker{display:none}
+.rif-proc-block>summary::before{content:'▸';color:#c2a35f;font-size:12px}
+.rif-proc-block[open]>summary::before{content:'▾'}
+.rif-proc-block>summary b{margin-left:auto;color:#a8801f;font-size:12.5px;font-weight:600}
+.rif-proc-block[open]>summary{margin-bottom:10px}
+.rif-proc-block .rif-note{margin:0 0 10px;border-color:#eee4cf;background:#fffdf8;color:#8a7c60}
+.rif-cook-flag{display:inline-block;margin-left:8px;padding:1px 8px;border:1px solid #f0dcb0;border-radius:9px;background:#fffaf0;color:#a8801f;font-size:11px;font-style:normal;font-weight:600;line-height:17px}
+/* 编辑向导「用料明细」页签：与页签标题（.device-ingredient-head 的 18px 内边距）左右对齐并留出底部间距 */
+.unified-recipe-editor-root #ingredientDetailList{padding:14px 18px 18px}
+/* 商品SKU 用料的「规格」信息（选择用料弹窗 / 关联用料行 / 用料明细） */
+.rif-row span .rif-row-spec,.rif-name>small.rif-spec,.rif-sub .rif-spec{color:#4d6fa8}
+/* ===== 与「新建/编辑菜谱」抽屉框架对齐（只作用于菜谱详情，不影响其它详情抽屉） ===== */
+#unifiedRecipeDetail .device-detail-drawer{width:min(1180px,96vw)}
+#unifiedRecipeDetail .recipe-modal-head{height:82px;padding:0 25px}
+#unifiedRecipeDetail .recipe-modal-head h2{font-size:16.4px;font-weight:700;margin:0 0 6px}
+#unifiedRecipeDetail .recipe-modal-head p{font-size:12px;margin:0}
+#unifiedRecipeDetail .device-detail-tabs{padding:0 18px}
+#unifiedRecipeDetail .device-detail-tabs button{padding:15px 22px}
+#unifiedRecipeDetail .device-detail-tabs button.active{border-bottom-color:#2867e8}
+#unifiedRecipeDetail .recipe-modal-foot{height:72px;padding:15px 24px}
+/* 「不计入投料」角标：步骤头是 3 列 grid，第 4 个子元素会被挤到下一行 → 补一列并禁止换行 */
+#unifiedRecipeDetail .device-detail-process-step>header{grid-template-columns:34px 1fr auto auto}
+.rif-cook-flag{flex:0 0 auto;white-space:nowrap}
