@@ -1,33 +1,24 @@
 {
-    "publishedAt":  "2026-10-23 10:17",
-    "publishLabel":  "商户端：新增采购计划、档口管理与供应商管理，更新排餐/生产计划；租户端：新增供应商管理，更新统一菜谱用料流程",
-    "tenantSourceAt":  "2026-10-22 15:21",
+    "publishedAt":  "2026-10-23 10:34",
+    "publishLabel":  "租户端：去掉供应商新建/建立合作时「首次登录强制修改密码」与「平台已有供应类型」两处提示文案（刷新资源版本号）",
+    "tenantSourceAt":  "2026-10-23 10:34",
     "merchantSourceAt":  "2026-10-23 09:08",
     "opsysSourceAt":  "2026-09-24 10:59",
     "changes":  {
                     "tenant":  {
                                    "modules":  [
-                                                   "业务标注",
-                                                   "统一菜谱",
-                                                   "前端构建产物",
-                                                   "商品中心",
-                                                   "供应商管理",
-                                                   "统一菜谱编辑"
+                                                   "入口页",
+                                                   "供应商管理"
                                                ],
-                                   "moreCount":  4,
-                                   "fileCount":  25
+                                   "moreCount":  0,
+                                   "fileCount":  2
                                },
                     "merchant":  {
                                      "modules":  [
-                                                     "业务标注",
-                                                     "merchant-mobile",
-                                                     "档口管理",
-                                                     "餐次计划",
-                                                     "组织范围切换",
-                                                     "采购计划"
+
                                                  ],
-                                     "moreCount":  9,
-                                     "fileCount":  44
+                                     "moreCount":  0,
+                                     "fileCount":  0
                                  },
                     "opsys":  {
                                   "modules":  [

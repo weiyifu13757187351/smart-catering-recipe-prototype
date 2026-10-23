@@ -361,7 +361,7 @@ function supOpenEditor(mode, row) {
               <input id="supAccount" placeholder="请输入账号（如手机号）" value="${acc ? supEsc(acc.name) : ''}" ${isEdit ? 'readonly class="locked"' : ''}/>
               <small id="supAccountHint" class="${lockAcct ? 'err' : ''}">${isEdit ? (lockAcct ? `账号由「${supEsc(acc.tenant)}」开通，本租户不可创建、不可重置` : '账号创建后不可修改，如需变更请联系平台') : '该账号不可与其他供应商账号重复'}</small>
             </label>
-            <label>默认密码<input id="supPwd" value="${SUP_DEFAULT_PWD}" readonly/><small>首次登录强制修改密码</small></label>
+            <label>默认密码<input id="supPwd" value="${SUP_DEFAULT_PWD}" readonly/></label>
           </div>
           <span class="sup-badge ${lockAcct ? '' : 'hidden'}" id="supAccountBadge">${lockAcct ? `⚠ 账号已存在（${supEsc(acc.name)}），请使用该账号登录供应商系统` : ''}</span>
         </section>
@@ -369,7 +369,6 @@ function supOpenEditor(mode, row) {
         <section class="sup-section" data-anno="sup-types">
           <div class="sup-section-head"><div><h3><i>4</i>供应类型</h3><p>至少选择 1 个，决定商户端采购时可按哪些形态选择该供应商</p></div></div>
           <div class="sup-types">${SUP_TYPES.map(t => `<label class="sup-type"><input type="checkbox" data-sup-type value="${t.key}" ${r && (r.types || []).indexOf(t.key) >= 0 ? 'checked' : ''}/><span><b>${t.key}</b><small>${t.desc}</small></span></label>`).join('')}</div>
-          <small id="supTypeHint" style="display:block;margin-top:10px;color:#94a0b4;font-size:11px"></small>
         </section>
 
         <section class="sup-section" data-anno="sup-merchants">
@@ -529,7 +528,6 @@ function supLockCross(hit) {
 
   supLockArchive(hit);
 
-  $('#supTypeHint').textContent = '该供应商在平台已有供应类型：' + ((hit.types || []).join(' / ') || '—') + '，可按本租户合作范围调整';
   $$('[data-sup-type]').forEach(x => { x.checked = (hit.types || []).indexOf(x.value) >= 0; });
 
   $('#supHeadTitle').textContent = '建立供应商合作';
@@ -577,7 +575,6 @@ function supUnlockCross() {
     tile.classList.remove('disabled');
     counter.textContent = '0/' + list.dataset.max;
   });
-  $('#supTypeHint').textContent = '';
 }
 
 function supBindUploads() {
