@@ -1,0 +1,8 @@
+﻿t=3s readyState=loading scripts=7 srcScripts=0 htmlLen=166488 nav=组织及成员|角色管理|管理员设置|recipeNav|dishCategoryNav
+t=6s readyState=loading scripts=8 srcScripts=1 htmlLen=166563 nav=组织及成员|角色管理|管理员设置|recipeNav|dishCategoryNav
+t=10s readyState=loading scripts=15 srcScripts=8 htmlLen=168477 nav=组织及成员|角色管理|管理员设置|recipeNav|dishCategoryNav|deviceRecipeNav
+t=15s readyState=loading scripts=21 srcScripts=14 htmlLen=172421 nav=组织及成员|角色管理|管理员设置|recipeNav|dishCategoryNav|deviceRecipeNav|mealPlanNav|productionPlanNav|purchasePlanNav|poOrderNav|srNav|stallListNav
+
+MerchantScope: object | MerchantPurchase: object | MerchantOrder: object
+失败资源: （无）
+点击结果: clicked | 可见: purchasePlanPage | 面包屑: 计划管理 / 采购计划

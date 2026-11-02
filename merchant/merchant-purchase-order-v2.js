@@ -329,8 +329,14 @@ function onScopeChanged(force) {
   S.stallId = next || S.stallId;
   if (!changed && !force) return;
   curOrder = null;
-  const sp = srPage();
-  if (sp && !sp.hidden) { renderSupply(); return; }
+  /* V4.16：只有用户当前就在采购管理栏目里才重画 / 切页。
+     旧逻辑不管在哪个栏目都 showList()，于是用户在「采购计划」「排餐计划」等页面
+     里切档口、换组织（首次进入这些页面时切换器挂载也会触发一次范围同步）时，
+     会被硬拉到「采购订单」——表现为「第一次点采购计划却跳到采购订单」。 */
+  const visible = el => !!(el && !el.hidden);
+  const srEl = $('#supplyRelationPage'), listEl = $('#purchaseOrderPage'), wizEl = $('#poWizardPage');
+  if (visible(srEl)) { renderSupply(); return; }
+  if (!visible(listEl) && !visible(wizEl)) return;
   showList();
 }
 

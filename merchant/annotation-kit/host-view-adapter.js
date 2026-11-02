@@ -42,18 +42,20 @@
   // 订单详情里的「验收 / 验收详情 / 差异原因 / 签名 / 退货 / 售后详情」共用同一套 po-form 结构，
   // 只能靠各自的专属控件区分；验收详情用 .po-cert（商品资质 + 签字区）兜底。
   function resolvePurchaseMgmtDrawer() {
-    const body = document.querySelector('#mpDrawerBody');
-    if (!body) return null;
-    if (body.querySelector('#poAcceptQty')) return 'po-accept';
-    if (body.querySelector('#poSigCanvas')) return 'po-sign';
-    if (body.querySelector('[data-diff-reason]')) return 'po-finish-diff';
-    if (body.querySelector('#poRtQty')) return 'po-return';
-    if (body.querySelector('[data-as-close]')) return 'po-as-detail';
-    if (body.querySelector('#poPickKw')) return 'po-add-sku';
-    if (body.querySelector('#poRcSearch')) return 'po-receiver-pick';
-    if (body.querySelector('.po-cert') || body.querySelector('[data-dacc-edit]')) return 'po-accept-detail';
-    if (body.querySelector('[data-sr-pick]')) return 'sr-bind';
-    if (body.querySelector('#srFormPick')) return 'sr-batch-form';
+    /* 抽屉分 body + foot 两段，取消/关闭按钮在 foot 里，所以要在整个 .mp-drawer 上找特征 */
+    const drawer = document.querySelector('.mp-drawer');
+    if (!drawer) return null;
+    const q = sel => drawer.querySelector(sel);
+    if (q('#poAcceptQty')) return 'po-accept';
+    if (q('#poSigCanvas')) return 'po-sign';
+    if (q('[data-diff-reason]')) return 'po-finish-diff';
+    if (q('#poRtQty')) return 'po-return';
+    if (q('[data-as-close]')) return 'po-as-detail';
+    if (q('#poPickKw')) return 'po-add-sku';
+    if (q('#poRcSearch')) return 'po-receiver-pick';
+    if (q('.po-cert') || q('[data-dacc-edit]')) return 'po-accept-detail';
+    if (q('[data-sr-pick]')) return 'sr-bind';
+    if (q('#srFormPick')) return 'sr-batch-form';
     return null;
   }
 

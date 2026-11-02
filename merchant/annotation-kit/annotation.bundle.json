@@ -2800,9 +2800,10 @@
       "target": {
         "selector": ".po-accept-head",
         "fallbackSelectors": [
-          "#poFinishBtn"
+          "#poFinishBtn",
+          ".po-banner-ok"
         ],
-        "activationHint": "只在「验收中」状态出现；全部行验收后才可点按钮"
+        "activationHint": "验收中时是验收完成提示条；已完成后是绿色锁定横幅"
       },
       "sourceRefs": [
         "PM-05-FINISH"
@@ -3292,5 +3293,5 @@
     "mapped": 120,
     "unmapped": 0
   },
-  "buildId": "03c61ad05be0d14b"
+  "buildId": "e442ade388a47984"
 }

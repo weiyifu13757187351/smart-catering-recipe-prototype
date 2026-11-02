@@ -1,0 +1,3 @@
+﻿可验收按钮 = ["S0301","S1701","S2501"]
+验收抽屉 = {"view":"po-accept","by":{"readable":2,"out-of-context":28,"visible":1},"missing":[]}
+汇总条存在 = true

@@ -172,8 +172,8 @@
       "moduleName": "验收完成（订单级收口）",
       "target": {
         "selector": ".po-accept-head",
-        "fallbackSelectors": ["#poFinishBtn"],
-        "activationHint": "只在「验收中」状态出现；全部行验收后才可点按钮"
+        "fallbackSelectors": ["#poFinishBtn", ".po-banner-ok"],
+        "activationHint": "验收中时是验收完成提示条；已完成后是绿色锁定横幅"
       },
       "markdownFile": "annotations/po/merchant-purchase-order.md",
       "blockId": "pm-detail-accept-head",

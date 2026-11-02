@@ -1,0 +1,18 @@
+﻿title = 食联网数智餐饮平台 - 组织及成员
+href  = https://weiyifu13757187351.github.io/smart-catering-recipe-prototype/merchant/%E9%A3%9F%E8%81%94%E7%BD%91%E6%95%B0%E6%99%BA%E9%A4%90%E9%A5%AE%E5%B9%B3%E5%8F%B0-%E7%BB%84%E7%BB%87%E5%8F%8A%E4%BA%BA%E5%91%98.html
+脚本数 = 2
+脚本 src = 
+
+
+4xx/5xx 资源： （无）
+
+导航项 = 组织及成员 | 角色管理 | 管理员设置 | recipeNav | dishCategoryNav
+计划管理菜单存在 = false
+MerchantPurchase 模块 = undefined
+MerchantScope = undefined
+
+点采购计划前可见 = organizationPage
+点采购计划后可见 = organizationPage
+面包屑 = 基础信息 / 组织及成员
+
+异常 = （无）

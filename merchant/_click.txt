@@ -1,0 +1,8 @@
+﻿初始： organizationPage || 基础信息 / 组织及成员
+clicked #purchasePlanNav @121,940
+点采购计划后： organizationPage || 基础信息 / 组织及成员
+clicked #poOrderNav @121,1034
+点采购订单后： organizationPage || 基础信息 / 组织及成员
+clicked #purchasePlanNav @121,940
+再点采购计划后（等 2s）： organizationPage || 基础信息 / 组织及成员
+异常： （无）

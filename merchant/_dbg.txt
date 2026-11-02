@@ -1,0 +1,22 @@
+﻿加载完成，body.dataset.vpaView = other
+初始可见页面 = [ 'organizationPage' ]
+
+=== 点击采购计划后 ===
+可见页面 = [ 'purchasePlanPage' ]
+面包屑 = 计划管理  /  采购计划
+导航高亮 = [ '采购计划' ]
+vpaView = purchase-overview
+
+=== hidden 变化调用栈 ===
+ - HIDE merchantSupplierPage << at HTMLDivElement.set [as hidden] (<anonymous>:12:16) << at leave (http://127.0.0.1:4201/merchant-supplier-list.js?v=20261022-msup-2:242:27) << at HTMLDocument.<anonymous> (http://127.0.0.1:4201/merchant-supplier-list.js?v=20261022-msup-2:272:52) << at <anonymous>:1:44
+ - HIDE organizationPage << at HTMLDivElement.set [as hidden] (<anonymous>:12:16) << at http://127.0.0.1:4201/merchant-product-center.js?v=20261015-hideall-1:200:132 << at NodeList.forEach (<anonymous>) << at hidePage (http://127.0.0.1:4201/merchant-product-center.js?v=20261015-hideall-1:200:112)
+ - HIDE rolesPage << at HTMLDivElement.set [as hidden] (<anonymous>:12:16) << at http://127.0.0.1:4201/merchant-product-center.js?v=20261015-hideall-1:200:132 << at NodeList.forEach (<anonymous>) << at hidePage (http://127.0.0.1:4201/merchant-product-center.js?v=20261015-hideall-1:200:112)
+ - HIDE adminsPage << at HTMLDivElement.set [as hidden] (<anonymous>:12:16) << at http://127.0.0.1:4201/merchant-product-center.js?v=20261015-hideall-1:200:132 << at NodeList.forEach (<anonymous>) << at hidePage (http://127.0.0.1:4201/merchant-product-center.js?v=20261015-hideall-1:200:112)
+ - HIDE recipePage << at HTMLDivElement.set [as hidden] (<anonymous>:12:16) << at http://127.0.0.1:4201/merchant-product-center.js?v=20261015-hideall-1:200:132 << at NodeList.forEach (<anonymous>) << at hidePage (http://127.0.0.1:4201/merchant-product-center.js?v=20261015-hideall-1:200:112)
+ - HIDE dishCategoryPage << at HTMLDivElement.set [as hidden] (<anonymous>:12:16) << at http://127.0.0.1:4201/merchant-product-center.js?v=20261015-hideall-1:200:132 << at NodeList.forEach (<anonymous>) << at hidePage (http://127.0.0.1:4201/merchant-product-center.js?v=20261015-hideall-1:200:112)
+ - HIDE deviceRecipePage << at HTMLElement.set [as hidden] (<anonymous>:12:16) << at http://127.0.0.1:4201/merchant-product-center.js?v=20261015-hideall-1:200:132 << at NodeList.forEach (<anonymous>) << at hidePage (http://127.0.0.1:4201/merchant-product-center.js?v=20261015-hideall-1:200:112)
+ - HIDE stallPage << at HTMLDivElement.set [as hidden] (<anonymous>:12:16) << at http://127.0.0.1:4201/merchant-product-center.js?v=20261015-hideall-1:200:132 << at NodeList.forEach (<anonymous>) << at hidePage (http://127.0.0.1:4201/merchant-product-center.js?v=20261015-hideall-1:200:112)
+ - HIDE merchantSupplierPage << at HTMLDivElement.set [as hidden] (<anonymous>:12:16) << at http://127.0.0.1:4201/merchant-product-center.js?v=20261015-hideall-1:200:132 << at NodeList.forEach (<anonymous>) << at hidePage (http://127.0.0.1:4201/merchant-product-center.js?v=20261015-hideall-1:200:112)
+ - HIDE organizationPage << at HTMLDivElement.set [as hidden] (<anonymous>:12:16) << at http://127.0.0.1:4201/merchant-meal-plan-v1.js?v=20261015-hideall-1:558:56 << at Array.forEach (<anonymous>) << at hideAll (http://127.0.0.1:4201/merchant-meal-plan-v1.js?v=20261015-hideall-1:558:9)
+ - HIDE rolesPage << at HTMLDivElement.set [as hidden] (<anonymous>:12:16) << at http://127.0.0.1:4201/merchant-meal-plan-v1.js?v=20261015-hideall-1:558:56 << at Array.forEach (<anonymous>) << at hideAll (http://127.0.0.1:4201/merchant-meal-plan-v1.js?v=20261015-hideall-1:558:9)
+ - HIDE adminsPage << at HTMLDivElement.set [as hidden] (<anonymous>:12:16) << at http://127.0.0.1:4201/merchant-meal-plan-v1.js?v=20261015-hideall-1:558:56 << at Array.forEach (<anonymous>) << at hideAll (http://127.0.0.1:4201/merchant-meal-plan-v1.js?v=20261015-hideall-1:558:9)

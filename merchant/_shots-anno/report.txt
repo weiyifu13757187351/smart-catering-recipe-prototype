@@ -1,0 +1,13 @@
+== 打开原型 ==
+OK   采购订单列表 → view=po-list  visible=0 hidden=0 missingTarget=[] missingView=[] ambiguous=[]
+OK   订单详情（验收中） → view=po-detail  visible=0 hidden=0 missingTarget=[] missingView=[] ambiguous=[]
+OK   行级验收抽屉 → view=po-accept  visible=0 hidden=0 missingTarget=[] missingView=[] ambiguous=[]
+OK   验收详情抽屉 → view=po-accept-detail  visible=0 hidden=0 missingTarget=[] missingView=[] ambiguous=[]
+SKIP 验收完成（当前订单不是「验收中」或未全部验收）
+OK   订单详情（已完成） → view=po-detail  visible=0 hidden=0 missingTarget=[] missingView=[] ambiguous=[]
+OK   发起退货 → view=po-return  visible=0 hidden=0 missingTarget=[] missingView=[] ambiguous=[]
+SKIP 售后详情（该单无售后记录）
+OK   供货关系管理 → view=sr-list  visible=0 hidden=0 missingTarget=[] missingView=[] ambiguous=[]
+OK   选择供应商抽屉 → view=sr-bind  visible=0 hidden=0 missingTarget=[] missingView=[] ambiguous=[]
+OK   按形态批量绑定 → view=sr-batch-form  visible=0 hidden=0 missingTarget=[] missingView=[] ambiguous=[]
+== 结束，当前视图 po-list ==

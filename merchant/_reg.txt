@@ -1,0 +1,14 @@
+﻿用例                         | 期望页面 | 实际可见 | 结论
+--------------------------------------------------------------------------------------------
+OK   采购计划 → 切档口            | purchasePlanPage    | purchasePlanPage        | 通过
+OK   采购计划 → 换组织            | purchasePlanPage    | purchasePlanPage        | 通过
+OK   排餐计划 → 切档口            | mealPlanPage        | mealPlanPage            | 通过
+OK   采购订单 → 切档口            | purchaseOrderPage   | purchaseOrderPage       | 通过
+OK   供货关系 → 切档口            | supplyRelationPage  | supplyRelationPage      | 通过
+OK   采购订单 → 采购计划           | purchasePlanPage    | purchasePlanPage        | 通过
+
+采购订单列表仍可渲染：可见=purchaseOrderPage 行数 5 → 5
+
+异常： （无）
+
+全部通过：切换范围不再跳栏目
