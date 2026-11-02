@@ -38,6 +38,31 @@
     return null;
   }
 
+  // 采购管理（采购订单 + 供货关系管理）的抽屉同样挂在 #mpMask 上，按内容特征判定。
+  // 订单详情里的「验收 / 验收详情 / 差异原因 / 签名 / 退货 / 售后详情」共用同一套 po-form 结构，
+  // 只能靠各自的专属控件区分；验收详情用 .po-cert（商品资质 + 签字区）兜底。
+  function resolvePurchaseMgmtDrawer() {
+    const body = document.querySelector('#mpDrawerBody');
+    if (!body) return null;
+    if (body.querySelector('#poAcceptQty')) return 'po-accept';
+    if (body.querySelector('#poSigCanvas')) return 'po-sign';
+    if (body.querySelector('[data-diff-reason]')) return 'po-finish-diff';
+    if (body.querySelector('#poRtQty')) return 'po-return';
+    if (body.querySelector('[data-as-close]')) return 'po-as-detail';
+    if (body.querySelector('#poPickKw')) return 'po-add-sku';
+    if (body.querySelector('#poRcSearch')) return 'po-receiver-pick';
+    if (body.querySelector('.po-cert') || body.querySelector('[data-dacc-edit]')) return 'po-accept-detail';
+    if (body.querySelector('[data-sr-pick]')) return 'sr-bind';
+    if (body.querySelector('#srFormPick')) return 'sr-batch-form';
+    return null;
+  }
+
+  function purchaseMgmtPageVisible() {
+    return isVisible(document.querySelector('#purchaseOrderPage'))
+      || isVisible(document.querySelector('#poWizardPage'))
+      || isVisible(document.querySelector('#supplyRelationPage'));
+  }
+
   function resolveView() {
     // 设备操作步骤抽屉叠加在编辑抽屉之上，单独作为一个视图。
     if (isVisible(document.querySelector('.umt-action-drawer'))) {
@@ -54,6 +79,11 @@
     //（菜品详情的标题是菜名，动态值不能参与匹配）
     if (isVisible(document.querySelector('#mpMask'))) {
       const mask = document.querySelector('#mpMask');
+      // 采购管理（采购订单 / 供货关系）优先：它们的抽屉也挂在 #mpMask 上
+      if (purchaseMgmtPageVisible()) {
+        const poDrawer = resolvePurchaseMgmtDrawer();
+        if (poDrawer) return poDrawer;
+      }
       // 采购计划与排餐计划共用 #mpMask，采购侧特征优先（采购页面才可能打开采购抽屉）
       if (isVisible(document.querySelector('#purchasePlanPage'))) {
         const ppDrawer = resolvePurchaseDrawer();
@@ -107,6 +137,20 @@
       if (ppPage.querySelector('.pp-filters')) return 'purchase-list';
       return 'purchase-overview';
     }
+    // 采购管理 · 采购订单：列表（5 张统计卡 + 两组页签）→ 详情（商品明细整页）
+    const poPage = document.querySelector('#purchaseOrderPage');
+    if (isVisible(poPage)) {
+      return poPage.querySelector('#poBackList') ? 'po-detail' : 'po-list';
+    }
+    // 采购管理 · 新建订单向导：送达日期与数量 / 总览 / 收货与提交 三步各自成视图
+    const wizPage = document.querySelector('#poWizardPage');
+    if (isVisible(wizPage)) {
+      if (wizPage.querySelector('#wizRcAddr') || wizPage.querySelector('#wizRcPick')) return 'po-wizard-receiver';
+      if (wizPage.querySelector('.po-ov-stats')) return 'po-wizard-overview';
+      return 'po-wizard-days';
+    }
+    // 采购管理 · 供货关系管理（单层页面）
+    if (isVisible(document.querySelector('#supplyRelationPage'))) return 'sr-list';
     // 排餐计划：同一页两种形态 —— 组织层各档口总览 / 档口周排餐表
     const mealPage = document.querySelector('#mealPlanPage');
     if (isVisible(mealPage)) {

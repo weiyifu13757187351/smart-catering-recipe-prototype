@@ -1,8 +1,8 @@
 {
-    "publishedAt":  "2026-10-23 11:16",
-    "publishLabel":  "商户端：采购计划用料口径改为「烹饪投料（计入）」与「过程用料」均计入（用料依据文案、计算与业务标注同步，刷新资源版本号）",
+    "publishedAt":  "2026-11-02 11:32",
+    "publishLabel":  "商户端：采购管理（采购订单 + 供货关系管理）业务标注上线（31 条标注 / 16 视图，含金额截断、退货只冲减验收金额等口径）",
     "tenantSourceAt":  "2026-10-23 10:34",
-    "merchantSourceAt":  "2026-10-23 11:15",
+    "merchantSourceAt":  "2026-11-02 11:20",
     "opsysSourceAt":  "2026-09-24 10:59",
     "changes":  {
                     "tenant":  {
@@ -15,11 +15,14 @@
                     "merchant":  {
                                      "modules":  [
                                                      "业务标注",
-                                                     "餐次计划",
-                                                     "采购计划"
+                                                     "merchant-purchase-order-v1",
+                                                     "merchant-purchase-order-v2",
+                                                     "console.log(\u0027err\u0027",
+                                                     "组织范围切换",
+                                                     "_patch102"
                                                  ],
-                                     "moreCount":  0,
-                                     "fileCount":  5
+                                     "moreCount":  16,
+                                     "fileCount":  31
                                  },
                     "opsys":  {
                                   "modules":  [

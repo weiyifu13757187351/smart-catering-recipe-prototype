@@ -48,7 +48,23 @@
       "purchase-compare": "采购计划 / 报价比较",
       "purchase-line-quote": "采购计划 / 单行报价",
       "purchase-award": "采购计划 / 定标",
-      "purchase-award-confirm": "采购计划 / 定标确认"
+      "purchase-award-confirm": "采购计划 / 定标确认",
+      "po-list": "采购订单 / 订单列表",
+      "po-detail": "采购订单 / 订单详情",
+      "po-wizard-days": "采购订单 / 新建订单 · 送达日期与数量",
+      "po-wizard-overview": "采购订单 / 新建订单 · 总览",
+      "po-wizard-receiver": "采购订单 / 新建订单 · 收货与提交",
+      "po-add-sku": "采购订单 / 添加商品",
+      "po-receiver-pick": "采购订单 / 选择收货联系人",
+      "po-accept": "采购订单 / 行级验收",
+      "po-accept-detail": "采购订单 / 验收详情",
+      "po-finish-diff": "采购订单 / 验收完成 · 差异原因",
+      "po-sign": "采购订单 / 验收完成 · 电子签名",
+      "po-return": "采购订单 / 发起退货",
+      "po-as-detail": "采购订单 / 售后详情",
+      "sr-list": "供货关系管理",
+      "sr-bind": "供货关系管理 / 选择供应商",
+      "sr-batch-form": "供货关系管理 / 按形态批量绑定"
     }
   },
   "mermaid": {
@@ -60,6 +76,7 @@
     {"config": "annotation.config.json", "scope": "merchant-recipe-management", "order": 1},
     {"config": "stall/annotation.config.json", "scope": "merchant-stall-management", "order": 2},
     {"config": "plan/annotation.config.json", "scope": "merchant-meal-plan", "order": 3},
-    {"config": "purchase/annotation.config.json", "scope": "merchant-purchase-plan", "order": 4}
+    {"config": "purchase/annotation.config.json", "scope": "merchant-purchase-plan", "order": 4},
+    {"config": "po/annotation.config.json", "scope": "merchant-purchase-mgmt", "order": 5}
   ]
 }

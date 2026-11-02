@@ -113,6 +113,14 @@
       state.stallName = '';
       if (stallMode !== 'all') stallMode = '';
     }
+    /* stallAll:false 的页面（采购订单 / 供货关系管理）没有「总览」这一层：
+       即使上一次停在总览，也要落回该组织第一个档口 */
+    if (o.stall && o.stallAll === false && stallMode === 'all') {
+      const stalls0 = stallsOf(state.orgId);
+      state.stallId = stalls0.length ? stalls0[0].id : '';
+      state.stallName = stalls0.length ? stalls0[0].name : '';
+      stallMode = state.stallId ? 'one' : 'none';
+    }
     if (o.stall && stallMode !== 'all') {
       /* 计划页默认停在组织层总览（各档口入口本来就是计划页的落点），
          用户在页面里点进某个档口（stallMode='one'）之后就不再被默认值拉回来 */
@@ -151,7 +159,7 @@
         state.stallName = '';
         stallMode = 'none';
       }
-    } else if (stallMode === 'all') {
+    } else if (stallMode === 'all' && o.stallAll !== false) {
       /* 用户显式选了「全部档口（总览）」：换组织仍留在总览上（新组织没档口就是空态），
          不要把人悄悄塞进新组织的某个档口 —— 他只是想看看另一家的总览 */
       state.stallId = '';
@@ -203,7 +211,7 @@
     const orgOptions = subs().map(s => `<option value="${esc(s.id)}" ${s.id === sc.orgId ? 'selected' : ''}>${esc(s.name)}</option>`).join('');
     const stalls = stallsOf(sc.orgId);
     const stallOptions = o.stall
-      ? `<option value="" ${!sc.stallId ? 'selected' : ''}>全部档口（总览）</option>`
+      ? (o.stallAll === false ? '' : `<option value="" ${!sc.stallId ? 'selected' : ''}>全部档口（总览）</option>`)
         + stalls.map(s => `<option value="${esc(s.id)}" ${s.id === sc.stallId ? 'selected' : ''}>${esc(s.name)}</option>`).join('')
       : '';
     return `<div class="mos-bar" data-mos-bar${o.locked ? ' data-mos-locked="1"' : ''}>
@@ -221,7 +229,7 @@
       if (opts.locked) { refreshAll(); return; }
       /* 切组织：计划页跟着落到新组织第一个档口，菜谱/商品页只切组织 */
       if (!runBefore({ kind: 'org', orgId: orgSel.value, stall: !!opts.stall })) { refreshAll(); return; }
-      setOrg(orgSel.value, { stall: !!opts.stall });
+      setOrg(orgSel.value, { stall: !!opts.stall, stallAll: opts.stallAll !== false });
       refreshAll();
     };
     const stallSel = bar.querySelector('[data-mos-stall]');

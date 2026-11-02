@@ -93,3 +93,34 @@
 | merchant-purchase-plan | `PLAN-06-AWARD` | 商户端采购计划PRD-V3.0.md#6.5.4 定标 | 定标 | `merchant-purchase-plan:pp-award-rules`, `merchant-purchase-plan:pp-award-confirm`, `merchant-purchase-plan:pp-award-body` | 已映射 |
 | merchant-purchase-plan | `PLAN-07-COPY` | 商户端采购计划PRD-V3.0.md#7 文案与提示汇总 | 采购计划详情 | `merchant-purchase-plan:pp-award-rules`, `merchant-purchase-plan:pp-compare-rules`, `merchant-purchase-plan:pp-launch-rules`, `merchant-purchase-plan:pp-award-confirm`, `merchant-purchase-plan:pp-mapping-head`, `merchant-purchase-plan:pp-new-body` | 已映射 |
 | merchant-purchase-plan | `PLAN-08-EDGE` | 商户端采购计划PRD-V3.0.md#8.2 边界与异常 | 采购计划详情 | `merchant-purchase-plan:pp-days-rules`, `merchant-purchase-plan:pp-inquiry-rules`, `merchant-purchase-plan:pp-mapping-rules`, `merchant-purchase-plan:pp-overview-rules` | 已映射 |
+| merchant-purchase-mgmt | `PM-01-POSITION` | 商户端采购管理PRD.md#2.1 定位与结构 | 采购订单 | `merchant-purchase-mgmt:pm-list-rules` | 已映射 |
+| merchant-purchase-mgmt | `PM-02-STATE` | 商户端采购管理PRD.md#2.2 状态模型 | 采购订单 | `merchant-purchase-mgmt:pm-global-rules` | 已映射 |
+| merchant-purchase-mgmt | `PM-02-OPS` | 商户端采购管理PRD.md#2.3 状态 × 下单方可操作 | 采购订单 | `merchant-purchase-mgmt:pm-global-rules` | 已映射 |
+| merchant-purchase-mgmt | `PM-04-STATS` | 商户端采购管理PRD.md#2.4.1 统计卡 | 订单列表 | `merchant-purchase-mgmt:pm-list-stats` | 已映射 |
+| merchant-purchase-mgmt | `PM-04-FILTER` | 商户端采购管理PRD.md#2.4.2 筛选条 | 订单列表 | `merchant-purchase-mgmt:pm-list-filters` | 已映射 |
+| merchant-purchase-mgmt | `PM-04-TABS` | 商户端采购管理PRD.md#2.4.3 两组页签 | 订单列表 | `merchant-purchase-mgmt:pm-list-tabs` | 已映射 |
+| merchant-purchase-mgmt | `PM-04-TABLE` | 商户端采购管理PRD.md#2.4.4 订单表格 | 订单列表 | `merchant-purchase-mgmt:pm-list-rules`, `merchant-purchase-mgmt:pm-list-table` | 已映射 |
+| merchant-purchase-mgmt | `PM-04-OPS` | 商户端采购管理PRD.md#2.4.5 行操作 | 订单列表 | `merchant-purchase-mgmt:pm-list-table` | 已映射 |
+| merchant-purchase-mgmt | `PM-05-HEAD` | 商户端采购管理PRD.md#2.5.1 页头 | 订单详情 | `merchant-purchase-mgmt:pm-detail-rules` | 已映射 |
+| merchant-purchase-mgmt | `PM-05-LINES` | 商户端采购管理PRD.md#2.5.4 商品明细 | 订单详情 | `merchant-purchase-mgmt:pm-detail-lines` | 已映射 |
+| merchant-purchase-mgmt | `PM-05-OPS` | 商户端采购管理PRD.md#2.5.5 行操作 | 订单详情 | `merchant-purchase-mgmt:pm-detail-lines` | 已映射 |
+| merchant-purchase-mgmt | `PM-05-FINISH` | 商户端采购管理PRD.md#2.5.3 状态提示条 | 订单详情 | `merchant-purchase-mgmt:pm-detail-rules`, `merchant-purchase-mgmt:pm-detail-accept-head` | 已映射 |
+| merchant-purchase-mgmt | `PM-06-POOL` | 商户端采购管理PRD.md#2.6.1 入口与商品池 | 新建订单 | `merchant-purchase-mgmt:pm-wiz-days`, `merchant-purchase-mgmt:pm-add-sku` | 已映射 |
+| merchant-purchase-mgmt | `PM-06-DAYS` | 商户端采购管理PRD.md#2.6.2 第 1 步 | 新建订单 | `merchant-purchase-mgmt:pm-wiz-days`, `merchant-purchase-mgmt:pm-wiz-days-filters` | 已映射 |
+| merchant-purchase-mgmt | `PM-06-SKU` | 商户端采购管理PRD.md#2.6.3 添加商品抽屉 | 添加商品 | `merchant-purchase-mgmt:pm-add-sku`, `merchant-purchase-mgmt:pm-add-sku-bar` | 已映射 |
+| merchant-purchase-mgmt | `PM-06-OVERVIEW` | 商户端采购管理PRD.md#2.6.4 第 2 步 · 总览 | 新建订单 | `merchant-purchase-mgmt:pm-wiz-overview`, `merchant-purchase-mgmt:pm-wiz-overview-stats` | 已映射 |
+| merchant-purchase-mgmt | `PM-06-RECV` | 商户端采购管理PRD.md#2.6.5 第 3 步 · 收货与提交 | 新建订单 | `merchant-purchase-mgmt:pm-wiz-receiver`, `merchant-purchase-mgmt:pm-receiver-pick` | 已映射 |
+| merchant-purchase-mgmt | `PM-08-ACCEPT` | 商户端采购管理PRD.md#2.8.2 验收弹层字段 | 行级验收 | `merchant-purchase-mgmt:pm-accept`, `merchant-purchase-mgmt:pm-accept-sum` | 已映射 |
+| merchant-purchase-mgmt | `PM-08-DETAIL` | 商户端采购管理PRD.md#2.8.5 验收详情 | 验收详情 | `merchant-purchase-mgmt:pm-accept-detail` | 已映射 |
+| merchant-purchase-mgmt | `PM-08-DIFF` | 商户端采购管理PRD.md#2.8.7 验收完成 | 验收完成 | `merchant-purchase-mgmt:pm-finish-diff`, `merchant-purchase-mgmt:pm-sign` | 已映射 |
+| merchant-purchase-mgmt | `PM-09-RETURN` | 商户端采购管理PRD.md#2.9.2 退货弹层字段 | 退货 | `merchant-purchase-mgmt:pm-return` | 已映射 |
+| merchant-purchase-mgmt | `PM-09-AS` | 商户端采购管理PRD.md#2.9.4 售后三态与流转 | 售后详情 | `merchant-purchase-mgmt:pm-as-detail` | 已映射 |
+| merchant-purchase-mgmt | `PM-09-DEDUCT` | 商户端采购管理PRD.md#2.9.4a 金额冲减规则 | 售后详情 | `merchant-purchase-mgmt:pm-as-detail` | 已映射 |
+| merchant-purchase-mgmt | `SR-03-PAGE` | 商户端采购管理PRD.md#3.3 页面结构 | 供货关系管理 | `merchant-purchase-mgmt:sr-rules`, `merchant-purchase-mgmt:sr-filters` | 已映射 |
+| merchant-purchase-mgmt | `SR-03-STATS` | 商户端采购管理PRD.md#3.3.1 统计卡 | 供货关系管理 | `merchant-purchase-mgmt:sr-stats` | 已映射 |
+| merchant-purchase-mgmt | `SR-03-BIND` | 商户端采购管理PRD.md#3.4 单个绑定 | 供货关系管理 | `merchant-purchase-mgmt:sr-bind` | 已映射 |
+| merchant-purchase-mgmt | `SR-03-TABLE` | 商户端采购管理PRD.md#3.3.4 表格 | 供货关系管理 | `merchant-purchase-mgmt:sr-bind`, `merchant-purchase-mgmt:sr-table` | 已映射 |
+| merchant-purchase-mgmt | `SR-05-BATCH` | 商户端采购管理PRD.md#3.5 批量三动作 | 供货关系管理 | `merchant-purchase-mgmt:sr-batch-form`, `merchant-purchase-mgmt:sr-batch` | 已映射 |
+| merchant-purchase-mgmt | `SR-06-OFFSHELF` | 商户端采购管理PRD.md#3.6 与上下架的交互 | 供货关系管理 | `merchant-purchase-mgmt:sr-table` | 已映射 |
+| merchant-purchase-mgmt | `AMOUNT` | 商户端采购管理PRD.md#4 价格与金额 | 采购管理 | `merchant-purchase-mgmt:pm-global-rules` | 已映射 |
+| merchant-purchase-mgmt | `EDGE` | 商户端采购管理PRD.md#5 边界与异常 | 采购管理 | `merchant-purchase-mgmt:pm-global-rules` | 已映射 |
