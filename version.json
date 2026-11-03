@@ -1,5 +1,5 @@
 {
-    "publishedAt":  "2026-11-03 09:50",
+    "publishedAt":  "2026-11-03 09:54",
     "publishLabel":  "商户端：采购管理标注同步 PRD 修订（统计卡口径按已完成单、批次可删任意批并置灰保留、自动验收完成、时间轴新增修改订单事件、最近采购近 6 个月口径）；147 条 / 覆盖 120 项",
     "tenantSourceAt":  "2026-10-23 10:34",
     "merchantSourceAt":  "2026-11-03 09:50",
@@ -14,15 +14,15 @@
                                },
                     "merchant":  {
                                      "modules":  [
-                                                     "业务标注",
-                                                     "merchant-purchase-order-v2",
-                                                     "_acc",
-                                                     "_acc2",
-                                                     "_acc3",
-                                                     "_assets"
+                                                     "01-po-list",
+                                                     "02-po-detail",
+                                                     "03-po-accept",
+                                                     "04-po-accept-detail",
+                                                     "07-po-return",
+                                                     "09-sr-list"
                                                  ],
-                                     "moreCount":  19,
-                                     "fileCount":  29
+                                     "moreCount":  16,
+                                     "fileCount":  22
                                  },
                     "opsys":  {
                                   "modules":  [
