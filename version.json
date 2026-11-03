@@ -1,8 +1,8 @@
 {
-    "publishedAt":  "2026-11-03 10:29",
-    "publishLabel":  "商户端：线上改为单文件版（index.html 一个文件，内联 21 CSS + 17 JS + 全部业务标注）；新增 tools/bundle-single.mjs 构建脚本",
+    "publishedAt":  "2026-11-03 10:38",
+    "publishLabel":  "商户端：单文件重新构建（去 BOM、加构建说明头），线上仍只挂 index.html 一个文件",
     "tenantSourceAt":  "2026-10-23 10:34",
-    "merchantSourceAt":  "2026-11-03 10:29",
+    "merchantSourceAt":  "2026-11-03 10:38",
     "opsysSourceAt":  "2026-09-24 10:59",
     "changes":  {
                     "tenant":  {
@@ -14,15 +14,10 @@
                                },
                     "merchant":  {
                                      "modules":  [
-                                                     "业务标注",
-                                                     "merchant-mobile",
-                                                     "档口管理",
-                                                     "设备菜谱",
-                                                     "餐次计划",
-                                                     "组织范围切换"
+                                                     "入口页"
                                                  ],
-                                     "moreCount":  44,
-                                     "fileCount":  97
+                                     "moreCount":  0,
+                                     "fileCount":  1
                                  },
                     "opsys":  {
                                   "modules":  [
