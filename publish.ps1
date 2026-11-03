@@ -38,7 +38,9 @@ $Branch     = 'main'
 # label  = 中文名，用于日志和入口页
 $Sources = [ordered]@{
   'tenant'   = @{ label = '租户端'; path = (Join-Path $SourceBase 'restaurant-saas-tenant-prototype-unified-recipe-annotated') }
-  'merchant' = @{ label = '商户端'; path = (Join-Path $SourceBase 'merchant-recipe-annotated') }
+  # 商户端线上只挂一个文件：源目录仍是 merchant-recipe-annotated（分模块开发），
+  # 发布前由 tools/bundle-single.mjs 把它内联成 dist\index.html，这里发布的是构建产物。
+  'merchant' = @{ label = '商户端（单文件）'; path = (Join-Path $SourceBase 'merchant-recipe-annotated\dist') }
   'opsys'    = @{ label = '运营端'; path = 'C:\Users\18024\Documents\ChatGPT\运营端\smart-catering-product-center-prototype-local' }
 }
 
@@ -100,6 +102,16 @@ if (-not (Get-Command git -ErrorAction SilentlyContinue)) { Write-Err '未找到
 if (-not (Test-Path (Join-Path $RepoRoot '.git'))) { Write-Err "当前目录不是 git 仓库：$RepoRoot"; exit 1 }
 Push-Location $RepoRoot
 try {
+  Write-Step '0/5 构建商户端单文件（dist\index.html）'
+  $merchantSrc = Join-Path $SourceBase 'merchant-recipe-annotated'
+  if (-not (Test-Path $merchantSrc)) { Write-Err "找不到商户端源目录：$merchantSrc"; exit 1 }
+  Push-Location $merchantSrc
+  Invoke-Native { node tools/bundle-single.mjs } | ForEach-Object { Write-Host "  $_" -ForegroundColor DarkGray }
+  $buildCode = $LASTEXITCODE
+  Pop-Location
+  if ($buildCode -ne 0) { Write-Err "单文件构建失败（退出码 $buildCode），已终止发布"; exit 1 }
+  Write-Ok '商户端单文件已重新构建'
+
   foreach ($key in $SiteKeys) {
     $p = $Sources[$key].path
     if (-not (Test-Path $p)) { Write-Err "找不到 $($Sources[$key].label) 源目录：$p"; exit 1 }

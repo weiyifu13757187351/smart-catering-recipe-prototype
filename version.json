@@ -1,8 +1,8 @@
 {
-    "publishedAt":  "2026-11-03 09:54",
-    "publishLabel":  "商户端：采购管理标注同步 PRD 修订（统计卡口径按已完成单、批次可删任意批并置灰保留、自动验收完成、时间轴新增修改订单事件、最近采购近 6 个月口径）；147 条 / 覆盖 120 项",
+    "publishedAt":  "2026-11-03 10:29",
+    "publishLabel":  "商户端：线上改为单文件版（index.html 一个文件，内联 21 CSS + 17 JS + 全部业务标注）；新增 tools/bundle-single.mjs 构建脚本",
     "tenantSourceAt":  "2026-10-23 10:34",
-    "merchantSourceAt":  "2026-11-03 09:50",
+    "merchantSourceAt":  "2026-11-03 10:29",
     "opsysSourceAt":  "2026-09-24 10:59",
     "changes":  {
                     "tenant":  {
@@ -14,15 +14,15 @@
                                },
                     "merchant":  {
                                      "modules":  [
-                                                     "01-po-list",
-                                                     "02-po-detail",
-                                                     "03-po-accept",
-                                                     "04-po-accept-detail",
-                                                     "07-po-return",
-                                                     "09-sr-list"
+                                                     "业务标注",
+                                                     "merchant-mobile",
+                                                     "档口管理",
+                                                     "设备菜谱",
+                                                     "餐次计划",
+                                                     "组织范围切换"
                                                  ],
-                                     "moreCount":  16,
-                                     "fileCount":  22
+                                     "moreCount":  44,
+                                     "fileCount":  97
                                  },
                     "opsys":  {
                                   "modules":  [
