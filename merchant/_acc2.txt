@@ -1,4 +1,0 @@
-﻿订单行长这样 = [{"sku":"S0301","qty":6,"shipped":6,"acc":6},{"sku":"S1701","qty":4,"shipped":4,"acc":3},{"sku":"S2501","qty":2,"shipped":2,"acc":null}]
-验收中订单 = null
-需要补验收的行 = null
-异常 = （无）

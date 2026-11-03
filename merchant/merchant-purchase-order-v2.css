@@ -482,6 +482,9 @@
 .po-diff-table { width: 100%; }
 
 /* ===== V4.10 列表「删除」按钮（危险操作描边） ===== */
+/* V4.22：软删除的批次行置灰保留（不消失） */
+.po-table tr.is-deleted td, .po-table tr.is-deleted td b { color: #94a3b8; font-weight: 400; }
+.po-table tr.is-deleted td .po-btn { display: none; }
 .po-btn-danger { color: #c0392b; border-color: #f0cfc8; background: #fff; }
 .po-btn-danger:hover { color: #fff; background: #d4380d; border-color: #d4380d; }
 

@@ -1,9 +1,0 @@
-﻿初始：             organizationPage || 基础信息 / 组织及成员
-点采购计划后：      purchasePlanPage || 计划管理 / 采购计划
-当前范围：          {"org":"org_sub_1","stalls":["st_1:一楼面点档口"]}
-
-模拟在采购计划页发生范围切换 setStall(st_1) …
-切换后可见页面：    purchaseOrderPage || 采购管理 / 采购订单
-
-回到采购计划：      purchasePlanPage || 计划管理 / 采购计划
-setOrg 后可见：     purchaseOrderPage || 采购管理 / 采购订单

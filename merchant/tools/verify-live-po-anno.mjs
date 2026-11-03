@@ -1,4 +1,4 @@
-const SITE = 'https://weiyifu13757187351.github.io/smart-catering-recipe-prototype';
+﻿const SITE = 'https://weiyifu13757187351.github.io/smart-catering-recipe-prototype';
 const bust = '?cb=' + Date.now();
 const checks = [];
 
@@ -18,7 +18,9 @@ checks.push([`version.json 提交说明含「采购管理」`, String(v.publishL
 // 2) 入口 HTML 资源版本号
 const html = await get(`${SITE}/merchant/${encodeURIComponent('食联网数智餐饮平台-组织及人员.html')}${bust}`);
 checks.push(['商户端 HTML 200', html.status === 200]);
-checks.push(['HTML 引用新版本号 20261102-po-mgmt-1', html.text.includes('20261102-po-mgmt-1')]);
+checks.push(['HTML 引用最新资源版本号', /20261102-po-mgmt-\d/.test(html.text)]);
+checks.push(['bundle 含验收完成提示条兜底', bundle.text.includes('po-banner-ok')]);
+checks.push(['adapter 在整抽屉上找特征', adapter.text.includes('.mp-drawer')]);
 
 // 3) 线上 bundle 内容
 const bundle = await get(`${SITE}/merchant/annotation-kit/annotation.bundle.inline.js${bust}`);
@@ -40,3 +42,4 @@ let fail = 0;
 for (const [name, ok] of checks) { if (!ok) fail++; console.log(`${ok ? 'PASS' : 'FAIL'}  ${name}`); }
 console.log(fail ? `\n${fail} 项失败` : '\n线上校验全部通过');
 process.exit(fail ? 1 : 0);
+

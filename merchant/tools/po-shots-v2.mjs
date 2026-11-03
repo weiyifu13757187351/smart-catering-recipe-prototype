@@ -142,19 +142,19 @@ await evaluate(`(() => {
   document.querySelector('[data-ac-save]').click();
 })()`);
 await shot('12-订单详情-第 1 批已验收（3 箱）');
-/* V4.19：验收弹层的历史验收只做展示（无操作列） */
+/* V4.22：验收弹层的历史验收每条都能删（删后置灰保留） */
 await evaluate(`document.querySelector('#poLinesBody [data-line-accept="S0301"]').click()`);
 await sleep(280);
-await shot('11b-验收弹层-历史验收只读（无修改删除）');
+await shot('11b-验收弹层-历史验收（每条都可删除）');
 await evaluate(`document.querySelector('.mp-drawer [data-ac-cancel]').click()`);
 await sleep(220);
-/* V4.19：批次修改 / 删除在「验收详情 › 验收批次记录」；删除只作用于最新一批，二次确认后才生效 */
+/* V4.22：批次修改 / 删除在「验收详情 › 验收批次记录」；每条都能删，二次确认后置灰保留 */
 await evaluate(`document.querySelector('#poLinesBody [data-line-detail="S0301"]').click()`);
 await sleep(300);
-await shot('11c-验收详情-验收批次记录（可修改、可从最新一批删除）');
+await shot('11c-验收详情-验收批次记录（可修改、可删除）');
 await evaluate(`(() => { const b = document.querySelector('.mp-drawer [data-dacc-del]'); if (b) b.click(); })()`);
 await sleep(300);
-await shot('11d-验收详情-删除最新一批（二次确认）');
+await shot('11d-验收详情-删除批次（二次确认）');
 await evaluate(`document.getElementById('poConfirmCancel').click()`);
 await sleep(220);
 await evaluate(`document.querySelector('.mp-drawer [data-ld-close]').click()`);
@@ -182,6 +182,26 @@ await sleep(280);
 await evaluate(`document.querySelector('.mp-drawer [data-ld-close]').click()`);
 await sleep(240);
 await shot('14-订单详情-改批次后累计 6 箱');
+
+/* V4.22：删除 = 软删除——行不消失、整行置灰、操作列显示「已删除」，累计相应回退 */
+await evaluate(`document.querySelector('#poLinesBody [data-line-detail="S0301"]').click()`);
+await sleep(260);
+await evaluate(`(() => { const b = document.querySelector('.mp-drawer [data-dacc-row="2"] [data-dacc-del]'); if (b) b.click(); })()`);
+await sleep(280);
+await shot('14b-验收详情-删除批次（二次确认 · 删后置灰保留）');
+await evaluate(`document.getElementById('poConfirmOk').click()`);
+await sleep(340);
+await shot('14c-验收详情-已删除批次置灰保留（操作列显示已删除）');
+await evaluate(`document.querySelector('.mp-drawer [data-ld-close]').click()`);
+await sleep(240);
+/* 恢复现场：再验 3 箱，累计回到 6（历史里保留一条已删除批次） */
+await evaluate(`document.querySelector('#poLinesBody [data-line-accept="S0301"]').click()`);
+await sleep(220);
+await evaluate(`(() => { const q = document.getElementById('poAcceptQty'); q.value = '3'; q.dispatchEvent(new Event('input', { bubbles: true })); })()`);
+await sleep(200);
+await shot('14d-验收弹层-历史验收含已删除批次（置灰 · 显示已删除）');
+await evaluate(`document.querySelector('[data-ac-save]').click()`);
+await sleep(300);
 
 /* 验收详情 */
 await evaluate(`document.querySelector('#poLinesBody [data-line-detail="S0301"]').click()`);

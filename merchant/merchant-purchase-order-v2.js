@@ -1152,7 +1152,43 @@ const acceptDiffText = it => (!it || !it.diffReason) ? '—'
 /* V4.6：验收量改为「批次累加」——每批记录 qty，累计 = 各批之和 */
 const batchQtyOf = a => num(a.qty != null ? a.qty : (a.after != null ? a.after : 0));
 const batchesOf = (o, skuCode) => (o.accepts || []).filter(a => a.itemSku === skuCode);
-const sumBatches = (o, skuCode) => batchesOf(o, skuCode).reduce((s, a) => s + batchQtyOf(a), 0);
+/* V4.22：软删除——删掉的批次**不消失**（置灰保留、操作列显示「已删除」），累计只算未删除的 */
+const liveBatchesOf = (o, skuCode) => batchesOf(o, skuCode).filter(a => !a.deleted);
+const nextBatchSeq = (o, skuCode) => batchesOf(o, skuCode).reduce((m, a) => Math.max(m, a.seq), 0) + 1;
+const sumBatches = (o, skuCode) => liveBatchesOf(o, skuCode).reduce((s, a) => s + batchQtyOf(a), 0);
+/* 重算累计与批次数：只累计未删除批次；一条有效批次都不剩时该行回到「未验收」 */
+function recomputeAccepts(o, it) {
+  const all = batchesOf(o, it.skuCode);
+  const live = all.filter(a => !a.deleted);
+  let run = 0;
+  live.forEach(a => { run += batchQtyOf(a); a.after = run; });
+  all.filter(a => a.deleted).forEach(a => { a.after = null; });
+  it.acceptedQty = live.length ? run : null;
+  it.acceptSeq = live.length;
+  return { live, run };
+}
+/* 软删除任意一批（不再限最新一批）：二次确认 → 打 deleted 标记 → 重算 → 重开当前抽屉 */
+function softDeleteBatch(o, it, seq, reopen) {
+  const rec = batchesOf(o, it.skuCode).find(a => a.seq === seq);
+  if (!rec || rec.deleted) { toast('该批次已删除'); return; }
+  const qty = batchQtyOf(rec);
+  poConfirm({
+    title: '删除验收记录',
+    text: `是否删除第 ${seq} 批验收（${trimQty(qty)} ${it.unit}）？删除后该批次会在列表里置灰、标记「已删除」保留，累计验收量相应减少，且不能恢复。`,
+    okText: '删除', cancelText: '取消',
+    onOk: () => {
+      rec.deleted = true;
+      rec.deletedAt = nowStr();
+      const { run } = recomputeAccepts(o, it);
+      if (!(o.accepts || []).some(a => !a.deleted)) o.status = 'toReceive';
+      else if (o.status === 'toReceive') o.status = 'accepted';
+      o.timeline.push({ at: nowStr(), text: `删除「${it.productName}」第 ${seq} 批验收记录（${trimQty(qty)}${it.unit}），累计验收 ${trimQty(run)}${it.unit}` });
+      toast(`已删除第 ${seq} 批验收，累计 ${trimQty(run)}${it.unit}`);
+      refreshCurrent();
+      reopen();
+    }
+  });
+}
 const pendingQtyOf = it => Math.max(0, num(it.shippedQty) - num(it.acceptedQty));
 /* 验收完成环节要填差异原因的行：累计验收量 < 实际发货量 */
 const diffLinesOf = o => o.items.filter(i => i.shippedQty != null && num(i.acceptedQty) < num(i.shippedQty));
@@ -1165,23 +1201,27 @@ function openLineAccept(o, it) {
   const accepted = num(it.acceptedQty);
   const pending = pendingQtyOf(it);
   const prevRecs = batchesOf(o, it.skuCode);
-  const lastRec = prevRecs.length ? prevRecs[prevRecs.length - 1] : null;
+  const liveRecs = prevRecs.filter(a => !a.deleted);
+  const delCount = prevRecs.length - liveRecs.length;
+  const lastRec = liveRecs.length ? liveRecs[liveRecs.length - 1] : null;
   const prevPhotos = lastRec ? num(lastRec.photos) : 0;
+  const nextSeq = nextBatchSeq(o, it.skuCode);
   const unit = it.unit || '';
 
-  /* V4.19：验收弹层的历史验收**只做展示**（修改 / 删除统一放在「验收详情 › 验收批次记录」里，
-     避免「只想删记录却被迫填本次验收量」的问题） */
+  /* V4.22：历史验收每条都能删；删掉的批次不消失，整行置灰、操作列显示「已删除」 */
   const histRows = prevRecs.length ? prevRecs.map(a => `
-      <tr data-acc-row="${a.seq}">
+      <tr data-acc-row="${a.seq}"${a.deleted ? ' class="is-deleted"' : ''}>
         <td>第 ${a.seq} 批</td>
         <td class="po-sub">${a.at}</td>
         <td>${esc(a.by || '李库管')}</td>
         <td><b>${trimQty(batchQtyOf(a))}</b> ${esc(unit)}</td>
         <td class="po-sub">${num(a.photos)} 张</td>
+        <td>${a.deleted ? '<span class="po-sub">已删除</span>'
+          : `<button class="po-btn po-btn-xs po-btn-ghost po-btn-danger" data-acc-del="${a.seq}">删除</button>`}</td>
       </tr>`).join('')
-    : `<tr><td colspan="5"><div class="po-empty">该商品尚未验收，本次为第 1 批</div></td></tr>`;
+    : `<tr><td colspan="6"><div class="po-empty">该商品尚未验收，本次为第 1 批</div></td></tr>`;
 
-  drawer(`验收 · ${it.productName}`, `${o.no} · 送达 ${mdw(o.deliveryDate)} · 第 ${prevRecs.length + 1} 批`,
+  drawer(`验收 · ${it.productName}`, `${o.no} · 送达 ${mdw(o.deliveryDate)} · 第 ${nextSeq} 批`,
     `<div class="po-form po-accept-form">
       <table class="po-table po-accept-info">
         <thead><tr><th>商品名称</th><th>规格</th><th>单位</th><th class="po-money">单价</th><th>下单量</th><th>实际发货量</th><th>已验收量</th><th>待验收量</th></tr></thead>
@@ -1192,8 +1232,8 @@ function openLineAccept(o, it) {
           <td class="po-money">${money(it.price)}</td>
           <td>${trimQty(it.qty)}</td>
           <td><b>${trimQty(it.shippedQty)}</b></td>
-          <td id="poCurAccept">${prevRecs.length ? trimQty(accepted) : '未验收'}</td>
-          <td>${prevRecs.length ? trimQty(pending) : trimQty(it.shippedQty)}</td>
+          <td id="poCurAccept">${it.acceptedQty != null ? trimQty(accepted) : '未验收'}</td>
+          <td>${it.acceptedQty != null ? trimQty(pending) : trimQty(it.shippedQty)}</td>
         </tr></tbody>
       </table>
       <label>本次验收量 <em>*</em>
@@ -1207,9 +1247,9 @@ function openLineAccept(o, it) {
         <button class="po-btn po-btn-xs po-btn-ghost" id="poAddPhoto">+ 添加照片</button>
       </label>
       <div class="po-hist">
-        <div class="po-hist-head">历史验收<span class="po-sub">共 ${prevRecs.length} 批 · 合计 ${trimQty(accepted)} ${esc(unit)}${prevRecs.length ? '，仅展示；修改 / 删除请在「验收详情」里操作' : ''}</span></div>
+        <div class="po-hist-head">历史验收<span class="po-sub">共 ${liveRecs.length} 批 · 合计 ${trimQty(accepted)} ${esc(unit)}${delCount ? ` · 已删除 ${delCount} 批` : ''}${prevRecs.length ? '，每条都可删除（删后置灰保留、显示「已删除」）' : ''}</span></div>
         <table class="po-table po-hist-table">
-          <thead><tr><th>批次</th><th>时间</th><th>验收人</th><th>本次验收量</th><th>照片</th></tr></thead>
+          <thead><tr><th>批次</th><th>时间</th><th>验收人</th><th>本次验收量</th><th>照片</th><th>操作</th></tr></thead>
           <tbody id="poAccHist">${histRows}</tbody>
         </table>
       </div>
@@ -1253,6 +1293,12 @@ function openLineAccept(o, it) {
     photos.push(1); renderPhotos();
   });
 
+  /* V4.22：历史验收的删除（软删除，删后行仍保留、置灰显示「已删除」） */
+  $$('[data-acc-del]', $('#poAccHist')).forEach(b => b.addEventListener('click', e => {
+    e.preventDefault();
+    softDeleteBatch(o, it, Number(b.getAttribute('data-acc-del')), () => openLineAccept(o, it));
+  }));
+
   $('.mp-drawer [data-ac-cancel]').addEventListener('click', () => openLines(o));
   $('.mp-drawer [data-ac-save]').addEventListener('click', () => {
     const raw = ($('#poAcceptQty').value || '').trim();
@@ -1262,9 +1308,9 @@ function openLineAccept(o, it) {
     /* 允许累计超出实际发货量（超发 / 补送），不拦截 */
     const before = accepted;
     const total = accepted + v;
-    const seq = prevRecs.length + 1;
+    const seq = nextBatchSeq(o, it.skuCode);
     it.acceptedQty = total;
-    it.acceptSeq = seq;
+    it.acceptSeq = liveRecs.length + 1;
     o.accepts.push({
       itemSku: it.skuCode, seq, at: nowStr(), by: '李库管', method: 'manual',
       qty: v, before, after: total, diffReason: '', note: '', photos: photos.length
@@ -1301,18 +1347,18 @@ function openLineDetail(o, it) {
           <div class="po-sub">上传：供应商 · ${c.at}</div>
         </div>
       </div>`).join('') : '<div class="po-empty">供应商尚未上传该商品的检测报告</div>';
-  /* V4.19：批次记录的修改 / 删除统一在这里（验收弹层的历史验收只做展示）；
-     删除仍只能从最新一批逐条往上删；订单已完成（验收量锁定）时不给操作 */
-  const newestSeq = history.length ? history.reduce((m, a) => Math.max(m, a.seq), 0) : 0;
+  /* V4.22：批次记录每条都能删；删掉的批次不消失，整行置灰、操作列显示「已删除」；
+     订单已完成（验收量锁定）时不给操作 */
   const canEditBatch = o.status !== 'done';
+  const liveHistory = history.filter(a => !a.deleted);
   const histRows = history.length ? history.map(a => {
-    const ops = !canEditBatch
-      ? '<td class="po-sub">—</td>'
-      : `<td><button class="po-btn po-btn-xs po-btn-ghost" data-dacc-edit="${a.seq}">修改</button>
-          ${a.seq === newestSeq
-            ? `<button class="po-btn po-btn-xs po-btn-ghost po-btn-danger" data-dacc-del="${a.seq}">删除</button>`
-            : `<button class="po-btn po-btn-xs po-btn-disabled" disabled title="只能从最新一批开始逐条删除">删除</button>`}</td>`;
-    return `<tr data-dacc-row="${a.seq}"><td>第 ${a.seq} 批</td><td class="po-sub">${a.at}</td><td>${esc(a.by)}</td>
+    const ops = a.deleted
+      ? '<td><span class="po-sub">已删除</span></td>'
+      : !canEditBatch
+        ? '<td><span class="po-sub">—</span></td>'
+        : `<td><button class="po-btn po-btn-xs po-btn-ghost" data-dacc-edit="${a.seq}">修改</button>
+            <button class="po-btn po-btn-xs po-btn-ghost po-btn-danger" data-dacc-del="${a.seq}">删除</button></td>`;
+    return `<tr data-dacc-row="${a.seq}"${a.deleted ? ' class="is-deleted"' : ''}><td>第 ${a.seq} 批</td><td class="po-sub">${a.at}</td><td>${esc(a.by)}</td>
       <td>${a.method === 'scale' ? '电子秤验收' : '手动验收'}</td>
       <td><b>${trimQty(batchQtyOf(a))}</b> ${esc(it.unit)}</td>
       <td class="po-sub">${a.after == null ? '—' : trimQty(a.after)}</td>
@@ -1352,7 +1398,7 @@ function openLineDetail(o, it) {
        </table>
      </div>
      ${num(it.returnQty) > 0 ? `<div class="po-banner po-banner-warn">售后回写：该商品已退货 ${trimQty(it.returnQty)} ${esc(it.unit)}，当前累计验收量 ${trimQty(it.acceptedQty)}；原始批次记录保留在下方（不覆盖历史）。</div>` : ''}
-     <div class="po-section"><h3>验收批次记录<span class="po-sub">共 ${history.length} 批 · 累计 ${trimQty(totalAccepted)} ${esc(it.unit)}${!history.length ? '' : (canEditBatch ? '（可改单批数量；删除只能从最新一批开始逐条往上）' : '（订单已完成，验收量已锁定）')}</span></h3>
+     <div class="po-section"><h3>验收批次记录<span class="po-sub">共 ${liveHistory.length} 批 · 累计 ${trimQty(totalAccepted)} ${esc(it.unit)}${history.length - liveHistory.length ? ` · 已删除 ${history.length - liveHistory.length} 批` : ''}${!history.length ? '' : (canEditBatch ? '（可改单批数量；每条都能删除，删后置灰保留）' : '（订单已完成，验收量已锁定）')}</span></h3>
        <table class="po-table"><thead><tr><th>批次</th><th>时间</th><th>验收人</th><th>验收方式</th><th>本批验收量</th><th>累计</th><th>照片</th><th>操作</th></tr></thead>
        <tbody>${histRows}</tbody></table>
      </div>
@@ -1380,9 +1426,7 @@ function openLineDetail(o, it) {
       if (!raw || !isFinite(v)) { toast('请填写验收量'); return; }
       if (!(v > 0)) { toast('验收量必须大于 0'); return; }
       rec.qty = v;
-      let run = 0;
-      batchesOf(o, it.skuCode).forEach(a => { run += batchQtyOf(a); a.after = run; });
-      it.acceptedQty = run;
+      const { run } = recomputeAccepts(o, it);
       if (o.status === 'toReceive') o.status = 'accepted';
       o.timeline.push({ at: nowStr(), text: `修改「${it.productName}」第 ${seq} 批验收量为 ${trimQty(v)}${it.unit}，累计验收 ${trimQty(run)}${it.unit}` });
       toast(`第 ${seq} 批验收量已改为 ${trimQty(v)}${it.unit}，累计 ${trimQty(run)}${it.unit}`);
@@ -1392,32 +1436,10 @@ function openLineDetail(o, it) {
     $('[data-dacc-edit-cancel]').addEventListener('click', ev2 => { ev2.preventDefault(); openLineDetail(o, it); });
   }));
 
-  /* 删除最新一批：二次确认 → 去掉记录 → 重算累计 → 重开验收详情 */
+  /* V4.22：删除（软删除，行保留置灰）→ 重算累计 → 重开验收详情 */
   $$('.mp-drawer [data-dacc-del]').forEach(b => b.addEventListener('click', e => {
     e.preventDefault();
-    const seq = Number(b.getAttribute('data-dacc-del'));
-    const recs = batchesOf(o, it.skuCode);
-    const last = recs.length ? recs[recs.length - 1] : null;
-    if (!last || last.seq !== seq) { toast('只能删除最新一批验收记录'); return; }
-    poConfirm({
-      title: '删除验收记录',
-      text: `是否删除第 ${seq} 批验收（${trimQty(batchQtyOf(last))} ${it.unit}）？删除后累计验收量会相应减少，且不能恢复。`,
-      okText: '删除', cancelText: '取消',
-      onOk: () => {
-        const i2 = o.accepts.findIndex(r => r.itemSku === it.skuCode && r.seq === seq);
-        if (i2 >= 0) o.accepts.splice(i2, 1);
-        const left = batchesOf(o, it.skuCode);
-        let run = 0;
-        left.forEach(a => { run += batchQtyOf(a); a.after = run; });
-        it.acceptedQty = run;
-        it.acceptSeq = left.length ? left[left.length - 1].seq : 0;
-        if (!o.accepts.length) o.status = 'toReceive';
-        o.timeline.push({ at: nowStr(), text: `删除「${it.productName}」第 ${seq} 批验收记录（${trimQty(batchQtyOf(last))}${it.unit}），累计验收 ${trimQty(run)}${it.unit}` });
-        toast(`已删除第 ${seq} 批验收，累计 ${trimQty(run)}${it.unit}`);
-        refreshCurrent();
-        openLineDetail(o, it);
-      }
-    });
+    softDeleteBatch(o, it, Number(b.getAttribute('data-dacc-del')), () => openLineDetail(o, it));
   }));
 }
 

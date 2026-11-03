@@ -359,14 +359,14 @@ await step('累计实时回显：少于发货量提示短缺、超出提示超�
       || short.text.indexOf('少于实际发货量 0.5') < 0 || short.cls.indexOf('is-short') < 0) ? '累计提示不符' : '' };
 })()`);
 
-await step('验收弹层历史验收只读（无修改/删除列）→ 改量挪到「验收详情 · 验收批次记录」：第 1 批 2 箱改 3 箱 → 累计 6', `(() => {
-  /* ① 验收弹层的历史验收：只有 批次/时间/验收人/本次验收量/照片，没有任何操作按钮 */
+await step('验收弹层历史验收：只放删除（每条都能删）、没有修改 → 改量挪到「验收详情 · 验收批次记录」：第 1 批 2 箱改 3 箱 → 累计 6', `(() => {
+  /* ① 验收弹层的历史验收：列 = 批次/时间/验收人/本次验收量/照片/操作，操作里只有「删除」 */
   document.querySelector('#poLinesBody [data-line-accept="S0301"]').click();
   const ths = [...document.querySelectorAll('.po-hist-table thead th')].map(x => x.textContent.trim());
-  const readOnly = !document.querySelector('#poAccHist [data-acc-edit]')
-    && !document.querySelector('#poAccHist [data-acc-del]')
-    && document.querySelectorAll('.po-hist-table thead th').length === 5;
-  const histRowsAcc = document.querySelectorAll('#poAccHist [data-acc-row]').length;
+  const rowsAcc = [...document.querySelectorAll('#poAccHist [data-acc-row]')];
+  const accOps = { noEdit: !document.querySelector('#poAccHist [data-acc-edit]'),
+    delEach: rowsAcc.every(tr => !!tr.querySelector('[data-acc-del]')),
+    noLocked: !document.querySelector('#poAccHist button[disabled]') };
   document.querySelector('.mp-drawer [data-ac-cancel]').click();
   /* ② 验收详情里改量 */
   document.querySelector('#poLinesBody [data-line-detail="S0301"]').click();
@@ -382,60 +382,70 @@ await step('验收弹层历史验收只读（无修改/删除列）→ 改量挪
   const detailRows = document.querySelectorAll('.mp-drawer [data-dacc-row]').length;
   const acceptedText = document.querySelector('.mp-drawer').textContent;
   document.querySelector('.mp-drawer [data-ld-close]').click();
-  return { ths, readOnly, histRowsAcc, dThasOps: dTh.indexOf('操作') >= 0, beforeVal,
+  return { ths, accOps, histRowsAcc: rowsAcc.length, dThasOps: dTh.indexOf('操作') >= 0, beforeVal,
     accepted: it.acceptedQty, seq: it.acceptSeq, qty1: b[0].qty, qty2: b[1].qty, batches: b.length,
     detailRows, reopenDetail: /验收详情/.test(acceptedText),
-    fail: (ths.join(',') !== '批次,时间,验收人,本次验收量,照片' || !readOnly || histRowsAcc !== 2
+    fail: (ths.join(',') !== '批次,时间,验收人,本次验收量,照片,操作' || !accOps.noEdit || !accOps.delEach
+      || !accOps.noLocked || rowsAcc.length !== 2
       || dTh.indexOf('操作') < 0 || beforeVal !== '2' || it.acceptedQty !== 6 || b.length !== 2
-      || b[0].qty !== 3 || detailRows !== 2) ? '批次修改/只读口径不符' : '' };
+      || b[0].qty !== 3 || detailRows !== 2) ? '批次修改/历史验收口径不符' : '' };
 })()`);
 
-await step('验收详情的批次删除：只有最新一批可删、取消不生效、删后累计回退；验收弹层里没有删除入口', `(() => {
+await step('批次删除=软删除：每条都能删、取消不生效、删后行仍保留但置灰并显示「已删除」、累计回退（弹层同样）', `(() => {
   const rows = () => [...document.querySelectorAll('.mp-drawer [data-dacc-row]')];
   const acc = () => window.MerchantOrder.__debug.findOrder(window.__TARGET_NO).items.find(i => i.skuCode === 'S0301').acceptedQty;
   document.querySelector('#poLinesBody [data-line-detail="S0301"]').click();
-  const seqs = rows().map(tr => tr.getAttribute('data-dacc-row'));
+  const seqs0 = rows().map(tr => tr.getAttribute('data-dacc-row'));
   const ops = rows().map(tr => ({ seq: tr.getAttribute('data-dacc-row'),
     hasEdit: !!tr.querySelector('[data-dacc-edit]'),
-    delEnabled: !!tr.querySelector('[data-dacc-del]'),
-    delLocked: !!tr.querySelector('button[disabled]') }));
+    hasDel: !!tr.querySelector('[data-dacc-del]') }));
   const acc0 = acc();
   /* 取消：什么都不改 */
-  document.querySelector('.mp-drawer [data-dacc-del]').click();
+  document.querySelector('.mp-drawer [data-dacc-row="2"] [data-dacc-del]').click();
   const maskOn = document.getElementById('poConfirmMask').classList.contains('show');
   const askText = (document.querySelector('.po-confirm-x') || { textContent: '' }).textContent.replace(/\\s+/g, ' ').trim();
   document.getElementById('poConfirmCancel').click();
   const afterCancel = { rows: rows().length, acc: acc() };
-  /* 确认删除最新一批（第 2 批） */
-  document.querySelector('.mp-drawer [data-dacc-del]').click();
+  /* 确认删除第 2 批（不是最新一批也能删） */
+  document.querySelector('.mp-drawer [data-dacc-row="2"] [data-dacc-del]').click();
   document.getElementById('poConfirmOk').click();
   const o = window.MerchantOrder.__debug.findOrder(window.__TARGET_NO);
   const it = o.items.find(i => i.skuCode === 'S0301');
   const recs = o.accepts.filter(a => a.itemSku === 'S0301');
   const toastTxt = (document.getElementById('toast') || { textContent: '' }).textContent || '';
+  const delRow = document.querySelector('.mp-drawer [data-dacc-row="2"]');
   const afterDel = { rows: rows().length, seqs: rows().map(tr => tr.getAttribute('data-dacc-row')),
-    acc: it.acceptedQty, acceptSeq: it.acceptSeq, recs: recs.length, toast: toastTxt,
-    latestDelEnabled: !!document.querySelector('.mp-drawer [data-dacc-row="1"] [data-dacc-del]') };
+    greyed: !!delRow && delRow.classList.contains('is-deleted'),
+    opsText: delRow ? delRow.lastElementChild.textContent.trim() : '',
+    stillHasBtn: delRow ? !!delRow.querySelector('[data-dacc-del]') : null,
+    acc: it.acceptedQty, acceptSeq: it.acceptSeq, recs: recs.length, soft: !!recs.find(r => r.seq === 2 && r.deleted),
+    toast: toastTxt,
+    row1Del: !!document.querySelector('.mp-drawer [data-dacc-row="1"] [data-dacc-del]') };
   document.querySelector('.mp-drawer [data-ld-close]').click();
-  /* 恢复现场：再验 3 箱回到 2 批 / 累计 6，并把验收弹层重新打开（后续步骤按原路径走） */
+  /* 验收弹层里同样：已删除行置灰、操作列显示「已删除」，其余行仍有删除按钮 */
   document.querySelector('#poLinesBody [data-line-accept="S0301"]').click();
+  const aDelRow = document.querySelector('#poAccHist [data-acc-row="2"]');
+  const accView = { title: document.querySelector('.mp-drawer-sub') ? document.querySelector('.mp-drawer-sub').textContent : '',
+    greyed: !!aDelRow && aDelRow.classList.contains('is-deleted'),
+    opsText: aDelRow ? aDelRow.lastElementChild.textContent.trim() : '',
+    row1Del: !!document.querySelector('#poAccHist [data-acc-row="1"] [data-acc-del]') };
+  /* 恢复现场：再验 3 箱 → 累计 6，并把验收弹层重新打开（后续步骤按原路径走） */
   const q2 = document.getElementById('poAcceptQty');
   q2.value = '3'; q2.dispatchEvent(new Event('input', { bubbles: true }));
   document.querySelector('[data-ac-save]').click();
   document.querySelector('#poLinesBody [data-line-accept="S0301"]').click();
   const restored = { rows: document.querySelectorAll('#poAccHist [data-acc-row]').length,
     acc: document.getElementById('poCurAccept').textContent.trim(),
-    noDelInAccept: !document.querySelector('#poAccHist [data-acc-del]') };
-  const newestSeq = Math.max(...ops.map(x => Number(x.seq)));
-  const newestOp = ops.find(x => Number(x.seq) === newestSeq) || {};
-  const lockOk = ops.filter(x => Number(x.seq) !== newestSeq)
-    .every(x => x.delLocked && !x.delEnabled && x.hasEdit);
-  return { seqs, ops, acc0, maskOn, askText, afterCancel, afterDel, restored,
-    fail: (!lockOk || !newestOp.delEnabled || !maskOn || askText.indexOf('不能恢复') === -1
+    deletedRows: document.querySelectorAll('#poAccHist tr.is-deleted').length };
+  const allOpsOk = ops.every(x => x.hasEdit && x.hasDel);
+  return { seqs0, ops, acc0, maskOn, askText, afterCancel, afterDel, accView, restored,
+    fail: (!allOpsOk || !maskOn || askText.indexOf('置灰') === -1 || askText.indexOf('不能恢复') === -1
       || afterCancel.rows !== 2 || afterCancel.acc !== 6
-      || afterDel.rows !== 1 || afterDel.acc !== 3 || afterDel.recs !== 1
-      || !afterDel.latestDelEnabled || afterDel.toast.indexOf('已删除第') === -1
-      || restored.rows !== 2 || restored.acc !== '6' || !restored.noDelInAccept) ? '批次删除口径不符' : '' };
+      || afterDel.rows !== 2 || !afterDel.greyed || afterDel.opsText !== '已删除' || afterDel.stillHasBtn
+      || afterDel.acc !== 3 || afterDel.acceptSeq !== 1 || afterDel.recs !== 2 || !afterDel.soft
+      || afterDel.toast.indexOf('已删除第') === -1 || !afterDel.row1Del
+      || !accView.greyed || accView.opsText !== '已删除' || !accView.row1Del
+      || restored.rows !== 3 || restored.acc !== '6' || restored.deletedRows !== 1) ? '软删除口径不符' : '' };
 })()`);
 
 await step('验收照片：非必填（无必填标）、最多 5 张、可删；本次验收量仍必填', `(() => {

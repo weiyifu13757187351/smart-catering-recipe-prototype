@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 栏目/范围切换回归：任何栏目里切换组织或档口，都不许把用户挤到「采购订单」
  * 用法：CDP=http://127.0.0.1:9460 node tools/verify-nav-scope.mjs
  */
@@ -19,7 +19,20 @@ const ev = async x => { const r = await send('Runtime.evaluate', { expression: x
   return r.result?.exceptionDetails ? 'EVAL_ERROR ' + (r.result.exceptionDetails.exception?.description || '').split('\n')[0] : r.result?.result?.value; };
 const visIds = () => ev(`[...document.querySelectorAll('.page-view')].filter(p=>!p.hidden).map(p=>p.id).join(',')`);
 const click = async id => { await ev(`document.querySelector('#${id}').click()`); await sleep(900); };
-const reload = async () => { await send('Page.navigate', { url: APP }); await sleep(3800); };
+const waitReady = async (limit = 60000) => {
+  const t0 = Date.now();
+  while (Date.now() - t0 < limit) {
+    const ready = await ev(`typeof window.MerchantOrder === 'object' && typeof window.MerchantScope === 'object' && !!document.querySelector('#purchasePlanNav') && !!document.querySelector('#poOrderNav')`);
+    if (ready === true) return true;
+    await sleep(1000);
+  }
+  return false;
+};
+const reload = async () => {
+  await send('Page.navigate', { url: APP });
+  await sleep(Number(process.env.LOAD_WAIT || 3800));
+  return waitReady();
+};
 
 await send('Runtime.enable'); await send('Page.enable');
 await reload();
@@ -59,3 +72,5 @@ console.log(`\n采购订单列表仍可渲染：可见=${stillList} 行数 ${bef
 console.log('\n异常：', errs.length ? errs.slice(0, 5).join(' | ') : '（无）');
 console.log(bad ? `\n${bad} 个用例异常` : '\n全部通过：切换范围不再跳栏目');
 ws.close(); process.exit(bad ? 1 : 0);
+
+

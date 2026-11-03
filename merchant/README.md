@@ -64,10 +64,10 @@ http://localhost:4174/
 | 项 | 内容 |
 | --- | --- |
 | PRD | `商户端采购订单管理PRD-V2.0.md`（§14 原型说明含改造结果与已知简化） |
-| 实现 | `merchant-purchase-order-v2.js` + `merchant-purchase-order-v2.css`（前缀 `.po-*`，页面挂载 `?v=20261029-v118`） |
+| 实现 | `merchant-purchase-order-v2.js` + `merchant-purchase-order-v2.css`（前缀 `.po-*`，页面挂载 `?v=20261102-po-mgmt-3`） |
 | 验收脚本 | `PO_PORT=4201 node tools/po-smoke-v2.mjs`（**51 步**：两层框架的列表列 / 筛选 / 页签、详情「更多信息」、行级验收与留痕、签名收口、售后三态、**三步向导建单（商品池按供货关系过滤 / 总价随填量实时同步 / 总览摘要卡 + 每供应商一张卡 / 混合供应商拆单）**、修改订单、无询价残留）。默认 4201，可用 `PO_PORT` / `PO_BASE` 指向本目录起的本地服务；需 Chrome `--remote-debugging-port=9333` |
 | 供货关系验收脚本 | `PO_PORT=4201 node tools/po-supply-smoke.mjs`（**25 步**：入口 / 4 张统计卡 / 默认隐藏已下架与灰态只读（无勾选列）/ 商品分类三级弹层（一级、二级、全部分类）与分类列三级路径 / 形态·绑定状态·关键词·供应商筛选 / 单个绑定形态校验 / **无报价供应商单选锁定** / 无报价仍可保存 / 一键最低价两条平局规则 / **二次确认（取消不生效、确认才执行，作用于全部在售商品）** / 按形态批量覆盖 / **一键清除供应商 + 确认**（下架绑定不受影响）/ 档口隔离） |
-| 截图脚本 | `PO_PORT=4201 node tools/po-shots-v2.mjs` → 直接输出到 `recipe-work\_shots-po\`（**76 张**：订单两层 63 张（含 V4.2 三步向导、V4.3 总览卡片、V4.4 验收照片选填、V4.5 退货原因「其他」、V4.6 批次累加验收 / 差异原因收口）+ 供货关系管理 13 张） |
+| 截图脚本 | `PO_PORT=4201 node tools/po-shots-v2.mjs` → 直接输出到 `recipe-work\_shots-po\`（**79 张**：订单两层 66 张（含 V4.2 三步向导、V4.3 总览卡片、V4.4 验收照片选填、V4.5 退货原因「其他」、V4.6 批次累加验收 / 差异原因收口）+ 供货关系管理 13 张） |
 | 悬浮可见性巡检 | `PO_PORT=4201 node tools/po-hover-audit.mjs` → 用 CDP 强制 `:hover` 逐页算文字/背景对比度（**20 个页面状态、355 个可点元素**，阈值 < 2.2 判定「悬浮看不清」），hover 截图存 `tools/shots-hover/` |
 | 回滚 | 把 `食联网数智餐饮平台-组织及人员.html` 中的 v2 资源换回 `merchant-purchase-order-v1.js/.css` 即可（v1 文件仍在） |
 
